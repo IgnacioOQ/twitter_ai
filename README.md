@@ -16,7 +16,7 @@ The primary focus of this project is processing, cleaning, and analyzing Twitter
 - `docs/`: Markdown conventions, overarching explanations, and architectural plans.
 
 ## Notebooks Workflow
-The data pipeline is divided into five sequential stages, each housed in its own subdirectory within `notebooks/`:
+The data pipeline is divided into five sequential stages, each housed in its own subdirectory within `notebooks/`, and sequentially numbered with a clear snake_case naming convention (e.g., `01_twitter_api_mining.ipynb`):
 
 1. **`01_Ingestion/`**: Data mining from the Twitter API and access to shared folders.
 2. **`02_Processing/`**: Converting raw API data into usable dictionaries, structural sanity checks, network generation, author corpus creation, and text cleaning.
