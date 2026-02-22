@@ -16,12 +16,13 @@ The primary focus of this project is processing, cleaning, and analyzing Twitter
 - `docs/`: Markdown conventions, overarching explanations, and architectural plans.
 
 ## Notebooks Workflow
-1. `0.` Data mining and access to shared folders.
-2. `1.` Converting raw API data into usable dictionaries.
-3. `2.` Sanity checks, network generation, and author corpus creation.
-4. `3.` Adding sentiment and topic modeling (LDA) to tweets, grouping by author.
-5. `4.` Network analysis.
-6. `5.` Embedding mappings.
+The data pipeline is divided into five sequential stages, each housed in its own subdirectory within `notebooks/`:
+
+1. **`01_Ingestion/`**: Data mining from the Twitter API and access to shared folders.
+2. **`02_Processing/`**: Converting raw API data into usable dictionaries, structural sanity checks, network generation, author corpus creation, and text cleaning.
+3. **`03_Analysis_and_Modeling/`**: Adding sentiment analysis, extracting examples, LDA topic modeling, and embedding mappings.
+4. **`04_Network_Analysis/`**: Pure network graph analysis.
+5. **`05_Experiments/`**: Isolated testing (e.g., TP-Bigrams).
 
 ## Usage
 Since the core logic is in standard Jupyter `.ipynb` format, you can open them with VS Code, JupyterLab, or locally connect them to Google Colab to leverage cloud compute. Ensure that the required python libraries (pandas, scikit-learn, networkx, etc.) are installed if running locally.
