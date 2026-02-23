@@ -548,7 +548,125 @@ def equalize(net: nx.DiGraph, n: int) -> nx.DiGraph:
 #         # print(f"{n_edges_added=:,} edges added")
 #     # print(f"{edges_added_clustering:,} edges added to increase clustering")
 #     # print(f"{edges_added_degree_dist:,} edges added based on {target_degree_dist} degree distribution")
+#                     clustering_dict[n] = nx.clustering(net_new, n)
+#                 new_average_clustering = sum(clustering_dict.values()) / len(clustering_dict)
+
 #     return net_new
+
+
+def plot_report(G):
+    try:
+        import powerlaw
+    except ImportError:
+        powerlaw = None
+        print("powerlaw module not found. Distribution fitting will be skipped.")
+
+    print("Report and Plots")
+    print("Plotting Report")
+    print("-------------------------")
+    print("## Network Summary ##")
+    print("-------------------------")
+
+    is_directed = G.is_directed()
+    print(f"Network Type: {'Directed' if is_directed else 'Undirected'}")
+    print(f"Number of nodes (V): {G.number_of_nodes()}")
+    print(f"Number of edges (E): {G.number_of_edges()}")
+
+    is_weighted = False
+    for u, v, d in G.edges(data=True):
+        if "weight" in d:
+            is_weighted = True
+        break
+    print(f"Is Weighted: {is_weighted}")
+
+    stats = network_statistics(G, directed=is_directed)
+    print(f"Average Degree: {stats.get('average_degree', 0):.4f}")
+    print(f"Density: {nx.density(G):.6f}")
+    if "degree_gini_coefficient" in stats:
+        print(f"Gini Coefficient (Degree): {stats['degree_gini_coefficient']:.4f}")
+
+    if is_directed:
+        print(
+            f"Number of Weakly Connected Components: {nx.number_weakly_connected_components(G)}"
+        )
+    else:
+        print(f"Number of Connected Components: {nx.number_connected_components(G)}")
+
+    print(f"Number of self-loops: {nx.number_of_selfloops(G)}")
+    print("-------------------------\n")
+
+    print("## Detailed Node and Edge Example ##")
+    print("-----------------------------------")
+
+    if len(G.nodes) > 0:
+        sample_node = next(iter(G.nodes()))
+        print(f"🔍 Inspecting Node: '{sample_node}'\n")
+        print(f"Attributes of Node '{sample_node}':")
+        node_attr = G.nodes[sample_node]
+        for k, v in node_attr.items():
+            print(f"  - {k}: {v}")
+
+        print(f"\nEdges connected to Node '{sample_node}':")
+        edges = list(G.edges(sample_node, data=True))
+        if len(edges) > 0:
+            sample_edge = edges[0]
+            print(f"Example Edge: ('{sample_edge[0]}', '{sample_edge[1]}')")
+            print("Attributes of this edge:")
+            for k, v in sample_edge[2].items():
+                print(f"  - {k}: {v}")
+
+    print("-----------------------------------")
+    print("-------------------------")
+
+    print("--- 0. Extracting data from graph (mode: 'out') ---\n")
+    if is_directed:
+        degrees = [
+            deg for _, deg in G.out_degree(weight="weight" if is_weighted else None)
+        ]
+    else:
+        degrees = [deg for _, deg in G.degree(weight="weight" if is_weighted else None)]
+
+    degrees_arr = np.array(degrees)
+
+    print("--- 1. Calculating Percentiles ---")
+    if len(degrees_arr) > 0:
+        for p in [90, 95, 99]:
+            val = np.percentile(degrees_arr, p)
+            coverage = 100 * np.sum(degrees_arr <= val) / len(degrees_arr)
+            print(
+                f"~{p}% of nodes have strength <= {val:.1f} (Actual coverage: {coverage:.2f}%)"
+            )
+
+    print("\n--- 2. Fitting Power Law (Method: 'tail') ---")
+    if powerlaw is not None and len(degrees_arr[degrees_arr > 0]) > 0:
+        try:
+            # We suppress stdout to avoid excessive printing from powerlaw
+            fit = powerlaw.Fit(degrees_arr[degrees_arr > 0], xmin=None, discrete=True)
+            print("Fit results on the full distribution:")
+            print(f"Alpha (α): {fit.power_law.alpha:.4f}")
+            print(f"Xmin (xₘᵢₙ): {fit.power_law.xmin:.4f}")
+            print(f"Sigma (σ): {fit.power_law.sigma:.4f}\n")
+
+            print("--- 3. Distribution Comparison ---")
+            R, p_val = fit.distribution_compare("power_law", "lognormal")
+            print(
+                f"Power Law vs. Lognormal: Loglikelihood Ratio R={R:.4f}, p-value={p_val:.4f}"
+            )
+            if p_val < 0.05:
+                if R > 0:
+                    print("Verdict: Power law is a significantly better fit.\n")
+                else:
+                    print("Verdict: Lognormal is a significantly better fit.\n")
+            else:
+                print(
+                    "Verdict: Not statistically significant. Cannot conclude one is a better fit than the other.\n"
+                )
+        except Exception as e:
+            print(f"Error fitting power law: {e}\n")
+
+    print("--- 4. Generating Plot ---")
+    plot_network_degree_distribution(G, directed=is_directed)
+    plot_loglog(G, directed=is_directed)
 
 
 # ## Cluster
