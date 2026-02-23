@@ -249,7 +249,7 @@ def compute_katz_centrality(G, alpha=0.1, beta=1.0, measure_influence=True):
         )
 
 
-def network_statistics(G, directed=True):
+def network_statistics(G, directed=True, compute_clustering=False, fast_mode=True):
     stats = {}
 
     # Average degree
@@ -257,18 +257,32 @@ def network_statistics(G, directed=True):
         degrees = [deg for _, deg in G.out_degree()]
     else:
         degrees = [deg for _, deg in G.degree()]
-    stats["average_degree"] = sum(degrees) / len(degrees)
+
+    if len(degrees) > 0:
+        stats["average_degree"] = sum(degrees) / len(degrees)
+    else:
+        stats["average_degree"] = 0
 
     # Gini coefficient
     # print(degrees)
-    stats["degree_gini_coefficient"] = calculate_degree_gini(G, directed=directed)
+    if not fast_mode or len(degrees) < 500000:
+        try:
+            stats["degree_gini_coefficient"] = calculate_degree_gini(
+                G, directed=directed
+            )
+        except Exception:
+            pass
 
     # Compute clustering for each node
     # it allows us to use weights, which we neglect...
-    clustering_values = nx.clustering(G)
-    # Compute the average clustering coefficient manually
-    average_clustering = sum(clustering_values.values()) / len(clustering_values)
-    stats["approx_average_clustering_coefficient"] = average_clustering
+    if compute_clustering and (not fast_mode or len(G.nodes) < 100000):
+        clustering_values = nx.clustering(G)
+        # Compute the average clustering coefficient manually
+        if len(clustering_values) > 0:
+            average_clustering = sum(clustering_values.values()) / len(
+                clustering_values
+            )
+            stats["approx_average_clustering_coefficient"] = average_clustering
 
     # commenting out unnecesary metrics to speed up computation
     # if directed:
@@ -568,8 +582,10 @@ def plot_report(G):
     print("-------------------------")
 
     is_directed = G.is_directed()
+    v_count = G.number_of_nodes()
+
     print(f"Network Type: {'Directed' if is_directed else 'Undirected'}")
-    print(f"Number of nodes (V): {G.number_of_nodes()}")
+    print(f"Number of nodes (V): {v_count}")
     print(f"Number of edges (E): {G.number_of_edges()}")
 
     is_weighted = False
@@ -579,18 +595,27 @@ def plot_report(G):
         break
     print(f"Is Weighted: {is_weighted}")
 
-    stats = network_statistics(G, directed=is_directed)
+    stats = network_statistics(
+        G, directed=is_directed, compute_clustering=False, fast_mode=True
+    )
     print(f"Average Degree: {stats.get('average_degree', 0):.4f}")
     print(f"Density: {nx.density(G):.6f}")
     if "degree_gini_coefficient" in stats:
         print(f"Gini Coefficient (Degree): {stats['degree_gini_coefficient']:.4f}")
-
-    if is_directed:
-        print(
-            f"Number of Weakly Connected Components: {nx.number_weakly_connected_components(G)}"
-        )
     else:
-        print(f"Number of Connected Components: {nx.number_connected_components(G)}")
+        print(f"Gini Coefficient (Degree): Skipped (very large graph)")
+
+    if v_count < 100000:
+        if is_directed:
+            print(
+                f"Number of Weakly Connected Components: {nx.number_weakly_connected_components(G)}"
+            )
+        else:
+            print(
+                f"Number of Connected Components: {nx.number_connected_components(G)}"
+            )
+    else:
+        print("Number of Components: Skipped (very large graph)")
 
     print(f"Number of self-loops: {nx.number_of_selfloops(G)}")
     print("-------------------------\n")
