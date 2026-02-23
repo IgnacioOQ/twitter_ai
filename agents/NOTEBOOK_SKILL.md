@@ -110,7 +110,7 @@ RUNNING_LOCALLY = True
 
 if RUNNING_LOCALLY:
     # Standard macOS path for Google Drive Desktop
-    BASE_PATH = Path('/Volumes/GoogleDrive/MyDrive/AI Public Trust')
+    BASE_PATH = Path('/Volumes/GoogleDrive/My Drive/Colab Projects/AI Public Trust')
     
     # Ensure src module is discoverable from notebook subdirectories
     repo_root = Path(os.getcwd()).resolve().parents[1]
@@ -120,7 +120,7 @@ else:
     # Google Colab cloud path
     from google.colab import drive
     drive.mount('/content/drive')
-    BASE_PATH = Path('/content/drive/MyDrive/AI Public Trust')
+    BASE_PATH = Path('/content/drive/My Drive/Colab Projects/AI Public Trust')
 
 # Pre-compute critical paths used across notebooks
 twits_folder = BASE_PATH / 'Raw Data/Twits/'
