@@ -86,3 +86,48 @@ Collaborating on Google Drive requires all participants to add a **Shortcut** to
   `SHARED_FOLDER_PATH = '/content/drive/MyDrive/AI Public Trust'`
 - **Folder Verification**: Before executing data-heavy operations, agents should instruct notebooks to verify the existence of this target path using `os.path.exists(SHARED_FOLDER_PATH)`.
 - **Warning on Shortcuts**: If a collaborator names their shortcut differently, the `SHARED_FOLDER_PATH` variable is the only place that needs to be updated. Agents should keep this path abstracted into a top-level constant rather than scattering `/content/drive/...` strings throughout the code.
+
+### 3. Notebook Environment Switch & Path Management
+- status: active
+- id: notebook_skill.gdrive_workflows.env_switch
+<!-- content -->
+Because notebooks in this project are executed both in the cloud (Google Colab) and locally (VS Code / Jupyter), an `env_switch_setup` cell pattern must be strictly adhered to at the top of every notebook. 
+
+- **The `RUNNING_LOCALLY` flag**: This boolean controls the flow of pathing and imports. 
+- **Guarding Colab Imports**: Never import `google.colab` or call `drive.mount('/content/drive')` unconditionally. It will cause a `ModuleNotFoundError` when run locally. It must be guarded by `if not RUNNING_LOCALLY:`.
+- **Project Root Resolution**: Local execution of notebooks often happens from subdirectories (e.g. `notebooks/04_Network_Analysis/`), which breaks Python's ability to find the `src` module folder at the root of the project. A standardized setup block must dynamically append the repository root to `sys.path` *when running locally*.
+- **Single Source of Truth**: Define variables like `BASE_PATH`, `networks_folder`, `datasets_folder`, etc. **once** in the `env_switch_setup` cell. Never manually redefine them (e.g., `BASE_PATH = Path('/content/drive...')`) further down in the notebook, as this overwrites the correct local paths established by the environment switch block.
+
+#### Standardized Setup Cell Template
+
+```python
+import os
+import sys
+from pathlib import Path
+
+# --- ENVIRONMENT SWITCH ---
+RUNNING_LOCALLY = True
+
+if RUNNING_LOCALLY:
+    # Standard macOS path for Google Drive Desktop
+    BASE_PATH = Path('/Volumes/GoogleDrive/MyDrive/AI Public Trust')
+    
+    # Ensure src module is discoverable from notebook subdirectories
+    repo_root = Path(os.getcwd()).resolve().parents[1]
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+else:
+    # Google Colab cloud path
+    from google.colab import drive
+    drive.mount('/content/drive')
+    BASE_PATH = Path('/content/drive/MyDrive/AI Public Trust')
+
+# Pre-compute critical paths used across notebooks
+twits_folder = BASE_PATH / 'Raw Data/Twits/'
+test_folder = BASE_PATH / 'Raw Data/'
+datasets_folder = BASE_PATH / 'Data Sets'
+cleanedds_folder = BASE_PATH / 'Data Sets/Cleaned Data'
+networks_folder = BASE_PATH / 'Data Sets/Networks/'
+literature_folder = BASE_PATH / 'Literature/'
+topic_models_folder = BASE_PATH / 'Models/Topic Modeling/'
+```
