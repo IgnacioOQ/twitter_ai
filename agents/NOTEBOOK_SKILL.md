@@ -102,20 +102,22 @@ Because notebooks in this project are executed both in the cloud (Google Colab) 
 
 ```python
 import os
-import sys
 from pathlib import Path
+import sys
 
 # --- ENVIRONMENT SWITCH ---
-RUNNING_LOCALLY = True
+# Set to True if running on local machine with Google Drive Desktop mounted
+# Set to False if running in Google Colab cloud
+RUNNING_LOCALLY = False
 
 if RUNNING_LOCALLY:
+  # --- REPO ROOT ON sys.path (so `from src.*` works locally) ---
+    _REPO_ROOT = str(Path(os.getcwd()).resolve().parents[1])
+    if _REPO_ROOT not in sys.path:
+        sys.path.insert(0, _REPO_ROOT)
     # Standard macOS path for Google Drive Desktop
     BASE_PATH = Path('/Volumes/GoogleDrive/My Drive/Colab Projects/AI Public Trust')
     
-    # Ensure src module is discoverable from notebook subdirectories
-    repo_root = Path(os.getcwd()).resolve().parents[1]
-    if str(repo_root) not in sys.path:
-        sys.path.insert(0, str(repo_root))
 else:
     # Google Colab cloud path
     from google.colab import drive
