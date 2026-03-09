@@ -74,7 +74,7 @@ Followed immediately by a cell that changes into the cloned repo **and adds it t
 ```python
 import sys, os
 if not RUNNING_LOCALLY:
-    os.chdir('twitter-ai')
+    os.chdir('twitter_ai')
     _repo_root = os.getcwd()
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
