@@ -69,11 +69,18 @@ else:
     print('Running locally: Skipping Colab shell setup.')
 ```
 
-Followed immediately by a `%cd` into the cloned repo:
+Followed immediately by a cell that changes into the cloned repo **and adds it to `sys.path`** so that `from src.*` imports resolve correctly on Colab:
 
 ```python
-%cd twitter-ai
+import sys, os
+if not RUNNING_LOCALLY:
+    os.chdir('twitter-ai')
+    _repo_root = os.getcwd()
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 ```
+
+> **Note:** Use `os.chdir()` instead of the `%cd` magic so the call can be guarded by `if not RUNNING_LOCALLY`. The `sys.path` update mirrors what Cell 1 already does for the local branch.
 
 ### Cell 3 — pip Installs (Colab only, when needed)
 - status: active
