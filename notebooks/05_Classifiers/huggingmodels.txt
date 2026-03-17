@@ -1,0 +1,8 @@
+https://huggingface.co/Supreeth/DeBERTa-Twitter-Emotion-Classification
+https://huggingface.co/wesleyacheng/twitter-emotion-classification-with-bert
+https://huggingface.co/cardiffnlp/twitter-roberta-base-emotion-latest
+https://huggingface.co/cardiffnlp/twitter-roberta-base-emotion-multilabel-latest
+https://huggingface.co/cardiffnlp/twitter-roberta-base-emotion
+https://huggingface.co/bhadresh-savani/bert-base-go-emotion
+https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest
+https://huggingface.co/cardiffnlp/twitter-xlm-roberta-base-sentiment
