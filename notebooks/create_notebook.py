@@ -125,13 +125,15 @@ else:
     BASE_PATH = Path('/content/drive/My Drive/Colab Projects/AI Public Trust')
 
 # Pre-compute critical paths
-twits_folder        = BASE_PATH / 'Raw Data/Twits/'
-test_folder         = BASE_PATH / 'Raw Data/'
-datasets_folder     = BASE_PATH / 'Data Sets'
-cleanedds_folder    = BASE_PATH / 'Data Sets/Cleaned Data'
-networks_folder     = BASE_PATH / 'Data Sets/Networks/'
-literature_folder   = BASE_PATH / 'Literature/'
-topic_models_folder = BASE_PATH / 'Models/Topic Modeling/'"""
+twits_folder          = BASE_PATH / 'Raw Data/Twits/'
+test_folder           = BASE_PATH / 'Raw Data/'
+datasets_folder       = BASE_PATH / 'Data Sets'
+cleanedds_folder      = BASE_PATH / 'Data Sets/Cleaned Data'
+networks_folder       = BASE_PATH / 'Data Sets/Networks/'
+literature_folder     = BASE_PATH / 'Literature/'
+topic_models_folder   = BASE_PATH / 'Models/Topic Modeling/'
+classifiers_folder    = BASE_PATH / 'Models/Classifiers/'
+classifiers_folder.mkdir(parents=True, exist_ok=True)"""
     if extra_paths:
         return base + "\n" + extra_paths
     return base
@@ -300,31 +302,85 @@ nb2_cells = [
          "X_tr, X_val, y_tr, y_val = train_test_split(\n"
          "    train_df['text'], train_df['human_label'], test_size=0.1, random_state=42)"),
 
-    md("## 2. Fast Models (TF-IDF + Logistic Regression & LightGBM)"),
+    md("## 2. Sentence Embeddings\n\nGenerate sentence embeddings using `all-MiniLM-L6-v2` for use in the boosted tree and logistic regression."),
 
-    code("t0  = time.time()\n"
-         "vec = TfidfVectorizer(max_features=25_000)\n"
-         "Xtr_v  = vec.fit_transform(X_tr)\n"
-         "Xval_v = vec.transform(X_val)\n"
-         "print(f'TF-IDF vectorisation: {time.time()-t0:.1f}s')\n"
+    code("from sentence_transformers import SentenceTransformer\n"
          "\n"
          "t0 = time.time()\n"
-         "lr = LogisticRegression(max_iter=1000)\n"
-         "lr.fit(Xtr_v, y_tr)\n"
-         "lr_tr = time.time()-t0\n"
-         "t0 = time.time()\n"
-         "lr_acc = accuracy_score(y_val, lr.predict(Xval_v))\n"
-         "lr_inf = time.time()-t0\n"
-         "print(f'LR   train {lr_tr:.1f}s | infer {lr_inf:.2f}s | acc {lr_acc:.4f}')\n"
+         "st_model = SentenceTransformer('all-MiniLM-L6-v2')\n"
+         "embeddings_tr  = st_model.encode(X_tr.tolist(), show_progress_bar=True)\n"
+         "embeddings_val = st_model.encode(X_val.tolist(), show_progress_bar=True)\n"
+         "print(f'Sentence embedding time: {time.time()-t0:.1f}s')"),
+
+    md("## 3. Bag-of-Words (CountVectorizer)"),
+
+    code("from sklearn.feature_extraction.text import CountVectorizer\n"
          "\n"
+         "bow_vec = CountVectorizer(max_features=50_000)\n"
+         "X_bow_tr  = bow_vec.fit_transform(X_tr)\n"
+         "X_bow_val = bow_vec.transform(X_val)\n"
+         "print(f'BoW shape: {X_bow_tr.shape}')"),
+
+    md("## 4. Logistic Regression"),
+
+    code("from sklearn.metrics import roc_auc_score\n"
+         "\n"
+         "# --- On sentence embeddings ---\n"
          "t0 = time.time()\n"
-         "lgbm = lgb.LGBMClassifier(n_estimators=200, random_state=42)\n"
-         "lgbm.fit(Xtr_v, y_tr)\n"
-         "lg_tr = time.time()-t0\n"
+         "lr_embed = LogisticRegression(max_iter=1000)\n"
+         "lr_embed.fit(embeddings_tr, y_tr)\n"
+         "lr_embed_tr = time.time()-t0\n"
          "t0 = time.time()\n"
-         "lg_acc = accuracy_score(y_val, lgbm.predict(Xval_v))\n"
-         "lg_inf = time.time()-t0\n"
-         "print(f'LGBM train {lg_tr:.1f}s | infer {lg_inf:.2f}s | acc {lg_acc:.4f}')"),
+         "lr_embed_preds = lr_embed.predict(embeddings_val)\n"
+         "lr_embed_inf   = time.time()-t0\n"
+         "print(f'LR (embed) train {lr_embed_tr:.1f}s | infer {lr_embed_inf:.2f}s | acc {accuracy_score(y_val, lr_embed_preds):.4f}')\n"
+         "\n"
+         "# --- On BoW ---\n"
+         "t0 = time.time()\n"
+         "lr_bow = LogisticRegression(max_iter=1000)\n"
+         "lr_bow.fit(X_bow_tr, y_tr)\n"
+         "lr_bow_tr = time.time()-t0\n"
+         "t0 = time.time()\n"
+         "lr_bow_preds = lr_bow.predict(X_bow_val)\n"
+         "lr_bow_inf   = time.time()-t0\n"
+         "print(f'LR (BoW)   train {lr_bow_tr:.1f}s | infer {lr_bow_inf:.2f}s | acc {accuracy_score(y_val, lr_bow_preds):.4f}')"),
+
+    md("## 5. Boosted Tree (LightGBM native API)\n\nMatches the approach in `Classifiers_Training_Final.ipynb` — uses `lgb.Dataset` and `lgb.train()` with a params dict. Run with both sentence embeddings and BoW."),
+
+    code("# LightGBM params (binary classification, AUC metric)\n"
+         "lgb_param = {\n"
+         "    'objective':    'binary',\n"
+         "    'boosting_type': 'gbdt',\n"
+         "    'metric':       'auc',\n"
+         "    'verbose':      -1,\n"
+         "}\n"
+         "NUM_BOOST_ROUND = 1000\n"
+         "\n"
+         "# --- On sentence embeddings ---\n"
+         "train_data_embed = lgb.Dataset(embeddings_tr, label=(y_tr.astype(int) if hasattr(y_tr, 'astype') else list(y_tr)))\n"
+         "t0 = time.time()\n"
+         "clf_embed = lgb.train(lgb_param, train_data_embed, num_boost_round=NUM_BOOST_ROUND)\n"
+         "lgb_embed_tr = time.time()-t0\n"
+         "t0 = time.time()\n"
+         "lgb_embed_preds = (clf_embed.predict(embeddings_val) > 0.5).astype(int)\n"
+         "lgb_embed_inf   = time.time()-t0\n"
+         "print(f'LGB (embed) train {lgb_embed_tr:.1f}s | infer {lgb_embed_inf:.2f}s | acc {accuracy_score(y_val, lgb_embed_preds):.4f}')\n"
+         "clf_embed.save_model(str(classifiers_folder / 'lgb_embed.txt'))"),
+
+    code("# --- On BoW ---\n"
+         "import scipy.sparse\n"
+         "X_bow_tr_dense  = X_bow_tr.toarray()  if scipy.sparse.issparse(X_bow_tr)  else X_bow_tr\n"
+         "X_bow_val_dense = X_bow_val.toarray() if scipy.sparse.issparse(X_bow_val) else X_bow_val\n"
+         "\n"
+         "train_data_bow = lgb.Dataset(X_bow_tr_dense, label=(y_tr.astype(int) if hasattr(y_tr, 'astype') else list(y_tr)))\n"
+         "t0 = time.time()\n"
+         "clf_bow = lgb.train(lgb_param, train_data_bow, num_boost_round=NUM_BOOST_ROUND)\n"
+         "lgb_bow_tr = time.time()-t0\n"
+         "t0 = time.time()\n"
+         "lgb_bow_preds = (clf_bow.predict(X_bow_val_dense) > 0.5).astype(int)\n"
+         "lgb_bow_inf   = time.time()-t0\n"
+         "print(f'LGB (BoW)   train {lgb_bow_tr:.1f}s | infer {lgb_bow_inf:.2f}s | acc {accuracy_score(y_val, lgb_bow_preds):.4f}')\n"
+         "clf_bow.save_model(str(classifiers_folder / 'lgb_bow.txt'))"),
 
     md("## 3. Twitter-RoBERTa Fine-Tuning\n\n"
        "`cardiffnlp/twitter-roberta-base` — pre-trained on 58 M tweets."),
@@ -371,7 +427,7 @@ nb2_cells = [
          "res = trainer.evaluate()\n"
          "print(f'RoBERTa val accuracy: {res[\"eval_accuracy\"]:.4f}')\n"
          "\n"
-         "best_path = hitl_folder / 'best_roberta_model'\n"
+         "best_path = classifiers_folder / 'best_roberta_model'\n"
          "trainer.save_model(str(best_path))\n"
          "tokenizer.save_pretrained(str(best_path))\n"
          "print(f'Model saved to {best_path}')"),
@@ -443,7 +499,7 @@ nb3_cells = [
 
     md("## 1. Load Best Model"),
 
-    code("best_path = hitl_folder / 'best_roberta_model'\n"
+    code("best_path = classifiers_folder / 'best_roberta_model'\n"
          "if not best_path.exists():\n"
          "    raise FileNotFoundError('Model not found. Run notebook 02 first.')\n"
          "\n"
@@ -499,10 +555,179 @@ nb3_cells = [
          "print('Saved to Classifiers_Data/Final/')"),
 ]
 
-# ── Write all three notebooks ─────────────────────────────────────────────────
+# ── Notebook 4: Full-Dataset Mass Inference (~17M tweets) ────────────────────
+
+EXTRA_PATHS_4 = ("hitl_folder        = datasets_folder / 'Classifiers_Data' / 'HITL'\n"
+                 "full_inference_folder = datasets_folder / 'Classifiers_Data' / 'Full_Inference'\n"
+                 "full_inference_folder.mkdir(parents=True, exist_ok=True)")
+
+nb4_cells = [
+    md("# 04 - Full Dataset Mass Inference\n\n"
+       "Classifies the **entire remaining tweet corpus** (~17 million tweets) using the\n"
+       "models trained in notebook 02. Models are loaded from `Models/Classifiers/`.\n\n"
+       "This notebook is designed to run on Colab with GPU acceleration and processes tweets\n"
+       "in chunks to avoid out-of-memory errors."),
+
+    code(setup_cell(EXTRA_PATHS_4)),
+
+    code("if not RUNNING_LOCALLY:\n"
+         "    print('Running Colab setup...')\n"
+         "    import subprocess\n"
+         "    subprocess.run(['pip', 'install', '-q', 'transformers', 'torch',\n"
+         "                    'sentence-transformers', 'lightgbm'])\n"
+         "else:\n"
+         "    print('Running locally: skipping Colab setup.')"),
+
+    code("import os\n"
+         "import re\n"
+         "import time\n"
+         "import pickle\n"
+         "import numpy as np\n"
+         "import pandas as pd\n"
+         "import tqdm\n"
+         "import torch\n"
+         "import lightgbm as lgb\n"
+         "from pathlib import Path\n"
+         "from sentence_transformers import SentenceTransformer\n"
+         "from sklearn.feature_extraction.text import CountVectorizer\n"
+         "from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline"),
+
+    md("## Configuration\n\n"
+       "Set `CHUNK_SIZE` based on available RAM. 10 000 is safe for Colab; increase if you have more memory."),
+
+    code("CHUNK_SIZE    = 10_000   # tweets processed per batch\n"
+         "ROBERTA_BATCH = 64       # pipeline batch size for RoBERTa (GPU dependent)\n"
+         "SAVE_EVERY    = 100_000  # checkpoint: save intermediate results every N tweets"),
+
+    md("## 1. Text Cleaning"),
+
+    code("def clean_tweet(text: str) -> str:\n"
+         "    text = re.sub(r'http\\S+', '', text)          # remove URLs\n"
+         "    text = re.sub(r'@[A-Za-z0-9_]+', '', text)   # remove @mentions\n"
+         "    text = text.replace('#', '')                  # strip # from hashtags\n"
+         "    text = re.sub(r'\\bRT\\b', '', text)           # remove RT markers\n"
+         "    text = re.sub(r'\\n', ' ', text)\n"
+         "    text = re.sub(r'\\s+', ' ', text).strip()\n"
+         "    return text"),
+
+    md("## 2. Load Full Tweet Dataset\n\n"
+       "Expects the full cleaned tweet corpus as a DataFrame or pickle dict.\n"
+       "Adjust the path and loading logic to match your data format."),
+
+    code("# ── Adjust this path and format to your actual full corpus ──────────────\n"
+         "FULL_DATA_PATH = cleanedds_folder / 'all_cleaned_tweets.pkl'\n"
+         "\n"
+         "print(f'Loading full corpus from {FULL_DATA_PATH}...')\n"
+         "if FULL_DATA_PATH.suffix == '.pkl':\n"
+         "    full_df = pd.read_pickle(FULL_DATA_PATH)\n"
+         "elif FULL_DATA_PATH.suffix == '.csv':\n"
+         "    full_df = pd.read_csv(FULL_DATA_PATH)\n"
+         "else:\n"
+         "    raise ValueError('Unknown format. Update FULL_DATA_PATH.')\n"
+         "\n"
+         "# Ensure id column exists\n"
+         "if 'tweet_id' in full_df.columns and 'id' not in full_df.columns:\n"
+         "    full_df['id'] = full_df['tweet_id']\n"
+         "\n"
+         "print(f'Total tweets to classify: {len(full_df):,}')"),
+
+    md("## 3. Load Trained Models"),
+
+    code("# ── Twitter-RoBERTa (primary model) ─────────────────────────────────────\n"
+         "best_model_path = classifiers_folder / 'best_roberta_model'\n"
+         "if not best_model_path.exists():\n"
+         "    raise FileNotFoundError(f'RoBERTa model not found at {best_model_path}. Run notebook 02 first.')\n"
+         "\n"
+         "print('Loading Twitter-RoBERTa...')\n"
+         "tokenizer = AutoTokenizer.from_pretrained(str(best_model_path))\n"
+         "model     = AutoModelForSequenceClassification.from_pretrained(str(best_model_path))\n"
+         "device    = 0 if torch.cuda.is_available() else -1\n"
+         "roberta_pipe = pipeline('text-classification', model=model, tokenizer=tokenizer,\n"
+         "                        device=device, batch_size=ROBERTA_BATCH, return_all_scores=True)\n"
+         "print(f'RoBERTa loaded. Device: {\"GPU\" if device==0 else \"CPU\"}')"),
+
+    code("# ── LightGBM (sentence embeddings) ──────────────────────────────────────\n"
+         "lgb_embed_path = classifiers_folder / 'lgb_embed.txt'\n"
+         "lgb_bow_path   = classifiers_folder / 'lgb_bow.txt'\n"
+         "\n"
+         "clf_embed = lgb.Booster(model_file=str(lgb_embed_path)) if lgb_embed_path.exists() else None\n"
+         "clf_bow   = lgb.Booster(model_file=str(lgb_bow_path))   if lgb_bow_path.exists()   else None\n"
+         "\n"
+         "if clf_embed:\n"
+         "    print('LightGBM (embed) loaded.')\n"
+         "if clf_bow:\n"
+         "    print('LightGBM (BoW) loaded.')"),
+
+    code("# ── Sentence Transformer (for LightGBM embed) ───────────────────────────\n"
+         "if clf_embed:\n"
+         "    st_model = SentenceTransformer('all-MiniLM-L6-v2')\n"
+         "    print('Sentence transformer loaded.')"),
+
+    md("## 4. Run Mass Inference\n\n"
+       "Processes tweets in chunks. Results are saved incrementally every `SAVE_EVERY` tweets\n"
+       "to avoid losing progress on long runs."),
+
+    code("results = []\n"
+         "t_start = time.time()\n"
+         "n_total = len(full_df)\n"
+         "\n"
+         "for chunk_start in tqdm.tqdm(range(0, n_total, CHUNK_SIZE)):\n"
+         "    chunk = full_df.iloc[chunk_start:chunk_start + CHUNK_SIZE].copy()\n"
+         "    texts_raw = chunk['text'].astype(str).tolist()\n"
+         "    texts_clean = [clean_tweet(t) for t in texts_raw]\n"
+         "\n"
+         "    row_results = {'id': chunk['id'].tolist()\n"
+         "                   if 'id' in chunk.columns else list(range(chunk_start, chunk_start+len(chunk)))}\n"
+         "\n"
+         "    # ── RoBERTa predictions ──────────────────────────────────────────\n"
+         "    scores = roberta_pipe(texts_clean)\n"
+         "    row_results['roberta_label']      = [max(s, key=lambda x: x['score'])['label'] for s in scores]\n"
+         "    row_results['roberta_confidence'] = [max(s, key=lambda x: x['score'])['score'] for s in scores]\n"
+         "\n"
+         "    # ── LightGBM (embed) predictions ────────────────────────────────\n"
+         "    if clf_embed:\n"
+         "        embeds = st_model.encode(texts_clean, show_progress_bar=False)\n"
+         "        lgb_embed_probs = clf_embed.predict(embeds)\n"
+         "        row_results['lgb_embed_label'] = (lgb_embed_probs > 0.5).astype(int).tolist()\n"
+         "        row_results['lgb_embed_prob']  = lgb_embed_probs.tolist()\n"
+         "\n"
+         "    results.append(pd.DataFrame(row_results))\n"
+         "\n"
+         "    # ── Checkpoint save ──────────────────────────────────────────────\n"
+         "    processed_so_far = chunk_start + len(chunk)\n"
+         "    if processed_so_far % SAVE_EVERY < CHUNK_SIZE:\n"
+         "        checkpoint_df = pd.concat(results, ignore_index=True)\n"
+         "        checkpoint_path = full_inference_folder / f'checkpoint_{processed_so_far}.pkl'\n"
+         "        checkpoint_df.to_pickle(checkpoint_path)\n"
+         "        print(f'Checkpoint saved at {processed_so_far:,} tweets ({time.time()-t_start:.0f}s elapsed)')\n"
+         "\n"
+         "print(f'\nDone. Total time: {time.time()-t_start:.1f}s')\n"
+         "results_df = pd.concat(results, ignore_index=True)"),
+
+    md("## 5. Merge Predictions Back and Save Final Output"),
+
+    code("# Merge predictions onto the original dataframe (keeping all original columns)\n"
+         "final_df = full_df.merge(results_df, on='id', how='left')\n"
+         "\n"
+         "print(f'Final annotated dataset: {len(final_df):,} rows')\n"
+         "print(final_df[['id', 'text', 'roberta_label', 'roberta_confidence']].head())"),
+
+    code("# Save as both pickle (fast I/O) and CSV (interoperability)\n"
+         "out_pkl = full_inference_folder / 'full_inference_annotated.pkl'\n"
+         "out_csv = full_inference_folder / 'full_inference_annotated.csv'\n"
+         "\n"
+         "final_df.to_pickle(out_pkl)\n"
+         "final_df.to_csv(out_csv, index=False)\n"
+         "print(f'Saved to:\n  {out_pkl}\n  {out_csv}')"),
+]
+
+
+# ── Write all four notebooks ──────────────────────────────────────────────────
 
 if __name__ == "__main__":
     write_notebook(f"{NB_DIR}/01_hitl_data_preparation.ipynb", nb1_cells)
     write_notebook(f"{NB_DIR}/02_hitl_training_loop.ipynb",    nb2_cells)
     write_notebook(f"{NB_DIR}/03_final_inference.ipynb",       nb3_cells)
+    write_notebook(f"{NB_DIR}/04_full_dataset_inference.ipynb", nb4_cells)
+
 
