@@ -175,6 +175,59 @@ Only import the `src` submodules that the notebook actually uses.
 | 4 | Explicit library imports | Always |
 | 5 | `src/` imports | Only if the notebook uses internal `src` modules |
 
+## Google Drive Data Directory Structure
+- status: active
+<!-- content -->
+All data lives under `My Drive/Colab Projects/AI Public Trust/` (the `BASE_PATH`).
+The path variables defined in Cell 1 map to the following folders and canonical files:
+
+```
+AI Public Trust/
+├── Raw Data/                                  (test_folder = BASE_PATH / 'Raw Data/')
+│   ├── testing.json                           ← single test batch (raw API)
+│   └── Twits/                                 (twits_folder = BASE_PATH / 'Raw Data/Twits/')
+│       └── tweets_YYYY-MM-DDTHH:MM:SS.json   ← raw API harvest files
+│
+├── Data Sets/                                 (datasets_folder = BASE_PATH / 'Data Sets')
+│   ├── AItrust_twits_dict_test.json           ← unprocessed test twit dict   [written by 02_Processing/01]
+│   ├── AItrust_author_dict_test.json          ← unprocessed test author dict [written by 02_Processing/01]
+│   ├── AItrust_twits_dict.json                ← unprocessed full twit dict   [written by 02_Processing/01]
+│   ├── AItrust_author_dict.json               ← unprocessed full author dict [written by 02_Processing/01]
+│   │
+│   ├── Cleaned Data/                          (cleanedds_folder = BASE_PATH / 'Data Sets/Cleaned Data')
+│   │   ├── AItrust_twits_pruned_dict_test.json          [written by 02_Processing/02]
+│   │   ├── AItrust_Art_pruned_twit_dict_test.json       [written by 02_Processing/02]
+│   │   ├── AItrust_twits_pruned_dict.json               [written by 02_Processing/02]
+│   │   ├── AItrust_Art_pruned_twit_dict.json            [written by 02_Processing/02]
+│   │   ├── top_test_ai_tweets.csv                       [written by 02_Processing/02]
+│   │   ├── top_test_art_tweets.csv                      [written by 02_Processing/02]
+│   │   ├── test_basic_counts_dict.pkl                   [written by 02_Processing/02]
+│   │   ├── test_timeline_dict.pkl                       [written by 02_Processing/02]
+│   │   ├── test_author_corpus_dict.pkl                  [written by 02_Processing/02]
+│   │   ├── full_basic_counts_dict.pkl                   [written by 02_Processing/02]
+│   │   ├── full_timeline_dict.pkl                       [written by 02_Processing/02]
+│   │   ├── full_author_corpus_dict.pkl                  [written by 02_Processing/02]
+│   │   ├── AItrust_twits_pruned_dict_test_with_sentiment.json   [written by 03_Analysis/01]
+│   │   ├── AItrust_pruned_twits_with_sentiment.json             [written by 03_Analysis/01]
+│   │   ├── AItrust_pruned_twits_with_sentiment_cleaned.json     [written by 02_Processing/03]
+│   │   ├── AItrust_topics_k5_metadata.json                      [written by 03_Analysis/03]
+│   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.json     [written by 03_Analysis/03]
+│   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.jsonl.gz [written by 03_Analysis/03]
+│   │   └── top_retweets_by_topic_100.csv                        [written by 02_Processing/03]
+│   │
+│   └── Networks/                              (networks_folder = BASE_PATH / 'Data Sets/Networks/')
+│       ├── test_network_dict.pkl              [written by 02_Processing/02]
+│       ├── full_network_dict.pkl              [written by 02_Processing/02]
+│       ├── Test_Network.json                  [written by 02_Processing/02]
+│       ├── Full_Network.json                  [written by 02_Processing/02]
+│       └── Full_Network.gml                  [used by 04_Network_Analysis/01]
+│
+├── Literature/                                (literature_folder = BASE_PATH / 'Literature/')
+└── Models/
+    └── Topic Modeling/                        (topic_models_folder = BASE_PATH / 'Models/Topic Modeling/')
+        └── lda_k5_topics_metadata.json        [written by 03_Analysis/03]
+```
+
 ## Common Mistakes
 - status: active
 <!-- content -->
