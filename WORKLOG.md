@@ -13,6 +13,31 @@ Add an entry whenever you solve a difficult problem, make a significant change, 
 
 ---
 
+## 2026-05-05 — Migrate LLM bootstrap to google-genai SDK + Gemini 2.5 family
+- status: done
+- type: task
+- id: twitter_ai.worklog.2026_05_05_genai_sdk_migration
+- last_checked: 2026-05-05
+<!-- content -->
+**What:**
+- Swapped the LLM bootstrap notebook (`notebooks/05_Classifiers/01_llm_bootstrap_labelling.ipynb`) from the deprecated `google-generativeai` package to the unified `google-genai` SDK. New call shape: `client = genai.Client(api_key=...)` + `client.models.generate_content(model=..., contents=..., config=...)`. Imports updated to `from google import genai; from google.genai import types`.
+- Web-verified model pricing and the `ThinkingConfig` API. Found that the 2.0 Flash family (including `gemini-2.0-flash-lite`) is being phased out (EOL ~June 2026) and that `gemini-2.5-flash-lite` is now the cheapest stable model (~$0.10/M in, $0.40/M out; batch mode $0.05/$0.20).
+- Set `MODEL_NAME = 'gemini-2.5-flash-lite'` as the notebook default. Added a `DISABLE_THINKING = True` knob with three-branch logic that: (a) on `gemini-2.5-pro`, pins `thinking_budget=128` because Pro cannot disable thinking; (b) on `gemini-2.5-flash` / `gemini-2.5-flash-lite` with `DISABLE_THINKING=True`, sets `thinking_budget=0`; (c) on those models with `DISABLE_THINKING=False`, prints a cost warning. No-op on 2.0 models.
+- Updated `TODO_WORKFLOW.md` (example model id in the human-action block: `gemini-2.0-flash` → `gemini-2.5-flash-lite`).
+- KB updates (user-approved): `content/how-to/GEMINI_ERROR_HANDLING_SKILL.md` — expanded model list to include 2.5-flash-lite / 2.5-pro / 3.x previews, marked 2.0 family deprecated, added new "Disabling Thinking on 2.5 Models" subsection with the `ThinkingConfig` snippet + Pro-min-128 caveat + the python-genai #1842 tools-present silent-ignore gotcha. `content/how-to/MCP_SKILL.md` — appended a 2026-05 deprecation note to the gemini-2.0 paragraph pointing readers at the updated GEMINI doc.
+
+**Why:** Session-start choice of `google-generativeai` + `gemini-2.0-flash-lite` was based on training knowledge; KB and web verification revealed both were superseded. Migrating now avoids a forced rewrite when the 2.0 family is shut down. Propagating the finding to the canonical KB doc means future agents in any project that uses the KB inherit the correct model list automatically.
+
+**Outcome:** Notebook regenerates cleanly from `create_notebook.py`, parses as valid Python, runs the correct three-branch thinking logic. Two KB docs updated (with `.kb_backups/` snapshots). No code committed.
+
+**KB changes:**
+- Updated `content/how-to/GEMINI_ERROR_HANDLING_SKILL.md` (additive — model list + new section).
+- Updated `content/how-to/MCP_SKILL.md` (one-paragraph deprecation note).
+
+**Follow-up:** None for the SDK / model layer. The pending TODOs (`todo.run_hitl_data_prep`, `todo.setup_llm_bootstrap`) still apply unchanged — both wait on human review.
+
+---
+
 ## 2026-05-05 — Build classifier-stage data prep + LLM bootstrap pipeline
 - status: done
 - type: task
