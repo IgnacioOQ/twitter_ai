@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(jupyter nbconvert *)",
+      "Bash(grep -n -E \"\\(nb0_cells|nb1_cells|Notebook 0:|Notebook 1:|01_hitl_data_preparation|00_llm_bootstrap|00\\\\`|01\\\\`\\)\" notebooks/create_notebook.py)"
+    ]
+  }
+}

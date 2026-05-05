@@ -148,15 +148,241 @@ NB_DIR = "notebooks/05_Classifiers"
 
 EXTRA_PATHS = "hitl_folder = datasets_folder / 'Classifiers_Data' / 'HITL'"
 
-# ── Notebook 1: Data Preparation ─────────────────────────────────────────────
+# ── Notebook 1: LLM Bootstrap Labelling ──────────────────────────────────────
 
 nb1_cells = [
-    md("# 01 - HITL Data Preparation\n\n"
-       "Splits the **cleaned** tweets dataset into three partitions:\n"
-       "- **Base** (~100 000 tweets): source for initial ground-truth labelling\n"
-       "- **HITL batches** (~200 000 tweets, 4 × 50 000): for iterative human review\n"
+    md("# 01 - LLM Bootstrap Labelling\n\n"
+       "Uses an LLM (Gemini API) to **bootstrap** the HITL classifier seed labels.\n"
+       "Replaces — or precedes — the human seed step described in `classification_strategy.md` (Step 0).\n\n"
+       "**Inputs:** `llm_bootstrap_dataset.pkl` (~10 000 tweets carved out by `00_hitl_data_preparation.ipynb`).\n"
+       "This subset is disjoint from `base_dataset.pkl`, the HITL batches, and `inference_dataset.pkl` —\n"
+       "see `partition_ids.pkl` for the manifest.\n\n"
+       "**Pipeline:**\n"
+       "1. Load `llm_bootstrap_dataset.pkl`.\n"
+       "2. For each tweet, call the LLM with a prompt containing the per-category criteria.\n"
+       "3. Parse the JSON response, validate the label, retry on transient errors.\n"
+       "4. Checkpoint every N tweets to survive Colab disconnects.\n"
+       "5. Save the final CSV with the **same schema** as `hitl_review_batch_*.csv`\n"
+       "   so it drops straight into `02_hitl_training_loop.ipynb`.\n\n"
+       "Two cells are **placeholders** that must be filled in before running:\n"
+       "the category list + criteria, and the Gemini API key + model id."),
+
+    code(setup_cell(EXTRA_PATHS)),
+
+    code("import os\n"
+         "if not RUNNING_LOCALLY:\n"
+         "    print('Running Colab setup...')\n"
+         "    import subprocess\n"
+         "    subprocess.run(['pip', 'install', '-q', 'google-generativeai'])\n"
+         "else:\n"
+         "    print('Running locally: skipping Colab setup.')"),
+
+    code("import json\n"
+         "import re\n"
+         "import time\n"
+         "from pathlib import Path\n"
+         "import numpy as np\n"
+         "import pandas as pd\n"
+         "import tqdm\n"
+         "import google.generativeai as genai"),
+
+    md("## Configuration\n\n"
+       "Tune the constants below per run. `SMOKE_TEST` keeps the pipeline cheap during development."),
+
+    code("# ── Run mode ────────────────────────────────────────────────────────────\n"
+         "SMOKE_TEST   = True       # True → label SMOKE_TEST_N tweets only; flip to False for the full run\n"
+         "SMOKE_TEST_N = 100\n"
+         "\n"
+         "# ── LLM ─────────────────────────────────────────────────────────────────\n"
+         "MODEL_NAME  = ''          # TODO: fill in the Gemini model id, e.g. 'gemini-1.5-flash' or 'gemini-2.0-flash'\n"
+         "TEMPERATURE = 0.0         # deterministic classification; raise only if you want sampling diversity\n"
+         "\n"
+         "# ── Retry / backoff ─────────────────────────────────────────────────────\n"
+         "MAX_RETRIES     = 3\n"
+         "INITIAL_BACKOFF = 2.0     # seconds; doubled on each retry\n"
+         "\n"
+         "# ── I/O ─────────────────────────────────────────────────────────────────\n"
+         "INPUT_PATH        = hitl_folder / 'llm_bootstrap_dataset.pkl'\n"
+         "OUTPUT_CSV        = hitl_folder / 'llm_bootstrap_labels.csv'\n"
+         "OUTPUT_PKL        = hitl_folder / 'llm_bootstrap_labels_full.pkl'\n"
+         "CHECKPOINT_PREFIX = 'llm_bootstrap_checkpoint'\n"
+         "CHECKPOINT_EVERY  = 1_000  # save partial results every N tweets"),
+
+    md("## Categories and Criteria\n\n"
+       "**TODO — fill these in before running.**\n\n"
+       "- `CATEGORIES` is the closed list of allowed labels. The LLM must return one of these strings.\n"
+       "- `CATEGORY_CRITERIA` is the per-category description that goes into the prompt.\n"
+       "  Be precise: include a definition, 2-3 positive examples, and 1-2 exclusions per category."),
+
+    code("# TODO: list every allowed category label exactly as you want it written in the output CSV.\n"
+         "CATEGORIES: list[str] = [\n"
+         "    # 'category_a',\n"
+         "    # 'category_b',\n"
+         "    # 'category_c',\n"
+         "]\n"
+         "\n"
+         "# TODO: write the full criteria for each category. The LLM sees this verbatim.\n"
+         "CATEGORY_CRITERIA: str = \"\"\"\n"
+         "<<< FILL IN THE PER-CATEGORY CRITERIA HERE >>>\n"
+         "\"\"\".strip()\n"
+         "\n"
+         "assert CATEGORIES, 'CATEGORIES is empty — fill it in before running.'\n"
+         "assert '<<< FILL IN' not in CATEGORY_CRITERIA, 'CATEGORY_CRITERIA still contains the placeholder.'"),
+
+    md("## API Key\n\n"
+       "**TODO — provide a Gemini API key before running.**\n\n"
+       "On Colab, store the key as a notebook secret named `GEMINI_API_KEY` (left sidebar → key icon)\n"
+       "and the cell below picks it up via `userdata.get`. Locally, set the `GEMINI_API_KEY`\n"
+       "environment variable. **Never hard-code the key in the notebook.**"),
+
+    code("API_KEY = ''  # leave empty — populated below from Colab secrets / env var\n"
+         "\n"
+         "if not RUNNING_LOCALLY:\n"
+         "    try:\n"
+         "        from google.colab import userdata\n"
+         "        API_KEY = userdata.get('GEMINI_API_KEY')\n"
+         "    except Exception as e:\n"
+         "        print(f'Colab userdata lookup failed: {e}')\n"
+         "else:\n"
+         "    API_KEY = os.environ.get('GEMINI_API_KEY', '')\n"
+         "\n"
+         "assert API_KEY, 'GEMINI_API_KEY not set. Add it as a Colab secret or env var before running.'\n"
+         "assert MODEL_NAME, 'MODEL_NAME is empty — set it in the Configuration cell.'\n"
+         "\n"
+         "genai.configure(api_key=API_KEY)\n"
+         "model = genai.GenerativeModel(\n"
+         "    model_name=MODEL_NAME,\n"
+         "    generation_config={\n"
+         "        'temperature': TEMPERATURE,\n"
+         "        'response_mime_type': 'application/json',\n"
+         "    },\n"
+         ")\n"
+         "print(f'LLM client ready: {MODEL_NAME}')"),
+
+    md("## Prompt and Response Schema\n\n"
+       "The LLM is asked to return a strict JSON object:\n"
+       "```\n"
+       "{\"label\": \"<one of CATEGORIES>\", \"confidence\": <float 0-1>, \"rationale\": \"<one short sentence>\"}\n"
+       "```\n"
+       "Anything else is treated as a parse error: it is retried, and on final failure the row is marked `PARSE_ERROR`."),
+
+    code("def build_prompt(tweet_text: str) -> str:\n"
+         "    return (\n"
+         "        'You are a tweet classifier for a research project on AI public trust.\\n'\n"
+         "        'Classify the tweet into exactly one of the following categories:\\n'\n"
+         "        f'{\", \".join(CATEGORIES)}\\n\\n'\n"
+         "        'Per-category criteria:\\n'\n"
+         "        f'{CATEGORY_CRITERIA}\\n\\n'\n"
+         "        'Return ONLY a JSON object with this exact schema (no prose, no markdown fences):\\n'\n"
+         "        '{\"label\": \"<one of the categories above>\", '\n"
+         "        '\"confidence\": <number between 0 and 1>, '\n"
+         "        '\"rationale\": \"<one short sentence>\"}\\n\\n'\n"
+         "        f'Tweet:\\n\"\"\"{tweet_text}\"\"\"'\n"
+         "    )"),
+
+    md("## Classification Function\n\n"
+       "Single-tweet wrapper: build prompt → call LLM → parse + validate JSON → retry on transient errors."),
+
+    code("PARSE_ERROR_RESULT = {'label': 'PARSE_ERROR', 'confidence': 0.0, 'rationale': ''}\n"
+         "\n"
+         "def _strip_code_fences(raw: str) -> str:\n"
+         "    raw = raw.strip()\n"
+         "    if raw.startswith('```'):\n"
+         "        raw = re.sub(r'^```(?:json)?\\s*', '', raw)\n"
+         "        raw = re.sub(r'\\s*```$', '', raw)\n"
+         "    return raw.strip()\n"
+         "\n"
+         "def classify_tweet(text: str) -> dict:\n"
+         "    prompt = build_prompt(text)\n"
+         "    last_error = ''\n"
+         "    for attempt in range(MAX_RETRIES):\n"
+         "        try:\n"
+         "            resp = model.generate_content(prompt)\n"
+         "            raw  = _strip_code_fences(resp.text or '')\n"
+         "            parsed = json.loads(raw)\n"
+         "            label = str(parsed.get('label', '')).strip()\n"
+         "            if label not in CATEGORIES:\n"
+         "                raise ValueError(f'label {label!r} not in CATEGORIES')\n"
+         "            return {\n"
+         "                'label': label,\n"
+         "                'confidence': float(parsed.get('confidence', 0.0)),\n"
+         "                'rationale': str(parsed.get('rationale', ''))[:500],\n"
+         "            }\n"
+         "        except Exception as e:\n"
+         "            last_error = f'{type(e).__name__}: {e}'\n"
+         "            if attempt + 1 < MAX_RETRIES:\n"
+         "                time.sleep(INITIAL_BACKOFF * (2 ** attempt))\n"
+         "    return {**PARSE_ERROR_RESULT, 'rationale': last_error[:500]}"),
+
+    md("## Load Input"),
+
+    code("assert INPUT_PATH.exists(), f'Input not found: {INPUT_PATH}. Run 00_hitl_data_preparation.ipynb first.'\n"
+         "df = pd.read_pickle(INPUT_PATH)\n"
+         "print(f'Loaded {len(df):,} tweets from {INPUT_PATH.name}')\n"
+         "\n"
+         "if SMOKE_TEST:\n"
+         "    df = df.sample(n=min(SMOKE_TEST_N, len(df)), random_state=42).reset_index(drop=True)\n"
+         "    print(f'SMOKE_TEST mode → using {len(df)} tweets')\n"
+         "\n"
+         "for col in ('id', 'text', 'likes', 'retweets'):\n"
+         "    if col not in df.columns:\n"
+         "        df[col] = '' if col in ('id', 'text') else 0\n"
+         "\n"
+         "df['text'] = df['text'].astype(str)"),
+
+    md("## Run Classification with Checkpointing"),
+
+    code("results: list[dict] = []\n"
+         "t0 = time.time()\n"
+         "\n"
+         "for _, row in tqdm.tqdm(df.iterrows(), total=len(df), desc='LLM labelling'):\n"
+         "    classification = classify_tweet(row['text'])\n"
+         "    results.append({\n"
+         "        'id': row['id'],\n"
+         "        'text': row['text'],\n"
+         "        'likes': row.get('likes', 0),\n"
+         "        'retweets': row.get('retweets', 0),\n"
+         "        'predicted_label': classification['label'],\n"
+         "        'confidence': classification['confidence'],\n"
+         "        'rationale': classification['rationale'],\n"
+         "        'human_label': '',\n"
+         "    })\n"
+         "    if (len(results) % CHECKPOINT_EVERY) == 0:\n"
+         "        ckpt = hitl_folder / f'{CHECKPOINT_PREFIX}_{len(results)}.pkl'\n"
+         "        pd.DataFrame(results).to_pickle(ckpt)\n"
+         "        tqdm.tqdm.write(f'checkpoint → {ckpt.name} ({time.time()-t0:.0f}s elapsed)')\n"
+         "\n"
+         "out_df = pd.DataFrame(results)\n"
+         "print(f'Done. Total time: {time.time()-t0:.1f}s')\n"
+         "print(out_df['predicted_label'].value_counts(dropna=False))"),
+
+    md("## Save Output\n\n"
+       "Two artifacts:\n"
+       "- **`llm_bootstrap_labels.csv`** — same schema as `hitl_review_batch_*.csv`, ready to drop into `02_hitl_training_loop.ipynb`.\n"
+       "- **`llm_bootstrap_labels_full.pkl`** — same data **plus** `confidence` and `rationale` columns for inspection."),
+
+    code("hitl_schema_cols = ['id', 'text', 'likes', 'retweets', 'predicted_label', 'human_label']\n"
+         "out_df[hitl_schema_cols].to_csv(OUTPUT_CSV, index=False)\n"
+         "out_df.to_pickle(OUTPUT_PKL)\n"
+         "\n"
+         "n_errors = (out_df['predicted_label'] == 'PARSE_ERROR').sum()\n"
+         "print(f'Saved → {OUTPUT_CSV}')\n"
+         "print(f'Saved → {OUTPUT_PKL}')\n"
+         "print(f'PARSE_ERROR rows: {n_errors:,} / {len(out_df):,} ({n_errors/max(len(out_df),1):.1%})')"),
+]
+
+# ── Notebook 0: Data Preparation ─────────────────────────────────────────────
+
+nb0_cells = [
+    md("# 00 - HITL Data Preparation\n\n"
+       "Splits the **cleaned** tweets dataset into four non-overlapping partitions:\n"
+       "- **LLM Bootstrap** (~10 000 tweets): labelled by an LLM in `01_llm_bootstrap_labelling.ipynb`\n"
+       "- **Base** (~100 000 tweets): reserve pool / source for any human seed labelling\n"
+       "- **HITL batches** (~200 000 tweets, 4 × 50 000): iterative human review\n"
        "- **Final Inference** (remainder): classified by the final model in notebook 03\n\n"
-       "Run this notebook **once** at the start of the project."),
+       "All partitions are mutually disjoint. A `partition_ids.pkl` manifest is written so any\n"
+       "downstream notebook can verify which subset a tweet belongs to.\n\n"
+       "Run this notebook **once** at the start of the project, before any of `01`, `02`, `03`."),
 
     code(setup_cell(EXTRA_PATHS)),
 
@@ -166,74 +392,183 @@ nb1_cells = [
          "else:\n"
          "    print('Running locally: skipping Colab setup.')"),
 
-    code("import numpy as np\n"
+    code("import pickle\n"
+         "import numpy as np\n"
          "import pandas as pd\n"
          "from pathlib import Path"),
 
-    code("CLEANED_DATA_PATH = cleanedds_folder / 'cleaned_tweets.pkl'\n"
-         "print(f'Loading from {CLEANED_DATA_PATH}')\n"
-         "if CLEANED_DATA_PATH.suffix == '.pkl':\n"
-         "    df = pd.read_pickle(CLEANED_DATA_PATH)\n"
-         "else:\n"
-         "    df = pd.read_csv(CLEANED_DATA_PATH)\n"
-         "print(f'Loaded {len(df):,} tweets')"),
+    md("## Load the Pruned Tweet Dict\n\n"
+       "Source: `cleanedds_folder / 'AItrust_twits_pruned_dict.json'` — the JSONL output of\n"
+       "`notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb`. Each line is one\n"
+       "tweet with the standard Twitter API v2 schema: `id`, `text`, `processed_text`,\n"
+       "`created_at`, `type`, `public_metrics` (nested), `referenced_tweets`, ...\n\n"
+       "Toggle `USE_TEST_DATA = True` to load the smaller `*_test.json` variant for development."),
 
-    md("## Normalise Columns"),
+    code("USE_TEST_DATA = False  # True → AItrust_twits_pruned_dict_test.json (development); False → full dataset\n"
+         "\n"
+         "PRUNED_DICT_NAME = 'AItrust_twits_pruned_dict_test.json' if USE_TEST_DATA else 'AItrust_twits_pruned_dict.json'\n"
+         "PRUNED_DICT_PATH = cleanedds_folder / PRUNED_DICT_NAME\n"
+         "\n"
+         "assert PRUNED_DICT_PATH.exists(), (\n"
+         "    f'Pruned dict not found: {PRUNED_DICT_PATH}. '\n"
+         "    f'Run notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb first.'\n"
+         ")\n"
+         "\n"
+         "print(f'Loading {PRUNED_DICT_PATH}...')\n"
+         "df = pd.read_json(PRUNED_DICT_PATH, lines=True)\n"
+         "print(f'Loaded {len(df):,} tweets')\n"
+         "print(f'Columns: {list(df.columns)}')"),
 
-    code("if 'public_metrics.like_count' in df.columns:\n"
-         "    df['likes']    = df['public_metrics.like_count']\n"
-         "    df['retweets'] = df['public_metrics.retweet_count']\n"
-         "elif 'like_count' in df.columns:\n"
-         "    df['likes']    = df['like_count']\n"
-         "    df['retweets'] = df['retweet_count']\n"
+    md("## Normalise Columns\n\n"
+       "Pull `likes` and `retweets` out of the nested `public_metrics` dict, cast `id` to string\n"
+       "(Twitter snowflake IDs exceed 2^53 and lose precision as Python floats), and keep only\n"
+       "the columns the HITL pipeline needs: `id`, `text`, `likes`, `retweets`."),
+
+    code("def _pm_field(pm, key, default=0):\n"
+         "    return pm.get(key, default) if isinstance(pm, dict) else default\n"
+         "\n"
+         "if 'public_metrics' in df.columns:\n"
+         "    df['likes']    = df['public_metrics'].apply(lambda pm: _pm_field(pm, 'like_count', 0)).astype(int)\n"
+         "    df['retweets'] = df['public_metrics'].apply(lambda pm: _pm_field(pm, 'retweet_count', 0)).astype(int)\n"
          "else:\n"
          "    df['likes'] = df['retweets'] = 0\n"
          "\n"
-         "if 'tweet_id' in df.columns:\n"
-         "    df['id'] = df['tweet_id']\n"
+         "df['id']   = df['id'].astype(str)\n"
+         "df['text'] = df['text'].astype(str)\n"
          "\n"
-         "keep = [c for c in ['id', 'text', 'likes', 'retweets'] if c in df.columns]\n"
-         "df = df[keep].copy()\n"
+         "df = df[['id', 'text', 'likes', 'retweets']].copy()\n"
          "df['predicted_label'] = np.nan\n"
          "df['human_label']     = np.nan\n"
-         "\n"
-         "df = df.sample(frac=1, random_state=42).reset_index(drop=True)\n"
-         "print(df.head())"),
+         "print(f'Normalised: {len(df):,} tweets')"),
 
-    md("## Partition the Dataset"),
+    md("## Attention-Weighted Shuffle\n\n"
+       "Tweet engagement (likes + retweets) follows a heavy-tailed (near power-law) distribution:\n"
+       "a small number of viral tweets carry most of the attention, while the long tail gets almost\n"
+       "none. A **uniform** random sample of 10 000 tweets from this corpus would consist almost\n"
+       "entirely of low-engagement tweets — the LLM and the classifier would never see the\n"
+       "discourse-shaping content.\n\n"
+       "We instead do an **attention-weighted permutation**: each tweet's selection probability is\n"
+       "proportional to `(likes + retweets + 1) ** SAMPLING_ALPHA`. The downstream slice still cuts\n"
+       "the dataframe into contiguous partitions, but the partitions are now *stratified by\n"
+       "influence* — the LLM Bootstrap slice (first 10 000) tends to pick up the influential head,\n"
+       "the base / HITL / inference slices follow with progressively lighter engagement.\n\n"
+       "`SAMPLING_ALPHA` is the smoothing exponent:\n"
+       "- `0.0` — uniform random (recovers the previous behaviour).\n"
+       "- `0.5` — square-root rule (default): head is well-represented, body still well-covered.\n"
+       "- `1.0` — proportional to attention: heavily concentrates on the head."),
 
-    code("BASE_SIZE = 100_000\n"
-         "HITL_SIZE = 200_000\n"
+    code("SAMPLING_ALPHA = 0.5  # 0 → uniform; 0.5 → sqrt smoothing (default); 1 → proportional to attention\n"
          "\n"
-         "if len(df) < BASE_SIZE + HITL_SIZE:\n"
-         "    print('Warning: dataset smaller than intended splits; adjusting.')\n"
-         "    BASE_SIZE = min(len(df), BASE_SIZE)\n"
-         "    HITL_SIZE = min(len(df) - BASE_SIZE, HITL_SIZE)\n"
+         "if SAMPLING_ALPHA > 0:\n"
+         "    attention = (df['likes'] + df['retweets'] + 1).astype(float)\n"
+         "    weights   = attention ** SAMPLING_ALPHA\n"
+         "    df = df.sample(frac=1, weights=weights, random_state=42).reset_index(drop=True)\n"
+         "    print(f'Attention-weighted shuffle (alpha={SAMPLING_ALPHA})')\n"
+         "else:\n"
+         "    df = df.sample(frac=1, random_state=42).reset_index(drop=True)\n"
+         "    print('Uniform shuffle (alpha=0)')"),
+
+    md("## Partition the Dataset\n\n"
+       "Slices the shuffled dataframe into four contiguous, disjoint partitions:\n"
+       "`LLM_BOOTSTRAP_SIZE` first, then `BASE_SIZE`, then `HITL_SIZE`, then the remainder."),
+
+    code("LLM_BOOTSTRAP_SIZE = 10_000\n"
+         "BASE_SIZE          = 100_000\n"
+         "HITL_SIZE          = 200_000\n"
          "\n"
-         "base_df      = df.iloc[:BASE_SIZE].copy()\n"
-         "hitl_df      = df.iloc[BASE_SIZE:BASE_SIZE + HITL_SIZE].copy()\n"
-         "inference_df = df.iloc[BASE_SIZE + HITL_SIZE:].copy()\n"
+         "required = LLM_BOOTSTRAP_SIZE + BASE_SIZE + HITL_SIZE\n"
+         "if len(df) < required:\n"
+         "    print(f'Warning: dataset has {len(df):,} rows, less than the {required:,} required; shrinking later partitions.')\n"
+         "    LLM_BOOTSTRAP_SIZE = min(len(df), LLM_BOOTSTRAP_SIZE)\n"
+         "    BASE_SIZE          = min(len(df) - LLM_BOOTSTRAP_SIZE, BASE_SIZE)\n"
+         "    HITL_SIZE          = max(0, len(df) - LLM_BOOTSTRAP_SIZE - BASE_SIZE)\n"
          "\n"
-         "print(f'Base: {len(base_df):,}  HITL: {len(hitl_df):,}  Inference: {len(inference_df):,}')"),
+         "a = LLM_BOOTSTRAP_SIZE\n"
+         "b = a + BASE_SIZE\n"
+         "c = b + HITL_SIZE\n"
+         "\n"
+         "llm_bootstrap_df = df.iloc[:a].copy()\n"
+         "base_df          = df.iloc[a:b].copy()\n"
+         "hitl_df          = df.iloc[b:c].copy()\n"
+         "inference_df     = df.iloc[c:].copy()\n"
+         "\n"
+         "print(f'LLM bootstrap: {len(llm_bootstrap_df):,}')\n"
+         "print(f'Base:          {len(base_df):,}')\n"
+         "print(f'HITL:          {len(hitl_df):,}')\n"
+         "print(f'Inference:     {len(inference_df):,}')"),
+
+    md("## Engagement Distribution by Partition\n\n"
+       "Sanity check that the attention-weighted shuffle stratified the partitions as intended.\n"
+       "On a heavy-tailed corpus you should see the LLM Bootstrap slice carry a much higher\n"
+       "median / mean / max engagement than the Inference slice."),
+
+    code("def _summarise(name, part):\n"
+         "    if not len(part):\n"
+         "        print(f'  {name:>14}: (empty)')\n"
+         "        return\n"
+         "    att = (part['likes'] + part['retweets']).astype(int)\n"
+         "    print(f'  {name:>14}: n={len(part):>9,}  median={att.median():>6.0f}  mean={att.mean():>9.1f}  '\n"
+         "          f'p95={att.quantile(0.95):>7.0f}  max={att.max():>9,}')\n"
+         "\n"
+         "print('Engagement (likes + retweets) by partition:')\n"
+         "_summarise('LLM bootstrap', llm_bootstrap_df)\n"
+         "_summarise('Base',          base_df)\n"
+         "_summarise('HITL',          hitl_df)\n"
+         "_summarise('Inference',     inference_df)"),
 
     md("## Save Partitions"),
 
     code("hitl_folder.mkdir(parents=True, exist_ok=True)\n"
          "\n"
+         "llm_bootstrap_df.to_pickle(hitl_folder / 'llm_bootstrap_dataset.pkl')\n"
          "base_df.to_pickle(hitl_folder / 'base_dataset.pkl')\n"
          "inference_df.to_pickle(hitl_folder / 'inference_dataset.pkl')\n"
          "\n"
-         "BATCH_SIZE = 50_000\n"
-         "n_batches  = int(np.ceil(len(hitl_df) / BATCH_SIZE))\n"
+         "BATCH_SIZE   = 50_000\n"
+         "n_batches    = int(np.ceil(len(hitl_df) / BATCH_SIZE)) if len(hitl_df) else 0\n"
+         "hitl_batches = {}\n"
          "for i in range(n_batches):\n"
          "    chunk = hitl_df.iloc[i * BATCH_SIZE:(i + 1) * BATCH_SIZE]\n"
          "    out   = hitl_folder / f'hitl_pending_batch_{i+1:02d}.pkl'\n"
          "    chunk.to_pickle(out)\n"
+         "    hitl_batches[f'hitl_batch_{i+1:02d}'] = chunk\n"
          "    print(f'Saved {out.name} ({len(chunk):,} tweets)')"),
 
-    md("## Export Iteration-0 Review Batch\n\n"
-       "No model exists yet, so we export 10 000 random tweets as the ground-truth seed.\n"
-       "Label the `human_label` column and save the file before running notebook 02."),
+    md("## Partition Manifest\n\n"
+       "Write a `partition_ids.pkl` mapping every partition name to its tweet IDs and assert\n"
+       "that the partitions are pairwise disjoint. Downstream notebooks can load this manifest\n"
+       "to verify which subset any tweet belongs to."),
+
+    code("def _ids(d):\n"
+         "    return d['id'].astype(str).tolist() if 'id' in d.columns else d.index.astype(str).tolist()\n"
+         "\n"
+         "partition_ids = {\n"
+         "    'llm_bootstrap': _ids(llm_bootstrap_df),\n"
+         "    'base':          _ids(base_df),\n"
+         "    'inference':     _ids(inference_df),\n"
+         "}\n"
+         "for name, batch_df in hitl_batches.items():\n"
+         "    partition_ids[name] = _ids(batch_df)\n"
+         "\n"
+         "seen = set()\n"
+         "for name, ids in partition_ids.items():\n"
+         "    s = set(ids)\n"
+         "    overlap = s & seen\n"
+         "    assert not overlap, f'Partition {name!r} overlaps existing partitions on {len(overlap)} ids'\n"
+         "    seen |= s\n"
+         "    print(f'  {name:>16}: {len(ids):>10,} ids')\n"
+         "print(f'  {\"TOTAL\":>16}: {len(seen):>10,} unique ids — all partitions disjoint')\n"
+         "\n"
+         "manifest_path = hitl_folder / 'partition_ids.pkl'\n"
+         "with open(manifest_path, 'wb') as f:\n"
+         "    pickle.dump(partition_ids, f)\n"
+         "print(f'Wrote → {manifest_path}')"),
+
+    md("## (Optional) Export Human Seed Review Batch\n\n"
+       "If you intend to run the **human-only** seed path (label 10 000 tweets by hand), this\n"
+       "cell exports the seed CSV. Skip it if you are using the **LLM bootstrap** path\n"
+       "(`01_llm_bootstrap_labelling.ipynb`) — both paths produce the same downstream artifact:\n"
+       "a labelled CSV that `02_hitl_training_loop.ipynb` ingests as initial training data."),
 
     code("seed = base_df.sample(n=min(10_000, len(base_df)), random_state=42).copy()\n"
          "if 'text' in seed.columns:\n"
@@ -725,9 +1060,10 @@ nb4_cells = [
 # ── Write all four notebooks ──────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    write_notebook(f"{NB_DIR}/01_hitl_data_preparation.ipynb", nb1_cells)
-    write_notebook(f"{NB_DIR}/02_hitl_training_loop.ipynb",    nb2_cells)
-    write_notebook(f"{NB_DIR}/03_final_inference.ipynb",       nb3_cells)
-    write_notebook(f"{NB_DIR}/04_full_dataset_inference.ipynb", nb4_cells)
+    write_notebook(f"{NB_DIR}/00_hitl_data_preparation.ipynb",   nb0_cells)
+    write_notebook(f"{NB_DIR}/01_llm_bootstrap_labelling.ipynb", nb1_cells)
+    write_notebook(f"{NB_DIR}/02_hitl_training_loop.ipynb",      nb2_cells)
+    write_notebook(f"{NB_DIR}/03_final_inference.ipynb",         nb3_cells)
+    write_notebook(f"{NB_DIR}/04_full_dataset_inference.ipynb",  nb4_cells)
 
 

@@ -26,46 +26,71 @@ This file is the per-repository instance of the `TODO_WORKFLOW_TEMPLATE.md` patt
 
 ---
 
-## Build LLM-Based Bootstrap Classification Pipeline (Colab)
+## Run HITL Data Preparation Notebook
 - status: todo
 - type: task
-- id: todo.llm_bootstrap_classifier
-- description: Build a Colab notebook that uses an LLM API (e.g. Gemini) to label tweets with categories using prompt-embedded criteria, to bootstrap the HITL classifier seed labels in stage 05.
+- id: todo.run_hitl_data_prep
+- description: Execute `00_hitl_data_preparation.ipynb` end-to-end to produce the four partitions and the partition manifest, after the human has reviewed the notebook for errors.
 - owner: agent
-- blocked_by: []
+- blocked_by: [human_review]
 - last_checked: 2026-05-05
 <!-- content -->
-**Context:** The HITL classifier in `notebooks/05_Classifiers/` currently relies on a human to label 10 000 seed tweets in `hitl_review_batch_00.csv` (see `notebooks/05_Classifiers/classification_strategy.md`, Step 0 — Initial Labelling). An LLM (Gemini API, or equivalent — Anthropic, OpenAI) can pre-label these tweets cheaply: the human can then review/correct rather than label from scratch, or the LLM labels can serve as the initial training set directly. The pipeline must run on Colab, take one tweet at a time, send it to the LLM with a prompt that contains the full category criteria, parse the response, and persist the classification.
+**Context:** The data-prep notebook `notebooks/05_Classifiers/00_hitl_data_preparation.ipynb` was scaffolded recently (cells defined in `notebooks/create_notebook.py`). It loads the JSONL pruned tweet dict produced by `notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb`, normalises columns out of the nested `public_metrics` dict, performs an attention-weighted permutation (`SAMPLING_ALPHA = 0.5` default), and slices the dataframe into four disjoint partitions (LLM Bootstrap, Base, HITL ×4, Inference) plus a `partition_ids.pkl` manifest with a disjointness assertion. Several assumptions were inferred from `02_sanity_check_and_network_generation.ipynb` (field names, schema, file path) that may not exactly match the live data — the human should sanity-check the notebook before it is run for real.
+
+**Human action required (do this first):**
+> **Please open `notebooks/05_Classifiers/00_hitl_data_preparation.ipynb`, read each cell end-to-end, and revise anything that does not match the actual upstream data or your intended flow.** Pay particular attention to: (1) the `PRUNED_DICT_NAME` / `USE_TEST_DATA` toggle and whether the path resolves; (2) the `_pm_field` extraction (`like_count` vs `retweet_count` vs other names in the actual `public_metrics` dict); (3) the `SAMPLING_ALPHA` default — verify it produces the engagement gradient you want; (4) the partition sizes (`LLM_BOOTSTRAP_SIZE`, `BASE_SIZE`, `HITL_SIZE`). Confirm in chat once done; the agent will then proceed.
 
 **Preconditions:**
-- The cleaned tweet dataset produced by `notebooks/02_Processing/03_cleaning_tweets.ipynb` exists at `BASE_PATH/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_cleaned.json`.
-- `notebooks/05_Classifiers/01_hitl_data_preparation.ipynb` has been run and produced `BASE_PATH/Data Sets/Classifiers_Data/HITL/base_dataset.pkl`.
-- A Gemini API key (or chosen alternative) is available. On Colab, load it via `from google.colab import userdata; userdata.get('GEMINI_API_KEY')` — never hard-code.
-- The final list of categories and per-category criteria has been confirmed with the user (or extracted from `classification_strategy.md` if documented there).
+- The human has reviewed and (if necessary) revised `00_hitl_data_preparation.ipynb`.
+- The pruned tweet dataset exists at `BASE_PATH / 'Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json'` (or `..._test.json` if `USE_TEST_DATA = True`).
 
 **Steps:**
-1. Read `notebooks/05_Classifiers/classification_strategy.md` end-to-end to confirm the schema of `hitl_review_batch_*.csv` (`id | text | likes | retweets | predicted_label | human_label`), the category list, and the role of Step 0.
-2. Read `notebooks/notebook_setup.md` and replicate its 5-cell setup pattern in the new notebook (env switch + paths → optional `git clone` → optional `pip install` → explicit imports → `src.*` imports if needed).
-3. Confirm the category list and per-category criteria with the user before drafting the prompt. Persist the criteria as a constant inside the notebook (or, if long, in a sibling `notebooks/05_Classifiers/llm_bootstrap_prompt.md` referenced from the notebook).
-4. Create `notebooks/05_Classifiers/00_llm_bootstrap_labelling.ipynb`. The `notebooks/create_notebook.py` helper may be used for scaffolding.
-5. Implement the pipeline inside the notebook:
-   - Load `base_dataset.pkl` and (for development) sample N=100 tweets via a `SMOKE_TEST` flag.
-   - Build the LLM client; load the API key from Colab `userdata`.
-   - Construct one instruction prompt containing: task description, category list, per-category criteria, and a strict output schema such as JSON `{"label": "<category>", "confidence": <0-1>, "rationale": "<one short sentence>"}`.
-   - Iterate over tweets; for each tweet call the LLM with prompt + tweet text, parse the JSON response, append to a results list. Validate that `label` is one of the declared categories; on parse failure, retry once, then mark the row as `predicted_label = "PARSE_ERROR"` and log the raw response.
-   - Add retry-with-exponential-backoff for rate-limit (`429`) and transient errors (`5xx`); cap at 3 retries.
-   - Checkpoint every 1 000 labelled tweets to `BASE_PATH/Data Sets/Classifiers_Data/HITL/llm_bootstrap_checkpoint_<n>.pkl` so a Colab disconnect does not lose progress, mirroring the checkpoint pattern in `04_full_dataset_inference.ipynb`.
-6. Persist the final output as `BASE_PATH/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv` with the **exact same schema** as `hitl_review_batch_*.csv`: `id | text | likes | retweets | predicted_label | human_label`. `predicted_label` is the LLM's label; `human_label` is left blank for downstream review.
-7. Add a leading markdown cell that documents: which LLM model + version was used, the prompt strategy, rate-limit handling, and how to feed the output into `02_hitl_training_loop.ipynb` (either as the seed CSV in place of `hitl_review_batch_00.csv`, or as an additional labelled batch).
-8. Update `notebooks/05_Classifiers/classification_strategy.md` to add the LLM-bootstrap option as a precursor or alternative to human seed labelling in Step 0. This file is in the working repo (not the KB), so edit it directly with `Edit`.
+1. Re-read the human-revised notebook in full before doing anything else.
+2. Run all cells (Colab or local) with the configuration the human chose. Do not silently change `SAMPLING_ALPHA` or any partition size.
+3. Confirm the partition manifest's disjointness assertion passes (the cell will raise if any partition overlaps).
+4. Inspect the engagement-distribution diagnostic — the printed table should show a clear gradient on `median` / `mean` / `p95` from LLM Bootstrap (highest) down to Inference (lowest). If the gradient is flat, raise `SAMPLING_ALPHA` and rerun; if the head dominates too aggressively (LLM Bootstrap mostly the same handful of viral tweets), lower it.
 
 **Verification:**
-- Notebook runs end-to-end on the 100-tweet `SMOKE_TEST` subset and writes a CSV at the expected path with the expected columns.
-- A `value_counts()` on `predicted_label` shows only declared categories plus, at most, a small fraction of `PARSE_ERROR` rows.
-- `02_hitl_training_loop.ipynb` can read the LLM-labelled CSV without schema changes (load it, confirm column dtypes match).
-- A `WORKLOG.md` entry is appended documenting the new notebook, the model + prompt used, and any non-obvious decisions.
+- These files exist in `BASE_PATH/Data Sets/Classifiers_Data/HITL/`: `llm_bootstrap_dataset.pkl`, `base_dataset.pkl`, `inference_dataset.pkl`, `hitl_pending_batch_0{1..4}.pkl`, and `partition_ids.pkl`.
+- `partition_ids.pkl` deserialises to a dict with keys `llm_bootstrap`, `base`, `hitl_batch_01..04`, `inference` and the disjointness check printed `all partitions disjoint`.
+- The engagement diagnostic shows the expected gradient.
 
-**On completion:** Delete this entire task block from TODO_WORKFLOW.md (from the `---` above the `##` header to the `---` below the last line).
+**On completion:** Delete this entire task block from TODO_WORKFLOW.md and append a `WORKLOG.md` entry recording: partition sizes, the `SAMPLING_ALPHA` used, any revisions the human made to the notebook, and the engagement-by-partition table.
+
+---
+
+## Set Up LLM Bootstrap Labelling
+- status: todo
+- type: task
+- id: todo.setup_llm_bootstrap
+- description: Configure and run `01_llm_bootstrap_labelling.ipynb` on the LLM Bootstrap partition, after the human has read the notebook and supplied categories, criteria, model id, and API key.
+- owner: agent
+- blocked_by: [todo.run_hitl_data_prep, human_review]
+- last_checked: 2026-05-05
+<!-- content -->
+**Context:** The LLM bootstrap notebook `notebooks/05_Classifiers/01_llm_bootstrap_labelling.ipynb` was scaffolded recently (cells in `notebooks/create_notebook.py`). It loads `llm_bootstrap_dataset.pkl` (~10 000 tweets carved out by `00_hitl_data_preparation.ipynb`), builds an LLM prompt from a configurable category list and per-category criteria, calls Gemini with retry/backoff and strict JSON parsing, checkpoints every 1 000 rows, and writes `llm_bootstrap_labels.csv` (HITL schema) plus `llm_bootstrap_labels_full.pkl` (with `confidence` + `rationale`). Two cells are placeholders — the category list + criteria, and the Gemini model id + API key — that **must** be filled before running.
+
+**Human action required (do this first):**
+> **Please open `notebooks/05_Classifiers/01_llm_bootstrap_labelling.ipynb`, read each cell, and revise the prompt-builder or pipeline if anything looks wrong.** Then provide the agent with: **(1)** the closed list of category labels (multi-class), **(2)** the per-category criteria text (definitions, positive examples, exclusions), **(3)** the Gemini model id (e.g. `gemini-2.0-flash`), and **(4)** confirmation that the `GEMINI_API_KEY` Colab secret has been set. The agent will fill in the placeholders and run the smoke test only after receiving all four.
+
+**Preconditions:**
+- `todo.run_hitl_data_prep` has been completed and `BASE_PATH/Data Sets/Classifiers_Data/HITL/llm_bootstrap_dataset.pkl` exists.
+- The human has reviewed `01_llm_bootstrap_labelling.ipynb` and supplied: category list, per-category criteria, Gemini model id, and confirmation that the API key is configured as a Colab secret named `GEMINI_API_KEY`.
+
+**Steps:**
+1. Re-read the human-revised notebook in full before editing.
+2. Fill the `CATEGORIES` list and `CATEGORY_CRITERIA` string with the values supplied by the human (in the marked TODO cell — the file has `assert` statements that fail loudly until the placeholders are gone).
+3. Set `MODEL_NAME` in the Configuration cell to the supplied Gemini model id.
+4. Run the notebook with `SMOKE_TEST = True` (default 100-tweet subset) on Colab. Inspect the `value_counts()` of `predicted_label` printed at the end — every row should be one of the declared categories or `PARSE_ERROR`, and PARSE_ERROR rate should be < 5%. If higher, adjust the prompt (likely the JSON schema instruction or category criteria) and rerun the smoke test before scaling up.
+5. Once the smoke test looks healthy, flip `SMOKE_TEST = False` and run on the full ~10 000-tweet LLM Bootstrap partition.
+6. Confirm `llm_bootstrap_labels.csv` was written with the HITL schema (`id | text | likes | retweets | predicted_label | human_label`) and the `_full.pkl` companion was written with `confidence` + `rationale` columns.
+
+**Verification:**
+- `BASE_PATH/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv` has ~10 000 rows.
+- `predicted_label` distribution is sensible: no single category > 90 %, no declared category at 0 %, PARSE_ERROR rate < 5 %.
+- The CSV loads cleanly from `02_hitl_training_loop.ipynb` (read it, confirm column dtypes match the human-labelled CSV schema).
+
+**On completion:** Delete this entire task block from TODO_WORKFLOW.md and append a `WORKLOG.md` entry recording: the Gemini model used, the categories, the prompt strategy, the PARSE_ERROR rate, the label distribution (`value_counts()` table), and any prompt iterations needed to get the smoke test below 5 % PARSE_ERROR.
 
 ---
 
