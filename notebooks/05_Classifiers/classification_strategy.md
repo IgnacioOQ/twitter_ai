@@ -2,7 +2,7 @@
 - status: active
 - type: guideline
 - id: classification_strategy
-- last_checked: 2026-04-10
+- last_checked: 2026-05-06
 <!-- content -->
 
 This document describes the classification workflow used in this project to label the full AI-Twitter dataset using a **Human-in-the-Loop (HITL) Active Learning** strategy.
@@ -17,16 +17,27 @@ The goal is to train a text classifier on tweets and use it to annotate the enti
 
 ## Dataset Partitioning
 
-The **pruned tweets dataset** at `cleanedds_folder / 'AItrust_twits_pruned_dict.json'` (JSONL output of `02_Processing/02_sanity_check_and_network_generation.ipynb`) is loaded by `00_hitl_data_preparation.ipynb`, then shuffled once with an **attention-weighted permutation** — each tweet's selection probability is proportional to `(likes + retweets + 1) ** SAMPLING_ALPHA` (default `0.5`, i.e. square-root smoothing). The dataframe is then sliced into four non-overlapping partitions:
+The **pruned tweets dataset** at `cleanedds_folder / 'AItrust_twits_pruned_dict.json'` (JSONL output of `02_Processing/02_sanity_check_and_network_generation.ipynb`) is loaded by `00_hitl_data_preparation.ipynb`. Each tweet carries `id`, `text`, `processed_text` (lowercase / URL-stripped / @-mention-stripped / RT-marker-stripped), `type` (one of `original`, `replied_to`, `quoted`, `retweeted`), and a nested `public_metrics` dict.
+
+### Retweets are split out before partitioning
+
+Retweets (`type == 'retweeted'`) are routed to a separate `retweets_dataset.pkl` and **never enter the train/test partitions**. A retweet's `text` is bit-for-bit identical to its referenced original's, so leaving retweets in would (1) leak the same string between training partitions and the held-out Inference partition, inflating measured generalisation, and (2) burn classifier compute predicting labels that are by construction the original's label. At merge time in Step 4, each retweet inherits its original's predicted (or human-confirmed) label via `referenced_tweets_dictionary` — no model call needed.
+
+`replied_to` and `quoted` carry the user's own commentary text on top of a reference, so their text is genuinely new and they remain in the partitionable corpus alongside originals.
+
+### The partitionable corpus
+
+The partitionable corpus (`type ∈ {original, replied_to, quoted}`) is then shuffled with an **attention-weighted permutation** — each tweet's selection probability is proportional to `(likes + retweets + 1) ** SAMPLING_ALPHA` (default `0.5`, i.e. square-root smoothing). The dataframe is then sliced into four non-overlapping partitions:
 
 | Partition | Size | Purpose |
 | :--- | :--- | :--- |
 | **LLM Bootstrap** | ~10 000 tweets | Labelled by an LLM (Gemini) in `01_llm_bootstrap_labelling.ipynb` to seed the training set |
 | **Base** | ~100 000 tweets | Reserve pool / source for any human seed labelling that supplements the LLM bootstrap |
 | **HITL Batches** | ~200 000 tweets (4 × 50 000) | Used for iterative human-in-the-loop review |
-| **Final Inference** | Remainder (~300k) | Classified by the final model, merged with the labelled data |
+| **Final Inference** | Remainder of partitionable corpus | Classified by the final model, merged with the labelled data and the retweet-lookup labels |
+| **Retweets** *(separate)* | All `type == 'retweeted'` rows | Bypass the model; labels inherited from referenced originals at Step 4 merge |
 
-A `partition_ids.pkl` manifest is written alongside the partition files mapping each partition name to its tweet IDs, with an inline assertion that the partitions are pairwise disjoint. Any downstream notebook can load this manifest to verify which subset a tweet belongs to.
+A `partition_ids.pkl` manifest is written to `Cleaned Data/Partitioned Data/`, mapping each partition name (including a `retweets` key) to its tweet IDs, with an inline assertion that all partitions are pairwise disjoint. Any downstream notebook can load this manifest to verify which subset a tweet belongs to.
 
 The **remaining ~17 million tweets** in the full corpus are classified separately in notebook 04 using the final trained model.
 
@@ -91,10 +102,10 @@ The best model is applied to the **next pending 50k batch**. From those predicti
 These 10 000 tweets are exported to `hitl_review_batch_XX.csv`, containing:
 
 ```
-id | text | likes | retweets | predicted_label | human_label
+id | text | processed_text | type | likes | retweets | predicted_label | human_label
 ```
 
-A human then fills in the `human_label` column and saves the file.
+`text` is the raw tweet body (what the human reads to label); `processed_text` is the cleaned variant carried alongside so downstream training can pick whichever input the chosen model prefers. `type` is always one of `original`, `replied_to`, or `quoted` here — retweets are excluded from HITL review by construction. The human then fills in the `human_label` column and saves the file.
 
 ---
 
@@ -104,9 +115,49 @@ Steps 1–2 are repeated up to **4 times** (one per 50k batch), incorporating ea
 
 ---
 
-### Step 4 — Final Inference (HITL Remainder)
+### Step 4 — Final Inference (HITL Remainder + Retweet Merge)
 
-Once the iterative loop is complete and the model quality is satisfactory, the finalised Twitter-RoBERTa model is applied to the **Final Inference partition** (~300k tweets). Results are merged with all human-labeled data into a single annotated file:
+Once Step 3 is complete, every tweet's label is produced in three passes.
+
+**Pass 1 — Classify the partitionable corpus.** Apply the finalised Twitter-RoBERTa model to the **Final Inference partition**. Combined with the HITL human labels and the LLM bootstrap labels, this gives a `labels` dict keyed by tweet ID — one label per *non-retweet* in the labelled corpus.
+
+**Pass 2 — Promote orphan originals.** For each retweet in `retweets_dataset.pkl`, read `ref_id = row['referenced_tweets_dictionary']['id']`. Retweets where `ref_id ∉ labels` are **orphans**: their referenced original was filtered out by upstream pruning but their own row survived. Group the orphans by `ref_id`, pick one representative per group (highest `(likes + retweets)`, then lowest `id` to break ties deterministically), classify *only* the representative once, and write the prediction to a second dict:
+
+```python
+orphan_originals = { ref_id: predicted_label, ... }   # one entry per missing referenced original
+```
+
+A viral missing original retweeted 5 000 times needs one model call here, not 5 000 — and all 5 000 sibling retweets are guaranteed to inherit the same label by construction.
+
+**Pass 3 — Look up retweet labels.** For every retweet:
+
+```python
+label = labels.get(ref_id) or orphan_originals.get(ref_id) or model_predict(row['text'])
+```
+
+The third branch is a safety net for retweets whose `referenced_tweets_dictionary` is empty or missing the `id` key — rare, but can happen if upstream parsing failed for the reference object. It is the only place we re-invoke the model per-row in Step 4.
+
+**Anticipated edge cases:**
+
+- **Empty `referenced_tweets_dictionary`.** Caught by the third branch above. Worth instrumenting: log the rate after the first run; if it exceeds ~1%, investigate the upstream JSONL rather than absorbing the cost silently.
+- **Multiple references on a single tweet** (e.g. a tweet that is both a reply and a quote). The Twitter v2 API can attach more than one reference, but the upstream `02_sanity_check_and_network_generation.ipynb` already collapses these to a single `referenced_tweets_dictionary` per tweet, so we treat its `id` as authoritative here.
+- **A `ref_id` that points to a tweet inside the partitionable corpus but not yet classified at merge time.** Cannot occur given Pass 1 ordering (every non-retweet is labelled before Pass 2 runs), but assert it explicitly so a future refactor can't silently break the invariant.
+- **Cross-partition consistency.** Since all retweets in an orphan group read off the same `orphan_originals[ref_id]`, sibling retweets of the same missing original always receive identical labels. The same property holds trivially for the standard lookup path.
+
+**Provenance.** A `label_source` column is written on every row of the final annotated file:
+
+| Value | Meaning |
+| :--- | :--- |
+| `human` | HITL-labelled (`human_label` non-null after a review round) |
+| `llm_bootstrap` | Gemini-labelled in `01_llm_bootstrap_labelling.ipynb` |
+| `model_original` | Twitter-RoBERTa on a partitionable tweet (`type ∈ {original, replied_to, quoted}`) |
+| `model_synthetic_retweet` | Twitter-RoBERTa on a representative retweet, used as the canonical label for a missing referenced original |
+| `model_no_reference` | Twitter-RoBERTa on a retweet whose `referenced_tweets_dictionary` was empty / unparseable |
+| `lookup` | Inherited from a labelled original or a synthetic original via `ref_id` (no model call) |
+
+This lets downstream analysis report the share of labels from each source and audit the orphan handling without re-running anything.
+
+**Output:**
 
 ```
 Data Sets/Classifiers_Data/Final/final_annotated_tweets.pkl
@@ -143,18 +194,25 @@ This annotated corpus feeds into `03_Analysis_and_Modeling` and `04_Network_Anal
 
 ## Data Folder Structure
 
+Partition outputs from notebook 00 live under `Cleaned Data/Partitioned Data/` (next to the upstream pruned tweet dict). Labelling artifacts and final inference outputs live under `Classifiers_Data/`.
+
 ```
 Data Sets/
+├── Cleaned Data/
+│   ├── AItrust_twits_pruned_dict.json     ← upstream input from 02/02
+│   └── Partitioned Data/                   ← outputs of 00_hitl_data_preparation.ipynb
+│       ├── llm_bootstrap_dataset.pkl       ← ~10 000 tweet partition for LLM bootstrap
+│       ├── base_dataset.pkl
+│       ├── inference_dataset.pkl
+│       ├── retweets_dataset.pkl            ← retweets — labels inherited at merge time
+│       ├── hitl_pending_batch_01.pkl       ← ... 04.pkl
+│       └── partition_ids.pkl               ← {partition_name: [tweet_id, ...]} manifest
+│
 └── Classifiers_Data/
     ├── HITL/
-    │   ├── llm_bootstrap_dataset.pkl       ← ~10 000 tweet partition for LLM bootstrap
     │   ├── llm_bootstrap_labels.csv        ← LLM-labelled seed (HITL CSV schema)
     │   ├── llm_bootstrap_labels_full.pkl   ← labels + confidence + rationale
     │   ├── llm_bootstrap_checkpoint_*.pkl  ← intermediate saves every 1 000 tweets
-    │   ├── partition_ids.pkl               ← {partition_name: [tweet_id, ...]} manifest
-    │   ├── base_dataset.pkl
-    │   ├── inference_dataset.pkl
-    │   ├── hitl_pending_batch_01.pkl       ← ... 04.pkl
     │   ├── hitl_review_batch_00.csv        ← optional human-labelled seed (Path B)
     │   └── hitl_review_batch_01.csv        ← ... 04.csv (filled after each loop)
     ├── Final/
@@ -176,6 +234,9 @@ Models/
 
 ## Key Decisions
 
+- **Why split retweets out instead of routing them through the classifier?** A retweet's `text` is bit-for-bit identical to its referenced original (Twitter's `RT @user: <text>` is the same content). Two problems if we left retweets in the partitionable corpus: (1) **text leakage** — the same string could land in both a training partition and the held-out Inference partition, polluting our generalisation measurement; (2) **wasted compute** — running Twitter-RoBERTa on each retweet predicts a label that is by construction the original's label, with the added risk that the model labels a retweet differently from its original on a borderline case. Splitting retweets into `retweets_dataset.pkl` and inheriting their labels at merge time fixes both. `replied_to` and `quoted` tweets carry the user's own commentary text on top of a reference, so their text is genuinely new and they stay in the partitionable corpus.
+- **Why promote one retweet per orphan group instead of running the classifier on every orphan?** A missing original can have anywhere from 1 to 50 000+ orphan retweets, all carrying identical text. Classifying each retweet independently wastes GPU time proportional to virality, and introduces a consistency risk: the model could land on different sides of the decision boundary on two near-identical inputs. Picking one representative per `ref_id`, classifying it once, and writing the prediction to `orphan_originals[ref_id]` reduces model passes by one to two orders of magnitude on viral missing originals and guarantees sibling consistency. The representative is chosen by descending `(likes + retweets)` and then ascending `id` so the choice is deterministic across reruns.
+- **Why keep both `text` and `processed_text` in every partition?** The two embedding pipelines want different inputs. `cardiffnlp/twitter-roberta-base` was pre-trained on near-raw tweets (it expects @-mentions, hashtags, casing, even URLs as `<url>` placeholders) and performs best on `text`. Classical bag-of-words and sentence-embedding pipelines benefit from the cleaning already done by `02_sanity_check_and_network_generation.ipynb` (`processed_text`), which collapses noise that would otherwise blow up vocabulary size or perturb dense vectors. Carrying both columns means every downstream notebook picks the right input for its model without having to re-run the cleaner.
 - **Why attention-weighted sampling instead of uniform random?** Tweet engagement on this corpus follows a heavy-tailed distribution — a small number of viral tweets carry most of the discourse. A uniform random sample of 10 000 tweets would consist almost entirely of low-engagement tweets, leaving the LLM and the classifier blind to the content that actually shapes the conversation. Weighting selection probability by `(likes + retweets + 1) ** SAMPLING_ALPHA` over-represents the influential head while still drawing from the body of the distribution. `SAMPLING_ALPHA = 0.5` (square-root smoothing) is the default; `0` recovers uniform, `1` is fully proportional to attention. The downstream slice (LLM Bootstrap → Base → HITL → Inference) is *stratified by influence* — the LLM Bootstrap subset carries the highest-engagement tweets so the LLM and the seed training set learn from the most informative content first.
 - **Why bootstrap with an LLM instead of going straight to human seed labelling?** Hand-labelling 10 000 tweets is the most expensive single step in the original loop. An LLM with a well-specified prompt can produce the same 10 000 labels in well under an hour for a few dollars — good enough to seed the first round of HITL training. The human review then concentrates where it pays off most: correcting the model's uncertain predictions in Steps 2-3, not creating labels from scratch. The LLM bootstrap subset is **disjoint** from the Base partition, so a human seed CSV (Path B) can be added on top without double-labelling any tweet.
 - **Why Twitter-RoBERTa over generic BERT?** `cardiffnlp/twitter-roberta-base` was specifically pre-trained on Twitter data (informal language, hashtags, mentions, abbreviations), making it significantly better at tweet classification than domain-general transformers.

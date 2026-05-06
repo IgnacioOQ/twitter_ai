@@ -24,3 +24,7 @@ __pycache__/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Local-only test fixtures and notebook outputs (too large for GitHub's 100 MB limit;
+# obtain separately and place under data_sets/ at the repo root for USE_LOCAL_TEST_DATA mode)
+data_sets/

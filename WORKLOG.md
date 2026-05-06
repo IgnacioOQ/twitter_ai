@@ -6,10 +6,41 @@
 - label: [agent]
 - injection: excluded
 - volatility: evolving
-- last_checked: 2026-05-05
+- last_checked: 2026-05-06
 <!-- content -->
 Append-only working history. Newest entries first.
 Add an entry whenever you solve a difficult problem, make a significant change, or complete a major task.
+
+---
+
+## 2026-05-06 — Wire 02/02 to in-repo `data_sets/` for local smoke-testing
+- status: done
+- type: task
+- id: twitter_ai.worklog.2026_05_06_local_test_data_toggle
+- last_checked: 2026-05-06
+<!-- content -->
+**What:**
+- The user added a new top-level `data_sets/` folder to the repo containing the test fixtures `AItrust_twits_dict_test.json` (313 MB, 233,094 JSONL records) and `AItrust_author_dict_test.json` (743 KB, 1,272 records). Goal was to make the test branch of `notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb` runnable on a laptop without Google Drive Desktop.
+- Modified cell 1 of `02_sanity_check_and_network_generation.ipynb` to add a `USE_LOCAL_TEST_DATA = False` toggle alongside `RUNNING_LOCALLY`. When both are `True`, `BASE_PATH = <repo>/data_sets/` and `datasets_folder = BASE_PATH`; `cleanedds_folder = BASE_PATH / 'Cleaned Data'` and `networks_folder = BASE_PATH / 'Networks'` are routed under it and auto-created via `.mkdir(parents=True, exist_ok=True)`. Default behaviour (Colab + local-Drive) is unchanged.
+- Edit had to go through a Python `json.load`/`json.dump` round-trip because the `.ipynb` exceeds the Read tool's 25 000-token limit and `NotebookEdit` requires a prior Read. Verified the edit was isolated to cell 1 by parsing both pre-edit and post-edit cell sources and comparing — only `cells[1].source` changed; cell count and all other sources unchanged. The pre-existing diff vs `HEAD` (cells 12+) is the user's own uncommitted work, not from this session.
+- Smoke-tested the new wiring with a Python script that mimicked cell 1's path resolution and replayed the read patterns from cells 5 and 6: both files parsed cleanly via line-by-line `json.loads`. Twit schema confirmed: `id`, `text`, `created_at`, `public_metrics`, `author_id`, `type`, `referenced_tweets`, `conversation_id`, `entities`, `referenced_tweets_dictionary`. Author schema confirmed: `description`, `public_metrics`, `created_at`, `id`, `entities`, `name`, `username`, `verified`.
+- Did **not** execute the full test-branch (cells 1–43) end-to-end — that's a human action captured as `todo.verify_02_02_local_test_run` because pruning + network generation against 233 K records is slow and I'd rather have the human eyeball the intermediate outputs.
+- Reviewed `notebooks/create_notebook.py` and `notebooks/notebook_setup.md` while considering propagation. Surfaced two issues: (1) BASE_PATH drift — 02/02 cell 1's Colab branch uses `Path('/content/drive/MyDrive/AI Public Trust')` while `setup_cell()` (lines 121, 125) uses `Path('/content/drive/My Drive/Colab Projects/AI Public Trust')`; the latter matches `README.md` and `notebook_setup.md` so the former is most likely a stale artifact. (2) `setup_cell()` and the canonical `notebook_setup.md` don't yet describe the new toggle, so any newly scaffolded notebook will lack it.
+- Updated `TODO_WORKFLOW.md` with four self-contained follow-up tasks (in suggested execution order):
+  - `todo.verify_02_02_local_test_run` (owner: human) — the end-to-end run.
+  - `todo.harmonise_base_path_drift` (blocked on human confirming canonical Drive path).
+  - `todo.create_notebook_local_test_toggle` (blocked on the path-drift task and on committing the pending edits in `00_hitl_data_preparation.ipynb` to avoid a regen clobber).
+  - `todo.notebook_setup_md_local_test` (doc update; ideally after verification).
+
+**Why:**
+- Self-contained smoke testing without Drive shortens the iteration loop on `02/02` and the `src/network/` modules. It also makes the test fixture available as a real input for any future regression check on network generation. The chain reaction (scaffolder + canonical doc updates) was deliberately deferred so we don't bake the path-drift inconsistency into the new template, and so the user can preserve their uncommitted edits in `05_Classifiers/00_hitl_data_preparation.ipynb` before any scaffolder regen.
+
+**Outcome:**
+- Cell 1 of `02_sanity_check_and_network_generation.ipynb` now supports three modes (Colab, local-Drive, local-test). Read patterns verified against both in-repo test dicts. No regressions in the default modes. Four follow-ups queued in `TODO_WORKFLOW.md` with full context, preconditions, steps, and verification gates.
+
+**KB changes:** None — deferred until `todo.verify_02_02_local_test_run` confirms the wiring works end-to-end. Auto-memory's "Notebook Setup Pattern" entry is consistent with the change but should gain a `USE_LOCAL_TEST_DATA` line once the doc update task ships.
+
+**Follow-up:** See the four new tasks in `TODO_WORKFLOW.md`. Nothing else outstanding from this session.
 
 ---
 
