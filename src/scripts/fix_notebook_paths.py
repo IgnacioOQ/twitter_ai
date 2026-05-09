@@ -5,15 +5,14 @@ import re
 
 NOTEBOOKS_DIR = 'notebooks'
 
-# Typical hardcoded path variations
+# Typical hardcoded path variations to normalize away
 HARDCODED_PREFIXES = [
-    r'/content/drive/My Drive/Colab Projects/AI Public Trust/',
     r'/content/drive/MyDrive/AI Public Trust/',
-    r'/content/drive/MyDrive/Colab Projects/AI Public Trust/'
+    r'/content/drive/MyDrive/Colab Projects/AI Public Trust/',
 ]
 
-# We want to replace hardcoded strings with a standardized parameter approach:
-# BASE_PATH = '/content/drive/MyDrive/AI Public Trust'
+# Canonical Drive layout (matches notebooks/notebook_setup.md and the README data folder map):
+# BASE_PATH = '/content/drive/My Drive/Colab Projects/AI Public Trust'
 # data_sets_folder = BASE_PATH + '/Data Sets/'
 
 def process_notebook(filepath):
@@ -44,7 +43,7 @@ def process_notebook(filepath):
             for prefix in HARDCODED_PREFIXES:
                 # Naive replacement inside string literals
                 # Ideally, they'd use a BASE variable. Let's just normalize the prefix first.
-                normalized_prefix = '/content/drive/MyDrive/AI Public Trust/'
+                normalized_prefix = '/content/drive/My Drive/Colab Projects/AI Public Trust/'
                 if prefix in line and prefix != normalized_prefix:
                     line = line.replace(prefix, normalized_prefix)
                     cell_modified = True

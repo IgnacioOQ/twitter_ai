@@ -105,3 +105,31 @@ Add an entry whenever you solve a difficult problem, make a significant change, 
 **Why:** The repository had no cross-session task backlog or worklog, so coding-agent sessions had nowhere to leave or pick up pending work, and no audit trail of significant interventions. The previous README was minimal and missing the HITL classifier stage, the `src/` package, and the Drive data structure — a new reader (human or agent) could not get a working mental model from it alone.
 
 **Outcome:** `README.md` rewritten; `TODO_WORKFLOW.md` and `WORKLOG.md` created. No code changes. Follow-up: none — future sessions can now use these files per Phase 5 of `content/workflows/CODING_AGENT_MAIN_WORKFLOW.md`.
+
+## 2026-05-09 — Pipeline graph + BASE_PATH harmonisation
+- type: entry
+- id: twitter_ai.worklog.2026_05_09_pipeline_graph_and_basepath
+- last_checked: 2026-05-09
+<!-- content -->
+**Task:** Build a queryable + visual representation of the data pipeline implicit across the 19 notebooks (the user can't easily see what produces/consumes what), and resolve the long-standing `todo.harmonise_base_path_drift` so artifact nodes resolve to a single canonical Drive path.
+
+**Outcome:**
+- New `src/scripts/pipeline_graph.py` (~430 lines) — static analyzer that walks every `.ipynb`, extracts path-variable bindings (canonical Colab branch), tracks local vars across cells in source order, recognizes read/write idioms (`pickle.dump`, `json.dump/load`, `pd.read_*`, `df.to_*`, `nx.read_gml/write_gml`, `ig.Graph.Read_GML`, `np.save/load`, `with open(...)`), resolves `/`-concat and `+`-concat paths, strips Jupyter magics before `ast.parse`. CLI: `build` (default, dumps JSON + 2 PNGs), `validate` (compares parser output vs README/notebook_setup.md `[stage/index]` tags), `downstream NB`, `upstream NB`.
+- New `docs/pipeline_overrides.yaml` — small annotations file (v1/v2 sentiment alternatives, stage-05 checkpoint glob patterns, friendly labels). Expected to stay <50 lines; everything else derived.
+- New generated artifacts under `docs/`: `pipeline_graph.json` (78 artifact nodes, 19 notebook nodes, 59 write + 56 read edges), `pipeline_graph.png` (full bipartite, stage-band layout), `pipeline_graph_notebooks.png` (notebook-only DAG projection).
+- `README.md` — added pointer + run command under Repository Structure.
+- **BASE_PATH harmonisation:** canonical Colab path is `/content/drive/My Drive/Colab Projects/AI Public Trust` (matches `02_extract_examples.ipynb`, the README data-layout block, and the canonical `notebooks/notebook_setup.md`). Updated **14 notebook files** (replaced wrong `MyDrive/AI Public Trust` references), `notebooks/notebook_setup.md` (line 44 cell-1 example), `src/scripts/inject_env_switch.py` (template lines 18 and 23 — local Volume now uses `My Drive/Colab Projects/...` instead of `MyDrive/...`, Colab branch likewise), `src/scripts/fix_notebook_paths.py` (re-pointed the normalisation target to the canonical, otherwise re-running it would re-introduce the drift), `agents/NOTEBOOK_SKILL.md` (two narrative refs), `README.md` (one narrative ref). After re-running `pipeline_graph.py` the BASE_PATH-divergence stderr warning is gone and all artifact nodes share the single prefix `My Drive/Colab Projects/AI Public Trust`.
+
+**Key decisions:**
+- **Code-first sourcing.** The graph is rebuilt from the live `.ipynb` files on every run; there is no hand-curated manifest to maintain. Decision driven by the user's note that the repo is not finalised — any docs-based manifest would silently drift.
+- **Stage-band layout** instead of `nx.topological_generations`. Disconnected notebooks (stage 6 `tp_bigrams_test`, the two stage-1 ingestion notebooks whose paths can't fully resolve) all landed in the same generation under topological layout, crowding the picture. y = -stage matches the user's mental model and the README's stage table.
+- **Strip the `/content/drive/` runtime prefix** from all artifact paths, also at emit time (not only at env-collection time). f-string-derived paths (`03/03_lda_tweet_topics`'s templated outputs) were leaking the prefix; emit-time strip catches them uniformly.
+- **`fix_notebook_paths.py` updated, not retired.** The script previously normalised everything *to* the wrong Colab path; flipping its target plus removing the canonical from `HARDCODED_PREFIXES` makes the script idempotent under the new canonical.
+
+**Validation findings (kept, not fixed):** `pipeline_graph.py validate` flags `Full_Network.gml` as documented `[04/01]` in the README data layout though the parser correctly identifies `02/02` as the producer (`04/01` is the consumer). Not fixed in this session — flagged for the README maintainer.
+
+**KB changes:** none — `content/how-to/GRAPH_REPRESENTATION_SKILL.md` already covered the relevant cookbook recipes (§3.3, §6.7, §6.12, §6.5). The notebook-AST-static-analysis tactics (cell-magic strip, cross-cell var binding, igraph-vs-networkx aliases, `+`-concat handling, `np.save`/`np.load` direct-path detection) are arguably worth capturing as a separate `NOTEBOOK_STATIC_IO_GRAPH_SKILL.md` if a similar parser is needed for another repo — deferred until that need surfaces.
+
+**Follow-up:**
+- `todo.create_notebook_local_test_toggle` is now unblocked (its `blocked_by` was `todo.harmonise_base_path_drift`).
+- Three notebooks remain at 0/0 in the graph: stage-01 `01_shared_folder_setup` (no real I/O), stage-01 `02_twitter_api_mining` (uses an unresolved `parent` variable in its own setup — pre-canonical layout), stage-06 `01_tp_bigrams_test` (confirmed isolated, synthetic data only). Acceptable; the graph is honest about what the parser can and can't see.

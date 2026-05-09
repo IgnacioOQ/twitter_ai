@@ -345,54 +345,14 @@ This file is the per-repository instance of the `TODO_WORKFLOW_TEMPLATE.md` patt
 
 ---
 
-## Harmonise BASE_PATH Across create_notebook.py and 02/02 Cell 1
-- status: todo
-- type: task
-- id: todo.harmonise_base_path_drift
-- description: Resolve the BASE_PATH inconsistency between `notebooks/create_notebook.py` and `notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb` so every notebook in the project resolves to the same Drive folder.
-- owner: agent
-- blocked_by: [human_review]
-- last_checked: 2026-05-06
-<!-- content -->
-**Context:** While reviewing scaffolding in session 2026-05-06, two BASE_PATH definitions were found to disagree:
-
-1. `notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb` cell 1:
-   - Local: `Path('/Volumes/GoogleDrive/My Drive/Colab Projects/AI Public Trust')`
-   - Colab: `Path('/content/drive/MyDrive/AI Public Trust')` ← note `MyDrive/AI Public Trust`
-2. `notebooks/create_notebook.py` `setup_cell()` (lines 121, 125):
-   - Local: `Path('/Volumes/GoogleDrive/My Drive/Colab Projects/AI Public Trust')`
-   - Colab: `Path('/content/drive/My Drive/Colab Projects/AI Public Trust')` ← note `My Drive/Colab Projects/AI Public Trust`
-
-`README.md` and `notebooks/notebook_setup.md` both state the canonical layout is `My Drive/Colab Projects/AI Public Trust/`. The Colab path in 02/02 cell 1 (`MyDrive/AI Public Trust`) skips the `Colab Projects/` parent and collapses `My Drive` into `MyDrive` — most likely a stale path from before the `Colab Projects/` reorganisation. Until the canonical path is settled, **do not touch `setup_cell()`'s BASE_PATH** (the path-shape change in `todo.create_notebook_local_test_toggle` would otherwise bake the drift in).
-
-**Human action required (do this first):**
-> **Please confirm which path is the live Drive layout.** Open Drive Desktop / drive.google.com and check whether `AI Public Trust/` lives at the root of `MyDrive` or under `MyDrive/Colab Projects/`. Reply with the canonical absolute path. If both paths exist (e.g. a copy lives at the root), say so — that may indicate a separate cleanup TODO.
-
-**Preconditions:**
-- The human has confirmed the canonical Drive path.
-
-**Steps:**
-1. Update `notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb` cell 1 so its Colab branch uses the canonical path. The local-Drive branch already matches the README layout — leave it unchanged unless the human says otherwise.
-2. Update `notebooks/create_notebook.py` `setup_cell()` (lines 121 and 125) so both branches use the canonical path.
-3. Grep the rest of the repo for `'MyDrive/AI Public Trust'`, `'My Drive/Colab Projects/AI Public Trust'`, `'/content/drive/MyDrive'`, `'/content/drive/My Drive'` and update any other notebook or doc that disagrees with the canonical path.
-4. Update `notebooks/notebook_setup.md` and `README.md` only if their stated canonical path turns out to be wrong (the human's reply settles this).
-
-**Verification:**
-- `git grep -E "MyDrive|My Drive"` returns the canonical path everywhere except documented historical notes.
-- Cell 1 of every notebook resolves to the same Drive folder when `RUNNING_LOCALLY=False`.
-
-**On completion:** Delete this entire task block from TODO_WORKFLOW.md and append a `WORKLOG.md` entry recording: which path was canonical, the list of files updated, and any orphaned files left behind on Drive.
-
----
-
 ## Add USE_LOCAL_TEST_DATA Toggle to create_notebook.py setup_cell()
 - status: todo
 - type: task
 - id: todo.create_notebook_local_test_toggle
 - description: Update the `setup_cell()` helper in `notebooks/create_notebook.py` so future notebooks emitted by the scaffolder include the `USE_LOCAL_TEST_DATA` flag introduced in 02/02 cell 1.
 - owner: agent
-- blocked_by: [todo.harmonise_base_path_drift]
-- last_checked: 2026-05-06
+- blocked_by: []
+- last_checked: 2026-05-09
 <!-- content -->
 **Context:** In session 2026-05-06 the agent wired `notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb` cell 1 to read the in-repo `data_sets/` folder when `RUNNING_LOCALLY=True` AND `USE_LOCAL_TEST_DATA=True`. That edit lives in 02/02 cell 1 only — the `setup_cell()` function in `notebooks/create_notebook.py` (the scaffolder used to (re)generate the HITL classifier notebooks `05_Classifiers/00..04`) still emits the old single-flag pattern. To make the local-test pattern propagate to any future notebook scaffolded by this script, `setup_cell()` needs to be updated to mirror the new shape.
 

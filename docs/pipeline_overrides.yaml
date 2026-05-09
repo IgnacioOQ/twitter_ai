@@ -1,0 +1,19 @@
+# pipeline_graph.py overrides — only what the parser cannot infer.
+# Everything else (reads, writes, edges) is derived from the notebooks themselves.
+
+# Notebook pairs that are mutually-exclusive runs of the same step.
+# Renders as a dashed edge between them; both still appear in the JSON.
+alternatives:
+  - ["03_Analysis_and_Modeling/01_sentiment_analysis",
+     "03_Analysis_and_Modeling/01_sentiment_analysis_v2"]
+
+# Artifact paths to collapse into a single glob node.
+# Use shell-style wildcards (`*`). Any artifact path that matches one of these
+# patterns gets folded into a single node bearing the pattern as its label.
+glob_artifacts:
+  - "MyDrive/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_checkpoint_*.pkl"
+  - "MyDrive/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/checkpoint_*.pkl"
+
+# Optional friendly labels for cluttered artifact paths in the diagram only.
+# The JSON keeps the full Drive path; this just shortens what the picture shows.
+friendly_labels: {}

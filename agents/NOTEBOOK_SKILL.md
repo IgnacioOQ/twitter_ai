@@ -74,7 +74,7 @@ This repository heavily relies on Google Drive and Google Colab for storage and 
   from google.colab import drive
   drive.mount('/content/drive')
   ```
-- **Local vs Cloud Execution**: Be aware that this syntax is exclusively for Google Colab environments. If testing code locally, the user will need Google Drive for Desktop installed, mapping the drive to a local path (e.g., `/Volumes/GoogleDrive/MyDrive`). 
+- **Local vs Cloud Execution**: Be aware that this syntax is exclusively for Google Colab environments. If testing code locally, the user will need Google Drive for Desktop installed, mapping the drive to a local path (e.g., `/Volumes/GoogleDrive/My Drive`).
 - **Avoid Hardcoding Local Paths**: When writing path strings, parameterize the root storage directory so it can be easily toggled between Colab paths and Local paths.
 
 ### 2. Shared Folder Shortcut Resolution
@@ -83,7 +83,7 @@ This repository heavily relies on Google Drive and Google Colab for storage and 
 <!-- content -->
 Collaborating on Google Drive requires all participants to add a **Shortcut** to the shared folder (e.g., `AI Public Trust`) into their personal `MyDrive`.
 - **Target Path**: The universal target path for accessing the shared data within Colab is typically:
-  `SHARED_FOLDER_PATH = '/content/drive/MyDrive/AI Public Trust'`
+  `SHARED_FOLDER_PATH = '/content/drive/My Drive/Colab Projects/AI Public Trust'`
 - **Folder Verification**: Before executing data-heavy operations, agents should instruct notebooks to verify the existence of this target path using `os.path.exists(SHARED_FOLDER_PATH)`.
 - **Warning on Shortcuts**: If a collaborator names their shortcut differently, the `SHARED_FOLDER_PATH` variable is the only place that needs to be updated. Agents should keep this path abstracted into a top-level constant rather than scattering `/content/drive/...` strings throughout the code.
 

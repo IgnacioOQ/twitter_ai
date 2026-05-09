@@ -40,8 +40,14 @@ twitter_ai/
 └── docs/                        ← long-form documentation
     ├── MD_CONVENTIONS.md        ← markdown / metadata conventions
     ├── MCP_EXPLANATION.md
-    └── MCP_SKLEARN_PLAN.md
+    ├── MCP_SKLEARN_PLAN.md
+    ├── pipeline_graph.png       ← bipartite map of notebooks ↔ Drive artifacts
+    ├── pipeline_graph_notebooks.png  ← projected notebook-only DAG (overview)
+    ├── pipeline_graph.json      ← persisted graph, queryable with `jq`
+    └── pipeline_overrides.yaml  ← small manual annotations for the graph builder
 ```
+
+The pipeline graph is regenerated from the live notebooks by `python3 src/scripts/pipeline_graph.py`; run `... downstream <notebook_id>` or `... upstream <notebook_id>` to query producer/consumer relations from the shell.
 
 ## Notebook Pipeline
 
@@ -118,7 +124,7 @@ The bracketed tags (`[02/02]`, `[03/03]`, ...) indicate which notebook *stage/in
 ### Option 1 — Google Colab (recommended)
 
 1. Open any notebook directly from this repo on Colab.
-2. The first cell mounts your Google Drive at `/content/drive` and resolves `BASE_PATH` to `MyDrive/AI Public Trust`.
+2. The first cell mounts your Google Drive at `/content/drive` and resolves `BASE_PATH` to `My Drive/Colab Projects/AI Public Trust`.
 3. If the notebook imports from `src/`, the second cell runs `git clone https://github.com/IgnacioOQ/twitter_ai.git` into the Colab session and adds the repo root to `sys.path`.
 
 ### Option 2 — Local
