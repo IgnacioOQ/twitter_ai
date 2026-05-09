@@ -128,7 +128,7 @@ Add an entry whenever you solve a difficult problem, make a significant change, 
 
 **Validation findings (kept, not fixed):** `pipeline_graph.py validate` flags `Full_Network.gml` as documented `[04/01]` in the README data layout though the parser correctly identifies `02/02` as the producer (`04/01` is the consumer). Not fixed in this session — flagged for the README maintainer.
 
-**KB changes:** none — `content/how-to/GRAPH_REPRESENTATION_SKILL.md` already covered the relevant cookbook recipes (§3.3, §6.7, §6.12, §6.5). The notebook-AST-static-analysis tactics (cell-magic strip, cross-cell var binding, igraph-vs-networkx aliases, `+`-concat handling, `np.save`/`np.load` direct-path detection) are arguably worth capturing as a separate `NOTEBOOK_STATIC_IO_GRAPH_SKILL.md` if a similar parser is needed for another repo — deferred until that need surfaces.
+**KB changes:** `content/how-to/GRAPH_REPRESENTATION_SKILL.md` updated — appended a paragraph to §3.3 ("Data-processing pipeline") capturing the eight static-AST tactics that turn a generic bipartite-modelling guide into a working extractor for an existing Jupyter notebook directory: cell-magic stripping, cross-cell env threading, `BinOp(Add)` / `BinOp(Div)` path resolution, cross-library alias handling (`nx.read_gml` ↔ `ig.Graph.Read_GML`; `pickle.load` vs `np.load`), `for (a,b) in <literal list>` unrolling, user-defined-function inlining with kwarg propagation, emit-time drive-prefix stripping, and stderr logging for unresolved I/O. Includes a pointer to `twitter_ai/src/scripts/pipeline_graph.py` as the in-repo reference implementation.
 
 **Follow-up:**
 - `todo.create_notebook_local_test_toggle` is now unblocked (its `blocked_by` was `todo.harmonise_base_path_drift`).
