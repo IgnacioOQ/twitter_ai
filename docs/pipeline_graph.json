@@ -390,6 +390,22 @@
       "bipartite": 1
     },
     {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Tweet Sheets/top_test_ai_tweets.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Tweet Sheets/top_test_ai_tweets.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Tweet Sheets/top_test_art_tweets.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Tweet Sheets/top_test_art_tweets.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
       "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/authorlite_k5_topics_metadata.json",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/authorlite_k5_topics_metadata.json",
@@ -430,6 +446,14 @@
       "bipartite": 1
     },
     {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.jsonl",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.jsonl",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
       "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/author_level/tfidf_unigram/lda_model_k{K}_a0p1_e0p1.pkl",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/author_level/tfidf_unigram/lda_model_k{K}_a0p1_e0p1.pkl",
@@ -443,6 +467,14 @@
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/author_level/tfidf_unigram/vectorizer_k{K}_a0p1_e0p1.pkl",
       "glob": false,
       "templated": true,
+      "bipartite": 1
+    },
+    {
+      "id": "/content/AItrust_pruned_twits_with_sentiment.json",
+      "kind": "artifact",
+      "drive_path": "/content/AItrust_pruned_twits_with_sentiment.json",
+      "glob": false,
+      "templated": false,
       "bipartite": 1
     },
     {
@@ -649,7 +681,7 @@
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/hitl_pending_batch_{i + 1}.pkl",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/hitl_pending_batch_{i + 1}.pkl",
-      "glob": true,
+      "glob": false,
       "templated": true,
       "bipartite": 1
     },
@@ -673,7 +705,7 @@
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_checkpoint_{len(results)}.pkl",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_checkpoint_{len(results)}.pkl",
-      "glob": true,
+      "glob": false,
       "templated": true,
       "bipartite": 1
     },
@@ -902,6 +934,16 @@
       "style": "alternative"
     },
     {
+      "src": "03_Analysis_and_Modeling/02_extract_examples",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Tweet Sheets/top_test_ai_tweets.csv",
+      "direction": "write"
+    },
+    {
+      "src": "03_Analysis_and_Modeling/02_extract_examples",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Tweet Sheets/top_test_art_tweets.csv",
+      "direction": "write"
+    },
+    {
       "src": "03_Analysis_and_Modeling/03_lda_tweet_topics",
       "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/authorlite_k5_topics_metadata.json",
       "direction": "write"
@@ -1092,6 +1134,11 @@
       "direction": "read"
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict.json",
+      "dst": "05_Classifiers/04_full_dataset_inference",
+      "direction": "read"
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_author_dict.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
@@ -1123,6 +1170,16 @@
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test.json",
+      "dst": "03_Analysis_and_Modeling/02_extract_examples",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
+      "dst": "02_Processing/02_sanity_check_and_network_generation",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
       "dst": "03_Analysis_and_Modeling/02_extract_examples",
       "direction": "read"
     },
@@ -1222,6 +1279,11 @@
       "direction": "read"
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_classified_{MODEL_ALIAS}.json",
+      "dst": "03_Analysis_and_Modeling/01_sentiment_analysis_v2",
+      "direction": "read"
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test.json",
       "dst": "03_Analysis_and_Modeling/01_sentiment_analysis_v2",
       "direction": "read"
@@ -1239,6 +1301,16 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/authorlite_k{K_TARGET}_topics_metadata.json",
       "dst": "03_Analysis_and_Modeling/03_lda_tweet_topics",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.jsonl",
+      "dst": "03_Analysis_and_Modeling/03_lda_tweet_topics",
+      "direction": "read"
+    },
+    {
+      "src": "/content/AItrust_pruned_twits_with_sentiment.json",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics",
       "direction": "read"
     },
     {
@@ -1314,6 +1386,21 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/test_sentences_corpus.pkl",
       "dst": "03_Analysis_and_Modeling/06_topic_modeling_appendix",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/llm_bootstrap_dataset.pkl",
+      "dst": "05_Classifiers/03_final_inference",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/base_dataset.pkl",
+      "dst": "05_Classifiers/03_final_inference",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/inference_dataset.pkl",
+      "dst": "05_Classifiers/03_final_inference",
       "direction": "read"
     },
     {

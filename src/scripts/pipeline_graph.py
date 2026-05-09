@@ -208,6 +208,51 @@ def _classify_open_call(call: ast.Call):
     return None, None
 
 
+_SENTINEL = object()
+
+
+def _eval_iter(node, env):
+    """Resolve an iterator expression to a list of strings or tuples-of-strings.
+
+    Handles `[(a, b), (c, d)]` literal lists, `[s1, s2]` literal lists, and Names
+    bound to such lists in env. Returns None when the iterator can't be resolved.
+    """
+    if isinstance(node, ast.Name):
+        v = env.get(node.id)
+        return v if isinstance(v, list) else None
+    if isinstance(node, (ast.List, ast.Tuple)):
+        items = []
+        for elt in node.elts:
+            if isinstance(elt, ast.Tuple):
+                vals = []
+                for sub in elt.elts:
+                    s = _eval(sub, env)
+                    if not isinstance(s, str):
+                        return None
+                    vals.append(s)
+                items.append(tuple(vals))
+            else:
+                s = _eval(elt, env)
+                if not isinstance(s, str):
+                    return None
+                items.append(s)
+        return items
+    return None
+
+
+def _bind(env: dict, name: str, value):
+    saved = env.get(name, _SENTINEL)
+    env[name] = value
+    return saved
+
+
+def _restore(env: dict, name: str, saved):
+    if saved is _SENTINEL:
+        env.pop(name, None)
+    else:
+        env[name] = saved
+
+
 def _strip_magics(src: str) -> str:
     """Drop Jupyter cell-magic and line-magic lines so ast.parse succeeds."""
     lines = src.splitlines()
@@ -220,11 +265,13 @@ def _strip_magics(src: str) -> str:
     return "\n".join(cleaned)
 
 
-def extract_io_from_cell(src: str, env: dict, in_loop: bool = False):
+def extract_io_from_cell(src: str, env: dict, func_defs: dict, in_loop: bool = False):
     """Yield (kind, path_str, templated, glob) tuples for one code cell.
 
-    The env dict is mutated in place with any new {name: resolved_path} bindings
-    discovered in this cell, so later cells in the same notebook see them.
+    env is mutated in place with new {name: resolved_path} bindings discovered
+    in this cell, so later cells see them. func_defs is the {name: ast.FunctionDef}
+    map collected across the whole notebook; calls to known functions get their
+    bodies inlined (with kwargs bound) so I/O inside helper functions is captured.
     """
     try:
         tree = ast.parse(_strip_magics(src))
@@ -232,6 +279,8 @@ def extract_io_from_cell(src: str, env: dict, in_loop: bool = False):
         return
 
     yield_buffer: list = []
+    inline_depth = [0]
+    INLINE_LIMIT = 4
 
     def emit(kind, path, in_loop_ctx):
         if not isinstance(path, str):
@@ -244,18 +293,65 @@ def extract_io_from_cell(src: str, env: dict, in_loop: bool = False):
         yield_buffer.append((kind, path, templated, is_glob))
 
     def walk(node, in_loop_ctx):
-        if isinstance(node, (ast.For, ast.While, ast.AsyncFor)):
-            child_ctx = True
-        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            child_ctx = in_loop_ctx
-        else:
-            child_ctx = in_loop_ctx
-
-        # capture local path bindings as we walk, so later statements see them
+        # capture path-like and list-like bindings so later statements see them
         if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            target_name = node.targets[0].id
             v = _eval(node.value, env)
             if isinstance(v, str):
-                env[node.targets[0].id] = v
+                env[target_name] = v
+            else:
+                lst = _eval_iter(node.value, env)
+                if lst is not None:
+                    env[target_name] = lst
+
+        # unroll for-loops over literal lists of tuples/strings
+        if isinstance(node, ast.For):
+            iter_vals = _eval_iter(node.iter, env)
+            if iter_vals is not None:
+                target = node.target
+                for vals in iter_vals:
+                    saved: dict = {}
+                    if isinstance(target, ast.Tuple) and isinstance(vals, tuple):
+                        names = [t.id for t in target.elts if isinstance(t, ast.Name)]
+                        if len(names) == len(vals):
+                            for n, val in zip(names, vals):
+                                saved[n] = _bind(env, n, val)
+                    elif isinstance(target, ast.Name):
+                        saved[target.id] = _bind(env, target.id, vals)
+                    for child in node.body:
+                        walk(child, True)
+                    for n, prev in saved.items():
+                        _restore(env, n, prev)
+                return  # don't fall through to default child walk
+
+        # inline calls to known user-defined functions, propagating kwargs
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in func_defs:
+            if inline_depth[0] < INLINE_LIMIT:
+                fdef = func_defs[node.func.id]
+                saved: dict = {}
+                # positional args → param names
+                params = [a.arg for a in fdef.args.args]
+                for i, arg_node in enumerate(node.args):
+                    if i >= len(params):
+                        break
+                    v = _eval(arg_node, env)
+                    if isinstance(v, str):
+                        saved[params[i]] = _bind(env, params[i], v)
+                # keyword args
+                for kw in node.keywords:
+                    if kw.arg is None:
+                        continue
+                    v = _eval(kw.value, env)
+                    if isinstance(v, str):
+                        saved[kw.arg] = _bind(env, kw.arg, v)
+                inline_depth[0] += 1
+                for child in fdef.body:
+                    walk(child, in_loop_ctx)
+                inline_depth[0] -= 1
+                for n, prev in saved.items():
+                    _restore(env, n, prev)
+                # also walk arg subtrees for any I/O hidden in the call site itself
+                # (rare, but harmless), then continue to the default walk below
 
         if isinstance(node, ast.With):
             for item in node.items:
@@ -300,10 +396,24 @@ def extract_io_from_cell(src: str, env: dict, in_loop: bool = False):
                         emit("read", _eval(path_node, env), in_loop_ctx)
 
         for child in ast.iter_child_nodes(node):
-            walk(child, child_ctx)
+            walk(child, in_loop_ctx)
 
     walk(tree, in_loop)
     yield from yield_buffer
+
+
+def _collect_func_defs(code_cells) -> dict:
+    """Walk every cell and return {func_name: ast.FunctionDef} for top-level defs."""
+    out: dict = {}
+    for cell in code_cells:
+        try:
+            tree = ast.parse(_strip_magics(cell.source))
+        except SyntaxError:
+            continue
+        for stmt in tree.body:
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                out[stmt.name] = stmt
+    return out
 
 
 def parse_notebook(path: Path):
@@ -317,13 +427,14 @@ def parse_notebook(path: Path):
         return {"reads": [], "writes": [], "env": {}, "unresolved": []}
 
     env, _ = collect_path_env(code_cells[0].source)
+    func_defs = _collect_func_defs(code_cells)
 
     reads: dict = {}
     writes: dict = {}
     unresolved: list = []
 
     for cell in code_cells[1:]:
-        for kind, p, templated, glob in extract_io_from_cell(cell.source, env):
+        for kind, p, templated, glob in extract_io_from_cell(cell.source, env, func_defs):
             entry = {"path": p, "templated": templated, "glob": glob}
             target = writes if kind == "write" else reads
             target[p] = entry
