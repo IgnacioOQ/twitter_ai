@@ -88,8 +88,10 @@ AI Public Trust/                                  (BASE_PATH)
 │   │   ├── AItrust_pruned_twits_with_sentiment[_cleaned].json          [03/01, 02/03]
 │   │   ├── AItrust_topics_k5_metadata.json                             [03/03]
 │   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.json(.gz) [03/03]
-│   │   ├── top_test_{ai,art}_tweets.csv                                [02/02]
-│   │   └── top_retweets_by_topic_100.csv                               [02/03]
+│   │   ├── top_retweets_by_topic_100.csv                               [02/03]
+│   │   └── Tweet Sheets/
+│   │       ├── top_test_ai_tweets.csv                                  [03/02]
+│   │       └── top_test_art_tweets.csv                                 [03/02]
 │   │
 │   ├── Networks/
 │   │   ├── {test,full}_network_dict.pkl                                [02/02]

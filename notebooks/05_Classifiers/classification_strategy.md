@@ -2,7 +2,7 @@
 - status: active
 - type: guideline
 - id: classification_strategy
-- last_checked: 2026-05-06
+- last_checked: 2026-05-13
 <!-- content -->
 
 This document describes the classification workflow used in this project to label the full AI-Twitter dataset using a **Human-in-the-Loop (HITL) Active Learning** strategy.
@@ -15,9 +15,22 @@ The goal is to train a text classifier on tweets and use it to annotate the enti
 
 ---
 
+## Dataset Type
+
+Every notebook in this stage exposes a `DATASET_TYPE` constant (default `'AI'`) in its setup cell. The value selects which pruned corpus to consume and which subdirectory under `Cleaned Data/Partitioned Data/` to read and write:
+
+| `DATASET_TYPE` | Pruned source (JSONL from `02_Processing/02`) | Partitioned outputs land in |
+| :--- | :--- | :--- |
+| `'AI'` | `AItrust_twits_pruned_dict.json` | `Cleaned Data/Partitioned Data/AI Data/` |
+| `'Art'` | `AItrust_Art_pruned_twit_dict.json` | `Cleaned Data/Partitioned Data/Art Data/` |
+
+Each corpus is partitioned, HITL-labelled, and classified end-to-end. Notebook `00` must be run **once per `DATASET_TYPE`** to seed the partition pickles for that corpus; notebooks `01`-`04` are then run per dataset, each with the matching `DATASET_TYPE` set. The trained model artifacts under `Models/Classifiers/` and the HITL labelling CSVs under `Classifiers_Data/HITL/` are **not** dataset-type-aware — the operator is expected to manage those artifacts between runs to avoid clobbering across corpora.
+
+---
+
 ## Dataset Partitioning
 
-The **pruned tweets dataset** at `cleanedds_folder / 'AItrust_twits_pruned_dict.json'` (JSONL output of `02_Processing/02_sanity_check_and_network_generation.ipynb`) is loaded by `00_hitl_data_preparation.ipynb`. Each tweet carries `id`, `text`, `processed_text` (lowercase / URL-stripped / @-mention-stripped / RT-marker-stripped), `type` (one of `original`, `replied_to`, `quoted`, `retweeted`), and a nested `public_metrics` dict.
+The **pruned tweets dataset** for the active `DATASET_TYPE` (`AItrust_twits_pruned_dict.json` for AI, `AItrust_Art_pruned_twit_dict.json` for Art — both JSONL outputs of `02_Processing/02_sanity_check_and_network_generation.ipynb`) is loaded by `00_hitl_data_preparation.ipynb`. Each tweet carries `id`, `text`, `processed_text` (lowercase / URL-stripped / @-mention-stripped / RT-marker-stripped), `type` (one of `original`, `replied_to`, `quoted`, `retweeted`), and a nested `public_metrics` dict.
 
 ### Retweets are split out before partitioning
 
@@ -37,7 +50,7 @@ The partitionable corpus (`type ∈ {original, replied_to, quoted}`) is then shu
 | **Final Inference** | Remainder of partitionable corpus | Classified by the final model, merged with the labelled data and the retweet-lookup labels |
 | **Retweets** *(separate)* | All `type == 'retweeted'` rows | Bypass the model; labels inherited from referenced originals at Step 4 merge |
 
-A `partition_ids.pkl` manifest is written to `Cleaned Data/Partitioned Data/`, mapping each partition name (including a `retweets` key) to its tweet IDs, with an inline assertion that all partitions are pairwise disjoint. Any downstream notebook can load this manifest to verify which subset a tweet belongs to.
+A `partition_ids.pkl` manifest is written to `Cleaned Data/Partitioned Data/{DATASET_TYPE} Data/`, mapping each partition name to its tweet IDs, with an inline assertion that all partitions are pairwise disjoint. Any downstream notebook can load this manifest to verify which subset a tweet belongs to.
 
 The **remaining ~17 million tweets** in the full corpus are classified separately in notebook 04 using the final trained model.
 
@@ -51,7 +64,7 @@ The seed training set is produced by one of two paths — they can also be combi
 
 **Path A — LLM Bootstrap (default).** The ~10 000 tweets in the **LLM Bootstrap** partition are labelled by an LLM (Gemini) in `01_llm_bootstrap_labelling.ipynb`. The notebook embeds the full per-category criteria in the prompt, parses a strict JSON response per tweet (`label`, `confidence`, `rationale`), retries on transient errors, checkpoints every 1 000 rows, and writes `llm_bootstrap_labels.csv` with the **same schema** as `hitl_review_batch_*.csv`. This CSV is read by `02_hitl_training_loop.ipynb` exactly like a human-labelled batch.
 
-**Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. A human annotates the `human_label` column. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
+**Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. The export is guarded by an `EXPORT_HUMAN_SEED` flag at the bottom of `00` (default `False` — skipped); set it to `True` and re-run that cell to produce the seed CSV. A human annotates the `human_label` column. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
 
 No model prediction is needed at this stage. The output of either path (or both) is the initial training set consumed by Step 1.
 
@@ -182,13 +195,15 @@ This annotated corpus feeds into `03_Analysis_and_Modeling` and `04_Network_Anal
 
 ## Notebooks
 
+All notebooks consume `DATASET_TYPE` (default `'AI'`); set it to `'Art'` to run the same pipeline against the Art corpus.
+
 | Notebook | Run when |
 | :--- | :--- |
-| `00_hitl_data_preparation.ipynb` | **Once, first** — partitions the data into LLM Bootstrap / Base / HITL / Inference and writes the `partition_ids.pkl` manifest |
-| `01_llm_bootstrap_labelling.ipynb` | **Once, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels.csv` |
+| `00_hitl_data_preparation.ipynb` | **Once per `DATASET_TYPE`, first** — partitions the data into LLM Bootstrap / Base / HITL / Inference and writes the `partition_ids.pkl` manifest |
+| `01_llm_bootstrap_labelling.ipynb` | **Once per `DATASET_TYPE`, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels.csv` |
 | `02_hitl_training_loop.ipynb` | **After each labelling round** — trains all models and exports the next review batch |
-| `03_final_inference.ipynb` | **Once** — classifies the HITL remainder and merges with labelled data |
-| `04_full_dataset_inference.ipynb` | **Once** — classifies the entire ~17M tweet corpus |
+| `03_final_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the HITL remainder and merges with labelled data |
+| `04_full_dataset_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the entire remaining corpus |
 
 ---
 
@@ -199,14 +214,18 @@ Partition outputs from notebook 00 live under `Cleaned Data/Partitioned Data/` (
 ```
 Data Sets/
 ├── Cleaned Data/
-│   ├── AItrust_twits_pruned_dict.json     ← upstream input from 02/02
-│   └── Partitioned Data/                   ← outputs of 00_hitl_data_preparation.ipynb
-│       ├── llm_bootstrap_dataset.pkl       ← ~10 000 tweet partition for LLM bootstrap
-│       ├── base_dataset.pkl
-│       ├── inference_dataset.pkl
-│       ├── retweets_dataset.pkl            ← retweets — labels inherited at merge time
-│       ├── hitl_pending_batch_01.pkl       ← ... 04.pkl
-│       └── partition_ids.pkl               ← {partition_name: [tweet_id, ...]} manifest
+│   ├── AItrust_twits_pruned_dict.json          ← upstream input from 02/02 (AI corpus)
+│   ├── AItrust_Art_pruned_twit_dict.json       ← upstream input from 02/02 (Art corpus)
+│   └── Partitioned Data/                       ← outputs of 00_hitl_data_preparation.ipynb
+│       ├── AI Data/                            ← written when DATASET_TYPE='AI'
+│       │   ├── llm_bootstrap_dataset.pkl       ← ~10 000 tweet partition for LLM bootstrap
+│       │   ├── base_dataset.pkl
+│       │   ├── inference_dataset.pkl
+│       │   ├── retweets_dataset.pkl            ← retweets — labels inherited at merge time
+│       │   ├── hitl_pending_batch_01.pkl       ← ... 04.pkl
+│       │   └── partition_ids.pkl               ← {partition_name: [tweet_id, ...]} manifest
+│       └── Art Data/                           ← written when DATASET_TYPE='Art' (same layout)
+│           └── ...
 │
 └── Classifiers_Data/
     ├── HITL/
