@@ -144,6 +144,22 @@ mcp__colab-mcp__get_cells(cellIndexStart, cellIndexEnd, includeOutputs=true)
 
 Keep any *code* change reflected in the repo `.ipynb` so git stays canonical. Loop within this phase until the cells behave as intended.
 
+### Step 3.3 — Driving long-running cells
+
+Cell execution is **decoupled from the MCP call**: `run_code_cell` returns after ~90 s even though the cell keeps running on the Colab kernel. A heavy cell — a full-dataset pass, `drive.mount` waiting on auth, a large `write_gml` — therefore surfaces as a `timed out after 90s` error while it is in fact **still executing**. Do **not** re-run it; that would queue a second execution behind the first.
+
+Instead, poll the cell:
+
+```text
+mcp__colab-mcp__get_cells(cellIndexStart=<n>, cellIndexEnd=<n>, includeOutputs=true)
+```
+
+- **Still running** while `execution_count` is `null`; the latest `tqdm`/stderr line (e.g. `31%|███ | 11271996/36560405 …`) streams into the cell's outputs after it has run a while (it may be empty for the first several seconds).
+- **Done** when `execution_count` flips from `null` to a number and the final `print`ed output appears.
+- **Crashed** if an `error` output with a traceback appears — check for this rather than assuming "still running".
+
+Cells run **sequentially on one kernel**, so you cannot slip a separate check cell in while a long one runs — it queues behind it. Poll the running cell itself. For multi-hour cells, check back on a timer instead of holding the call open.
+
 ---
 
 ## Phase 4 — Snapshot back to the repo
@@ -248,3 +264,6 @@ A [Google Drive MCP](https://github.com/isaacphi/mcp-gdrive) may later be incorp
 | `No module named 'numpy.rec'` / numpy version mismatch after a pip install | A pinned dependency downgraded numpy/scipy | Remove the pin (install plain); Runtime → Restart session, then re-run — the bridge survives |
 | `CUDA available: False` for heavy work | Runtime is CPU | Runtime → Change runtime type → GPU, then reconnect |
 | Tools disappear after a reload | MCP server restarted; token/port changed | Redo Phase 1 for fresh credentials |
+| `run_code_cell` returns `timed out after 90s` on a heavy cell | The MCP call caps at ~90 s; the cell keeps executing on the kernel | Don't re-run. Poll `get_cells(includeOutputs=true)`; done when `execution_count` flips from `null` to a number (Step 3.3) |
+| No `tqdm` progress bar while a long cell runs | stderr streams through the bridge with lag and isn't in the tool's return value | Poll `get_cells(includeOutputs=true)` — the latest stderr line appears in the cell's outputs once it has run a while |
+| Bridge lost after rearranging the Colab tab | The tab was closed or reloaded | Moving a tab to a new window is safe; only close/reload drops pairing — redo Phase 2 to re-attach |
