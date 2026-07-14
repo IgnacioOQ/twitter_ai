@@ -9,7 +9,7 @@ volatility: evolving
 scope: project-specific
 repository: [twitter_ai]
 execution_model: loop
-last_checked: '2026-07-09'
+last_checked: '2026-07-14'
 ---
 
 # Colab MCP Integration Workflow
@@ -263,6 +263,8 @@ A [Google Drive MCP](https://github.com/isaacphi/mcp-gdrive) may later be incorp
 | `too many open connections` when opening a notebook | The previous Colab tab still holds the single connection | Close the currently-connected tab, then re-open the new notebook URL with the fragment |
 | `get_cells` shows the empty scratch cell, not your notebook | The target tab never took over the connection | Re-open the notebook URL with the correct token/port fragment (Phase 2) |
 | `get_cells` keeps showing the scratch cell **and** closing the scratch tab makes every tool return `Unknown tool` | The GitHub-loaded notebook tab never seized the single connection because it was **not connected to a runtime** (the scratch tab auto-connects; a fresh GitHub notebook does not). Closing scratch then leaves no connected tab, so the bridge drops entirely | In the notebook tab, **Connect to a runtime first** (top-right, wait for the green check), *then* close the scratch tab, *then* re-navigate the notebook URL **with** the `#mcpProxyToken=…&mcpProxyPort=…` fragment so it grabs the freed slot. The port stays live for the server's life, so the notebook tab reconnects without redoing Phase 1 (Phase 2) |
+| `open_colab_browser_connection` returns `true` but **every** editing tool stays `Unknown tool` across repeated attempts (the server keeps toggling connected/disconnected) | The MCP **server process itself** has degraded from repeated open / close / developer-reload cycles — the editing tools never register even though `open` reports success. A browser reconnect *or* a developer reload does **not** recover it | **Fully restart Claude Code** (kills and respawns the MCP server), close all stale `empty.ipynb` scratch tabs, then redo Phase 1 on a clean slate. Do **not** keep calling `open_colab_browser_connection` to retry — each call spawns another scratch tab that competes for the single connection slot and worsens the state |
+| Bridge won't recover and you need results now | The bridge only automates the drive-from-Claude loop; it is never the *only* way to run — git holds the notebook and Drive holds the data/artifacts | Open the notebook on Colab **from GitHub** (Phase 2 URL — no fragment needed just to run it), Connect a runtime, and run the cells by hand. Snapshot any new outputs back per Phase 4. Falling back to a manual run loses only the automation, not the work |
 | `ModuleNotFoundError` on Colab (e.g. `gensim`) | Colab base image dropped the package | Add a `if not RUNNING_LOCALLY: !pip install -q <pkg>` cell, re-run (Step 3.1) |
 | `No module named 'numpy.rec'` / numpy version mismatch after a pip install | A pinned dependency downgraded numpy/scipy | Remove the pin (install plain); Runtime → Restart session, then re-run — the bridge survives |
 | `CUDA available: False` for heavy work | Runtime is CPU | Runtime → Change runtime type → GPU, then reconnect |
