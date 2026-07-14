@@ -68,6 +68,15 @@ def run_modularity_workflow(
     g = ig.Graph.Read_GML(str(in_path))
     print(f"   Vertices: {g.vcount():,}  Edges: {g.ecount():,}")
 
+    # Modularity community detection is defined for undirected graphs, and
+    # igraph's Louvain (community_multilevel) rejects directed input outright.
+    # Symmetrize: collapse reciprocal edges into one, summing their weights.
+    if g.is_directed():
+        combine = {"weight": "sum"} if "weight" in g.es.attributes() else None
+        g = g.as_undirected(mode="collapse", combine_edges=combine)
+        print(f"   Converted to undirected (collapse, sum weights): "
+              f"{g.vcount():,} V  {g.ecount():,} E")
+
     # ── 2. Community detection ────────────────────────────────────────────
     print(f"\n2. Running community detection ({method}) ...")
 
@@ -76,7 +85,7 @@ def run_modularity_workflow(
     if method == "leiden_full":
         # Full Leiden with CPM (Constant Potts Model)
         partition = g.community_leiden(
-            objective_function="CPMVertexPartition",
+            objective_function="CPM",
             weights=weight_attr,
             resolution=resolution,
             n_iterations=-1,

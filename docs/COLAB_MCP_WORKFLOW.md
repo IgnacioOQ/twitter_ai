@@ -168,6 +168,8 @@ Cells run **sequentially on one kernel**, so you cannot slip a separate check ce
 hitl_gate: true
 ```
 
+**Mandatory before leaving a notebook — do not skip.** Snapshot the *executed* notebook back into the repo **before** switching to another notebook (re-entering Phase 2) or ending the session. A GitHub-loaded notebook cannot be saved back to GitHub, and Colab does not auto-save it to Drive, so **closing or switching its tab permanently discards the executed state** — printed outputs, rendered plots, and any cells added or modified live during Phase 3. Capturing that state is the whole point of the loop; treat an un-snapshotted notebook as unfinished work, and never close its tab until Step 4.2 has written its executed cells into the repo `.ipynb`.
+
 Reconcile the executed notebook into git, then let the human approve the commit. This is the gate that keeps git authoritative; a human must confirm the diff and authorize any `git` write (per repository policy, every commit is approved on its own).
 
 ### Step 4.1 — Pull the executed state
@@ -227,7 +229,7 @@ The token and port above are illustrative — read the current session's values 
 
 | Condition | Action |
 |:---|:---|
-| Switching to a different notebook | Re-enter Phase 2 with the same token/port; the new tab takes over the single connection |
+| Switching to a different notebook | **Snapshot the current notebook first (Phase 4)** — closing its tab discards executed state — then re-enter Phase 2 with the same token/port; the new tab takes over the single connection |
 | Exploratory work with no repo notebook yet | Build cells in the scratch notebook (Phase 3), then create a repo `.ipynb` in Phase 4 |
 | MCP server restarted (developer reload) | Token/port are regenerated — redo Phase 1 to get fresh values |
 | Heavy compute (embeddings, LDA grid) | Set GPU runtime in Step 2.3 before running Phase 3 |
@@ -247,7 +249,7 @@ A [Google Drive MCP](https://github.com/isaacphi/mcp-gdrive) may later be incorp
 - [ ] Phase 2 done: target notebook opened with the pairing fragment; `get_cells` confirms the right notebook.
 - [ ] Setup section run on Colab (Drive mounted, `src` cloned, imports OK).
 - [ ] Iteration complete; code changes reflected in the repo `.ipynb`.
-- [ ] Executed state snapshotted back to git; commit human-approved.
+- [ ] Executed state snapshotted back to git **before closing/switching the tab** (GitHub-loaded notebooks lose outputs on close); commit human-approved.
 
 ---
 
