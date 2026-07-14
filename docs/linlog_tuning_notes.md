@@ -17,13 +17,11 @@ Achieve a soft, radial nebula layout (characteristic of LinLog's logarithmic att
 - **Result**: Pushed into a perfectly uniform, densely packed circle (a "Petri dish" or "foam" disc). `strong_gravity_mode` scales gravity with distance, which violently pulled the boundary nodes inward. This solved the boundary sprawl, but the inward pressure was so high it completely crushed the communities together into a uniform texture.
 - **Verdict**: Excellent circular footprint, but destroyed community separation. Nodes appeared disconnected from edges due to extreme compression.
 
-### 3. Current Version (Slightly Higher Gravity)
-- **Parameters**: `scaling_ratio=2.0`, `strong_gravity_mode=False`, `gravity=2.0`
-- **Result**: Reverts the extreme compression of `strong_gravity_mode` to allow communities to naturally push apart (restoring the clustering of Experiment 1). Doubles the standard `gravity` to gently reel the boundary nodes back into a natural circular shape without squashing the core.
-- **Verdict**: (Pending review) Should offer the best balance of circular footprint and readable community clusters.
+### 3. Final Tuned Version (High Scaling + Elevated Gravity)
+- **Parameters**: `scaling_ratio=5.0`, `strong_gravity_mode=False`, `gravity=2.0`
+- **Result**: Increasing `scaling_ratio` pulled the communities apart, solving the lack of distinct clustering seen in the baseline. Simultaneously, keeping `gravity=2.0` reeled in the outer leaves just enough to maintain a pleasing, soft circular nebula shape without crossing the threshold into the squashed "foam disc".
+- **Verdict**: Optimal setup for the soft radial look. It balances clear community structure with LinLog's signature circular boundary.
 
-## Next Steps / Future Tuning
-If Experiment 3 is still too tight or too loose:
-- To **separate communities more**: Increase `scaling_ratio` (e.g., `5.0` or `10.0`) while keeping `strong_gravity_mode=False`.
-- To **pull the boundary in tighter**: Increase `gravity` incrementally (e.g., `3.0` or `5.0`).
-- **Never** combine high `scaling_ratio` with `strong_gravity_mode` for this graph, as it induces the "foam disc" failure state.
+## Conclusion
+The final LinLog recipe (`scaling_ratio=5.0`, `gravity=2.0`) successfully achieves color-clustered communities within a soft radial boundary. 
+**Crucial Finding**: `strong_gravity_mode` must be avoided on graphs of this scale (millions of edges), as it applies overwhelming compression that crushes any modularity structure into a foam-like singularity.
