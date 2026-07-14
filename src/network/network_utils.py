@@ -36,21 +36,21 @@ def plot_network_degree_distribution(G, directed=True):
 
 def plot_loglog(G, directed=True, m=10):
     if directed:
-        # Get the in-degree of all nodes
-        out_degrees = [d for _, d in G.out_degree()]
-
-        # Compute the histogram
-        max_degree = max(out_degrees)
-        degree_freq = [out_degrees.count(i) for i in range(max_degree + 1)]
+        # Frequency of each out-degree value in a single O(N) pass.
+        # (np.bincount replaces an O(max_degree x N) list.count() loop that
+        # does not scale to million-node graphs.)
+        out_degrees = np.fromiter((d for _, d in G.out_degree()), dtype=np.int64)
+        degree_freq = np.bincount(out_degrees) if out_degrees.size else np.array([])
     else:
-        degree_freq = nx.degree_histogram(G)
-    degrees = range(len(degree_freq))
+        degree_freq = np.array(nx.degree_histogram(G))
+    degrees = np.arange(len(degree_freq))
     plt.figure(figsize=(8, 6))
     plt.loglog(degrees[m:], degree_freq[m:], "go-")
     plt.xlabel("Degree")
     plt.ylabel("Frequency")
     plt.xticks(fontsize=8, rotation=20)
     plt.title("Network Out-Degree Distribution Log-Log Plot")
+    plt.show()
 
 
 def scatter_plot(df, target_variable="share_of_correct_agents_at_convergence"):
