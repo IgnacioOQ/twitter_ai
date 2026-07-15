@@ -2,14 +2,14 @@
 status: active
 type: workflow
 id: twitter_ai.colab_mcp_workflow
-description: Drive this project's notebooks on Google Colab's cloud runtime from Claude Code via the Colab MCP — pair the browser bridge, attach a repo notebook, iterate cells against real Drive data and GPUs, and snapshot executed state back to git as the single source of truth.
+description: Drive this project's notebooks on Google Colab's cloud runtime from Claude Code via the Colab MCP — pair the browser bridge, then either attach a repo notebook (Mode A) or inject its cells into the bridge's own scratch tab (Mode B, attach-free), iterate against real Drive data and GPUs, and snapshot executed state back to git as the single source of truth.
 label: [agent, human, python]
 injection: procedural
 volatility: evolving
 scope: project-specific
 repository: [twitter_ai]
 execution_model: loop
-last_checked: '2026-07-14'
+last_checked: '2026-07-15'
 ---
 
 # Colab MCP Integration Workflow
@@ -19,6 +19,8 @@ This workflow defines how to run `twitter_ai` notebooks on **Google Colab's clou
 It differs from [notebooks/notebook_setup.md](../notebooks/notebook_setup.md) (which defines the *internal* structure every notebook must have) by governing the *outer loop* of how a session moves a notebook between the repo and Colab.
 
 **Execution model:** loop — a per-notebook cycle of attach → iterate (edit + run) → snapshot, repeated until the notebook is complete.
+
+**Two execution modes.** Phases 2–4 below describe **Mode A** (attach the target notebook's own Colab tab to the bridge). **Mode B — inject-and-run** (see its own section after Phase 4) skips the attach hand-off entirely: the agent drives the scratch tab the bridge already controls, injecting the repo notebook's cells and merging outputs back by an index map. Mode A preserves the notebook's identity in the Colab UI; Mode B is the reliable fallback whenever the Mode A hand-off fails (the recurring `Unknown tool` symptom), and is fine as a first choice for partial or exploratory runs.
 
 **Prerequisites:**
 - Colab MCP registered in [.mcp.json](../.mcp.json) at project scope and showing `✓ Connected` (`claude mcp list`).
@@ -190,6 +192,37 @@ Present the notebook diff and the one-line intent. On approval, commit and (if d
 
 ---
 
+## Mode B — Inject-and-run (attach-free scratch drive)
+
+Mode A's weak point is the hand-off: a GitHub-loaded tab must seize the bridge's single connection slot, and when it does so without a live runtime the bridge drops (`Unknown tool` from every cell tool). Mode B never hands off. The scratch `empty.ipynb` tab spawned by `open_colab_browser_connection` auto-connects a runtime and holds the bridge from the start; the agent drives *it* directly, treating the repo `.ipynb` as the author of record and the scratch tab as a disposable executor. Validated end-to-end with [docs/colab_proxy.ipynb](colab_proxy.ipynb).
+
+### Step B.1 — Prepare the scratch runtime
+
+The scratch tab is already connected (CPU by default). If the run needs a GPU: **Runtime → Change runtime type → GPU → Connect** in the scratch tab — the bridge survives the runtime swap. Confirm the bridge responds with `get_cells` (a single empty cell).
+
+### Step B.2 — Inject and run with an index map
+
+Read the repo `.ipynb` locally and inject its **code cells in order** with `add_code_cell` (markdown cells are skipped — they don't execute). Record one mapping row per injected cell:
+
+```text
+repo cell id  →  colab cell id (returned by add_code_cell)  →  colab index
+```
+
+Run each cell with `run_code_cell`, polling long cells exactly as in Step 3.3. Live fixes are applied with `update_cell` on Colab **and mirrored into the repo `.ipynb` immediately** (`NotebookEdit`) — the repo stays canonical; never let the scratch copy drift.
+
+### Step B.3 — Snapshot outputs back (the retrieval pipeline)
+
+Scratch cells are new objects with their own ids, so nothing can be saved from the Colab side; outputs are pulled through the bridge and merged into the repo notebook **by the map**:
+
+1. `get_cells(includeOutputs=true)`.
+2. For each mapping row, verify the Colab cell's source still equals the repo cell's source (whitespace-normalized). **A mismatch aborts the merge for that cell** — outputs must never land on the wrong cell.
+3. Copy `outputs` + `execution_count` into the matched repo cell (local JSON edit of the `.ipynb`).
+4. Human-approved commit, exactly as Step 4.3.
+
+The map is positional (only code cells were injected, order preserved); the source-equality check in step 2 is what makes the merge safe rather than hopeful.
+
+---
+
 ## Example — End-to-end on one notebook
 
 Running [notebooks/06_Experiments/01_tp_bigrams_test.ipynb](../notebooks/06_Experiments/01_tp_bigrams_test.ipynb) on Colab and snapshotting the result back to git.
@@ -232,7 +265,8 @@ The token and port above are illustrative — read the current session's values 
 | Switching to a different notebook | **Snapshot the current notebook first (Phase 4)** — closing its tab discards executed state — then re-enter Phase 2 with the same token/port; the new tab takes over the single connection |
 | Exploratory work with no repo notebook yet | Build cells in the scratch notebook (Phase 3), then create a repo `.ipynb` in Phase 4 |
 | MCP server restarted (developer reload) | Token/port are regenerated — redo Phase 1 to get fresh values |
-| Heavy compute (embeddings, LDA grid) | Set GPU runtime in Step 2.3 before running Phase 3 |
+| Heavy compute (embeddings, LDA grid) | Set GPU runtime in Step 2.3 (Mode A) or Step B.1 (Mode B) before running Phase 3 |
+| Mode A attach fails with `Unknown tool` | Switch to **Mode B** (inject-and-run). Do **not** keep re-calling `open_colab_browser_connection` — each call spawns another scratch tab competing for the single slot |
 
 ---
 
@@ -246,7 +280,7 @@ A [Google Drive MCP](https://github.com/isaacphi/mcp-gdrive) may later be incorp
 
 - [ ] Colab MCP `✓ Connected`; `timeout` > 60000.
 - [ ] Phase 1 done: `open_colab_browser_connection()` returned `true`; TOKEN and PORT recorded.
-- [ ] Phase 2 done: target notebook opened with the pairing fragment; `get_cells` confirms the right notebook.
+- [ ] Phase 2 done: target notebook opened with the pairing fragment; `get_cells` confirms the right notebook. (Mode B instead: scratch tab confirmed, GPU set if needed, index map started.)
 - [ ] Setup section run on Colab (Drive mounted, `src` cloned, imports OK).
 - [ ] Iteration complete; code changes reflected in the repo `.ipynb`.
 - [ ] Executed state snapshotted back to git **before closing/switching the tab** (GitHub-loaded notebooks lose outputs on close); commit human-approved.
@@ -272,3 +306,4 @@ A [Google Drive MCP](https://github.com/isaacphi/mcp-gdrive) may later be incorp
 | `run_code_cell` returns `timed out after 90s` on a heavy cell | The MCP call caps at ~90 s; the cell keeps executing on the kernel | Don't re-run. Poll `get_cells(includeOutputs=true)`; done when `execution_count` flips from `null` to a number (Step 3.3) |
 | No `tqdm` progress bar while a long cell runs | stderr streams through the bridge with lag and isn't in the tool's return value | Poll `get_cells(includeOutputs=true)` — the latest stderr line appears in the cell's outputs once it has run a while |
 | Bridge lost after rearranging the Colab tab | The tab was closed or reloaded | Moving a tab to a new window is safe; only close/reload drops pairing — redo Phase 2 to re-attach |
+| Mode A hand-off repeatedly drops the bridge (`Unknown tool` every time the notebook tab takes over), even with runtime-first ordering | The GitHub tab seizes the slot without holding it, and repeated open/close cycles degrade the server | Stop attaching: use **Mode B** against the scratch tab, which never hands off. If tools stay unregistered even against a fresh scratch tab, fully restart Claude Code (a developer reload is insufficient) |

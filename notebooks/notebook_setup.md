@@ -2,7 +2,7 @@
 - status: active
 - type: guideline
 - id: notebook_setup_guide
-- last_checked: 2026-03-09
+- last_checked: 2026-07-15
 <!-- content -->
 This document defines the canonical structure for the **Setup section** of every notebook in this project. All notebooks must follow this pattern to ensure consistency and correct execution both locally and on Google Colab.
 
@@ -174,6 +174,28 @@ Only import the `src` submodules that the notebook actually uses.
 | 3 | `pip install` | Only if non-default packages are needed |
 | 4 | Explicit library imports | Always |
 | 5 | `src/` imports | Only if the notebook uses internal `src` modules |
+
+## Teardown Section — Disconnect from Runtime
+- status: active
+<!-- content -->
+Every **processing notebook** should **finish** with a short teardown section
+whose final cell disconnects from the Colab runtime, freeing the GPU/instance
+for other work. This matters most for GPU notebooks, where an idle runtime keeps
+a scarce accelerator reserved after the work is done.
+
+Place it as the **last section** of the notebook, after all artifacts have been
+written to Drive. Guard it with `if not RUNNING_LOCALLY` so it is a no-op
+locally, and be aware that it **terminates the runtime** — any unsaved in-memory
+state is lost, so run it only once you are truly finished.
+
+```python
+# ---- Disconnect from the Colab runtime (frees the GPU/instance) ------------ #
+# Run this LAST, once artifacts are saved: it terminates the runtime, so any
+# unsaved in-memory state is lost. No-op locally.
+if not RUNNING_LOCALLY:
+    from google.colab import runtime
+    runtime.unassign()
+```
 
 ## Google Drive Data Directory Structure
 - status: active
