@@ -142,7 +142,7 @@ def run_modularity_workflow(
     print("   Done.")
 
     # ── 3. Assign community IDs to vertices ───────────────────────────────
-    attr_name = f"community_{method}"
+    attr_name = f"community{method.replace('_', '')}"
     g.vs[attr_name] = partition.membership
     print(f"\n3. Assigned community IDs as vertex attribute '{attr_name}'.")
 
