@@ -20,7 +20,7 @@ It differs from [notebooks/notebook_setup.md](../notebooks/notebook_setup.md) (w
 
 **Execution model:** loop — a per-notebook cycle of attach → iterate (edit + run) → snapshot, repeated until the notebook is complete.
 
-**Two execution modes.** Phases 2–4 below describe **Mode A** (attach the target notebook's own Colab tab to the bridge). **Mode B — inject-and-run** (see its own section after Phase 4) skips the attach hand-off entirely: the agent drives the scratch tab the bridge already controls, injecting the repo notebook's cells and merging outputs back by an index map. Mode A preserves the notebook's identity in the Colab UI; Mode B is the reliable fallback whenever the Mode A hand-off fails (the recurring `Unknown tool` symptom), and is fine as a first choice for partial or exploratory runs.
+**Two execution modes — Mode A is primary.** Phases 2–4 below describe **Mode A** (attach the target notebook's own Colab tab to the bridge), the **preferred** mode: it runs the *actual* repo notebook — markdown cells and all — in the Colab UI, and a human can click *Run* on cells directly. Mode A still hits occasional connectivity trouble on the attach hand-off (the recurring `Unknown tool` symptom), but it remains the better experience. **Mode B — inject-and-run** (see its own section after Phase 4) is a **secondary, deficient fallback** — reach for it only when the Mode A hand-off genuinely can't be made to work. It skips the attach by re-injecting the notebook's *code* cells into the bridge's own scratch tab and merging outputs back by an index map, but that reconstruction is worse than Mode A in three concrete ways (detailed in the Mode B section): it is slow to rebuild the notebook from scratch, it drops the notebook's markdown cells, and it takes running the cells out of your hands (the agent drives every `run_code_cell` through the MCP).
 
 **Prerequisites:**
 - Colab MCP registered in [.mcp.json](../.mcp.json) at project scope and showing `✓ Connected` (`claude mcp list`).
@@ -160,6 +160,8 @@ mcp__colab-mcp__get_cells(cellIndexStart=<n>, cellIndexEnd=<n>, includeOutputs=t
 - **Done** when `execution_count` flips from `null` to a number and the final `print`ed output appears.
 - **Crashed** if an `error` output with a traceback appears — check for this rather than assuming "still running".
 
+**The output stream lags — trust `execution_count`, not stdout.** The bridge refreshes a running cell's captured stdout/stderr in bursts, so on a long cell the last visible line can sit **unchanged for many minutes** while the kernel is still advancing (or has already finished and the flush simply hasn't arrived). Do not read a stalled last line as a hang, and do not re-run. The reliable done-signal is `execution_count` flipping from `null` to a number — watch that, not the streamed text. Heavy cells legitimately run for many minutes: a full-resolution datashader render, a large-graph layout, or serializing millions of rows into an interactive widget (e.g. cosmograph) can each take 5–15 min, and diffuse layouts (linlog) render several times slower than compact ones (classic). Poll on a timer and stay patient. For a genuinely long silence, a human can glance at the Colab tab, whose live spinner and RAM gauge reflect the true kernel state better than the lagged bridge output.
+
 Cells run **sequentially on one kernel**, so you cannot slip a separate check cell in while a long one runs — it queues behind it. Poll the running cell itself. For multi-hour cells, check back on a timer instead of holding the call open.
 
 ---
@@ -193,6 +195,8 @@ Present the notebook diff and the one-line intent. On approval, commit and (if d
 ---
 
 ## Mode B — Inject-and-run (attach-free scratch drive)
+
+**Secondary mode — prefer Mode A.** Mode B is a fallback for when the Mode A attach can't be made to work, not a first choice. Its reconstruction of the notebook is deficient in three ways: (1) **slow** — it rebuilds the notebook cell-by-cell from scratch, far slower than attaching the real one; (2) **markdown is lost** — only code cells are injected, so the notebook's narrative never reaches Colab; (3) **no manual runs** — the agent drives every cell through the MCP, so you can't just click *Run* yourself. Use it only after Mode A has genuinely failed.
 
 Mode A's weak point is the hand-off: a GitHub-loaded tab must seize the bridge's single connection slot, and when it does so without a live runtime the bridge drops (`Unknown tool` from every cell tool). Mode B never hands off. The scratch `empty.ipynb` tab spawned by `open_colab_browser_connection` auto-connects a runtime and holds the bridge from the start; the agent drives *it* directly, treating the repo `.ipynb` as the author of record and the scratch tab as a disposable executor. Validated end-to-end with [docs/colab_proxy.ipynb](colab_proxy.ipynb).
 
@@ -305,5 +309,6 @@ A [Google Drive MCP](https://github.com/isaacphi/mcp-gdrive) may later be incorp
 | Tools disappear after a reload | MCP server restarted; token/port changed | Redo Phase 1 for fresh credentials |
 | `run_code_cell` returns `timed out after 90s` on a heavy cell | The MCP call caps at ~90 s; the cell keeps executing on the kernel | Don't re-run. Poll `get_cells(includeOutputs=true)`; done when `execution_count` flips from `null` to a number (Step 3.3) |
 | No `tqdm` progress bar while a long cell runs | stderr streams through the bridge with lag and isn't in the tool's return value | Poll `get_cells(includeOutputs=true)` — the latest stderr line appears in the cell's outputs once it has run a while |
+| A running cell's output looks frozen on one line for many minutes | The bridge flushes captured stdout/stderr in bursts, lagging far behind the kernel | Don't assume it's hung or re-run it. Poll `get_cells(includeOutputs=true)`; done when `execution_count` flips `null`→number. Heavy render / layout / widget-serialization cells can legitimately take 5–15 min; a human can confirm true state from the Colab tab's spinner/RAM gauge |
 | Bridge lost after rearranging the Colab tab | The tab was closed or reloaded | Moving a tab to a new window is safe; only close/reload drops pairing — redo Phase 2 to re-attach |
 | Mode A hand-off repeatedly drops the bridge (`Unknown tool` every time the notebook tab takes over), even with runtime-first ordering | The GitHub tab seizes the slot without holding it, and repeated open/close cycles degrade the server | Stop attaching: use **Mode B** against the scratch tab, which never hands off. If tools stay unregistered even against a fresh scratch tab, fully restart Claude Code (a developer reload is insufficient) |
