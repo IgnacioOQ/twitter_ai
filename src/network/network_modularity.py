@@ -45,8 +45,13 @@ def run_modularity_workflow(
         * ``'leiden_fast'``  – Leiden with fast modularity (RBConfiguration)
         * ``'louvain'``      – Louvain algorithm
         * ``'label_propagation'`` – Label-propagation algorithm
+        * ``'leiden_directed'`` – leidenalg RBConfiguration on the directed
+          graph (no undirected collapse), seeded for reproducibility
+        * ``'infomap'``      – Infomap map-equation clustering on the directed
+          graph (no undirected collapse), seeded for reproducibility
     resolution : float
-        Resolution parameter (used by Leiden and Louvain methods).
+        Resolution parameter (used by Leiden and Louvain methods; ignored by
+        label propagation and Infomap).
 
     Returns
     -------
@@ -71,7 +76,8 @@ def run_modularity_workflow(
     # Modularity community detection is defined for undirected graphs, and
     # igraph's Louvain (community_multilevel) rejects directed input outright.
     # Symmetrize: collapse reciprocal edges into one, summing their weights.
-    if g.is_directed():
+    # leidenalg and Infomap handle directed input natively — keep it directed.
+    if g.is_directed() and method not in ("leiden_directed", "infomap"):
         combine = {"weight": "sum"} if "weight" in g.es.attributes() else None
         g = g.as_undirected(mode="collapse", combine_edges=combine)
         print(f"   Converted to undirected (collapse, sum weights): "
@@ -102,11 +108,35 @@ def run_modularity_workflow(
         partition = g.community_multilevel(weights=weight_attr)
     elif method == "label_propagation":
         partition = g.community_label_propagation(weights=weight_attr)
+    elif method == "leiden_directed":
+        import leidenalg as la
+        partition = la.find_partition(
+            g,
+            la.RBConfigurationVertexPartition,
+            weights=weight_attr,
+            resolution_parameter=resolution,
+            seed=42,
+        )
+    elif method == "infomap":
+        from infomap import Infomap
+        flags = "--two-level --seed 42 --silent"
+        if g.is_directed():
+            flags += " --directed"
+        im = Infomap(flags)
+        for e in g.es:
+            im.add_link(e.source, e.target, e[weight_attr] if weight_attr else 1.0)
+        im.run()
+        # Module ids are 1-based; inputs are LWCCs, so every vertex has links
+        # and appears in get_modules().
+        modules = im.get_modules()
+        membership = [modules[v] - 1 for v in range(g.vcount())]
+        partition = ig.VertexClustering(g, membership)
+        print(f"   Infomap codelength: {im.codelength:.4f} bits")
     else:
         raise ValueError(
             f"Unknown method '{method}'. "
             f"Choose from: 'leiden_full', 'leiden_fast', 'louvain', "
-            f"'label_propagation'."
+            f"'label_propagation', 'leiden_directed', 'infomap'."
         )
 
     print("   Done.")
@@ -130,7 +160,10 @@ def run_modularity_workflow(
 
     # ── 5. Summary ────────────────────────────────────────────────────────
     n_communities = len(partition)
-    modularity = partition.modularity
+    # Explicit call so weights are always used; on a directed graph igraph
+    # computes directed modularity (partition.modularity would ignore weights
+    # for the leiden_directed / infomap partitions).
+    modularity = g.modularity(partition.membership, weights=weight_attr)
     sizes = partition.sizes()
     sizes_sorted = sorted(sizes, reverse=True)
 
