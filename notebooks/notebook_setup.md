@@ -242,7 +242,16 @@ AI Public Trust/
 │       ├── full_network_dict.pkl              [written by 02_Processing/02]
 │       ├── Test_Network.json                  [written by 02_Processing/02]
 │       ├── Full_Network.json                  [written by 02_Processing/02]
-│       └── Full_Network.gml                  [used by 04_Network_Analysis/01]
+│       ├── Full_Network.gml                   [used by 04_Network_Analysis/01]
+│       ├── LWCC.gml / .graphml                [written by 04_Network_Analysis/01 — pruning strategy 1]
+│       ├── 90TS_LWCC.gml / .graphml           [written by 04_Network_Analysis/01 — pruning strategy 2]
+│       ├── Final_OutThreshold1.gml / .graphml [written by 04_Network_Analysis/01 — pruning strategy 3]
+│       ├── Final_OutThreshold1_<method>.gml   [written by 04_Network_Analysis/01 — community-annotated,
+│       │                                       method ∈ label_propagation, louvain, leiden_fast,
+│       │                                       leiden_directed, infomap]
+│       └── Final_OutThreshold1_author_communities.json     [written by 04_Network_Analysis/01 —
+│                                               {author_id: {method: community_id}}, all five methods;
+│                                               keys = the ~1.98M pruned-network authors]
 │
 ├── Literature/                                (literature_folder = BASE_PATH / 'Literature/')
 └── Models/
@@ -256,3 +265,4 @@ AI Public Trust/
 - **Using `from src.network.imports import *`** — this hides what is actually imported and makes the notebook harder to debug. Always list imports explicitly in Cell 4.
 - **Missing `igraph as ig`** — `igraph` must be imported explicitly even though it is pip-installed in Cell 3.
 - **Putting imports before pip installs** — Cell 4 must come after Cell 3, since packages like `igraph` and `leidenalg` must be installed before they can be imported.
+- **Breaking the Colab cell shape when editing a notebook's JSON** — this project's notebooks are Colab-flavored (`nbformat_minor: 0`): each cell's id lives at `metadata.id`, **not** as a top-level `id` field, and Colab's loader hard-crashes (`TypeError: Cannot read properties of undefined (reading 'id')`) on any cell missing the `metadata` key — the notebook becomes unloadable from GitHub. When inserting or rewriting cells programmatically, give every cell a `metadata` dict with its id inside. Check the whole repo with `notebooks/analyze_notebooks.py` (the `colab_ok` column); see `docs/COLAB_MCP_WORKFLOW.md` § Troubleshooting.
