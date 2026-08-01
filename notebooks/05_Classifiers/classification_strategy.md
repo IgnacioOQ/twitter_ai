@@ -2,7 +2,7 @@
 - status: active
 - type: guideline
 - id: classification_strategy
-- last_checked: 2026-05-13
+- last_checked: 2026-08-01
 <!-- content -->
 
 This document describes the classification workflow used in this project to label the full AI-Twitter dataset using a **Human-in-the-Loop (HITL) Active Learning** strategy.
@@ -12,6 +12,23 @@ This document describes the classification workflow used in this project to labe
 ## Overview
 
 The goal is to train a text classifier on tweets and use it to annotate the entire dataset. Rather than labelling data randomly, we use an iterative active learning loop where a human reviews the predictions the model is *least confident about*, feeding corrections back into the training set. This maximises label quality while minimising human effort.
+
+---
+
+## Label Taxonomy
+
+**`categories.md` is the source of truth for what the labels mean.** This document describes the *machinery*; that one describes the *label set* the machinery carries.
+
+The taxonomy is currently **two labels**, deliberately:
+
+| Label | Meaning |
+| :--- | :--- |
+| `originality` | The tweet appeals to originality — newness, creativity, copying, theft — **as a criterion for the value of art**. |
+| `none` | Residual bucket: no category in the current taxonomy applies. |
+
+Starting at one substantive category keeps the bootstrap's errors attributable — a wrong label traces to a specific clause of one definition rather than to an unknown interaction between several. `categories.md` carries the decision test, worked examples, exclusions, confidence calibration, and the checklist for adding category *N+1* (including the two things that must be decided at that point: what happens to existing `none` rows, and whether the single-label assumption still holds).
+
+Because notebook `01` does not clone this repo on Colab, the criteria cannot be read from `categories.md` at runtime — they are embedded as a literal in cell 7. **Editing `categories.md` requires re-pasting its Criteria block into that cell.**
 
 ---
 
@@ -62,7 +79,11 @@ The **remaining ~17 million tweets** in the full corpus are classified separatel
 
 The seed training set is produced by one of two paths — they can also be combined.
 
-**Path A — LLM Bootstrap (default).** The ~10 000 tweets in the **LLM Bootstrap** partition are labelled by an LLM (Gemini) in `01_llm_bootstrap_labelling.ipynb`. The notebook embeds the full per-category criteria in the prompt, parses a strict JSON response per tweet (`label`, `confidence`, `rationale`), retries on transient errors, checkpoints every 1 000 rows, and writes `llm_bootstrap_labels.csv` with the **same schema** as `hitl_review_batch_*.csv`. This CSV is read by `02_hitl_training_loop.ipynb` exactly like a human-labelled batch.
+**Path A — LLM Bootstrap (default).** The tweets in the **LLM Bootstrap** partition are labelled by an LLM (Gemini) in `01_llm_bootstrap_labelling.ipynb`. The notebook embeds the full per-category criteria in the prompt, constrains the response with a native JSON schema (`label`, `confidence`, `rationale`) whose `label` enum is derived from `CATEGORIES`, retries on transient errors, checkpoints every 1 000 rows, and writes `llm_bootstrap_labels.csv` with the **same schema** as `hitl_review_batch_*.csv`. This CSV is read by `02_hitl_training_loop.ipynb` exactly like a human-labelled batch.
+
+> **The partition is ~10 000 tweets but the notebook currently ships a hard cap of `MAX_LLM_TWEETS = 1_000` per run**, enforced independently of `SMOKE_TEST` at three layers (dataframe truncation, an assertion before the loop, and a per-call counter in `classify_tweet` that raises rather than exceed the budget). The cap is there because the criteria in `categories.md` are still being tuned; the full partition should not be spent on a definition that has not yet survived a read of its own low-confidence rows. Raising it is a deliberate edit to the Configuration cell.
+
+The `llm_bootstrap_labels_full.pkl` companion file carries `confidence` and `rationale` alongside the labels, and is the artifact to read when tuning the criteria — the `rationale` instructs the model to quote the phrase that decided the label, so a disagreement is traceable to a specific clause.
 
 **Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. The export is guarded by an `EXPORT_HUMAN_SEED` flag at the bottom of `00` (default `False` — skipped); set it to `True` and re-run that cell to produce the seed CSV. A human annotates the `human_label` column. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
 
@@ -200,7 +221,7 @@ All notebooks consume `DATASET_TYPE` (default `'AI'`); set it to `'Art'` to run 
 | Notebook | Run when |
 | :--- | :--- |
 | `00_hitl_data_preparation.ipynb` | **Once per `DATASET_TYPE`, first** — partitions the data into LLM Bootstrap / Base / HITL / Inference and writes the `partition_ids.pkl` manifest |
-| `01_llm_bootstrap_labelling.ipynb` | **Once per `DATASET_TYPE`, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels.csv` |
+| `01_llm_bootstrap_labelling.ipynb` | **Once per `DATASET_TYPE`, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels.csv`. Reads its label set and criteria from `categories.md` (pasted in, see [Label Taxonomy](#label-taxonomy)); capped at `MAX_LLM_TWEETS` per run |
 | `02_hitl_training_loop.ipynb` | **After each labelling round** — trains all models and exports the next review batch |
 | `03_final_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the HITL remainder and merges with labelled data |
 | `04_full_dataset_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the entire remaining corpus |
