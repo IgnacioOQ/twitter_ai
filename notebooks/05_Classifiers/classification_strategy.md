@@ -83,6 +83,14 @@ The seed training set is produced by one of two paths — they can also be combi
 
 > **The partition is ~10 000 tweets but the notebook currently ships a hard cap of `MAX_LLM_TWEETS = 1_000` per run**, enforced independently of `SMOKE_TEST` at three layers (dataframe truncation, an assertion before the loop, and a per-call counter in `classify_tweet` that raises rather than exceed the budget). The cap is there because the criteria in `categories.md` are still being tuned; the full partition should not be spent on a definition that has not yet survived a read of its own low-confidence rows. Raising it is a deliberate edit to the Configuration cell.
 
+**Which tweets get labelled, and the record of it.** Selection is a fixed permutation of the partition (sorted by `id`, permuted with `SELECTION_SEED`, sliced from the head), so a smoke run's tweets are a strict subset of a full run's and successive runs *extend* the labelled set rather than redraw it. Every id sent to the LLM is appended to `Classifiers_Data/HITL/llm_bootstrap_seen_ids_{DATASET_TYPE}.json`, which accumulates across runs.
+
+> **This file, not `partition_ids.pkl`, defines the bootstrap training set.** The manifest records which tweets are *eligible* for bootstrap labelling; with the cap, only a fraction is actually labelled and the remaining ~9 000 of the partition stay unseen — legitimately usable as held-out evaluation data. Any downstream accuracy measurement must exclude the ids in the basket, or it is scoring the model on its own training data.
+
+**Token accounting** (`TOKENOPT_REF.md` §16-17): a pre-flight cell projects tokens and cost before the loop and warns above `COST_ALERT_USD`; the run cell reports the billed `usage_metadata` including the implicit-cache hit rate; each run appends `llm_bootstrap_usage_<timestamp>.json`. Measured prompt size is ~4 557 chars (~1 300 input tokens), of which ~96% is the static criteria scaffold, so a capped 1 000-tweet run costs roughly 1.3 M input tokens and ≤128 k output.
+
+**Token ceiling.** `MAX_SESSION_TOKENS = 2_000_000` bounds total tokens per run independently of the row cap. At ~1.4 M for a full 1 000-tweet run it is a backstop rather than the binding limit — it fires only if per-call cost inflates unexpectedly. Enforcement is between calls (`usage_metadata` arrives with the response), so overshoot is bounded by a single call. **A breach stops the loop cleanly instead of raising:** completed rows are saved and basketed, and `stopped_early` is recorded in both the usage record and the basket's run log. The clean stop is load-bearing — `CHECKPOINT_EVERY = 1_000` means an uncaught exception partway through a capped run would otherwise discard the entire run.
+
 The `llm_bootstrap_labels_full.pkl` companion file carries `confidence` and `rationale` alongside the labels, and is the artifact to read when tuning the criteria — the `rationale` instructs the model to quote the phrase that decided the label, so a disagreement is traceable to a specific clause.
 
 **Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. The export is guarded by an `EXPORT_HUMAN_SEED` flag at the bottom of `00` (default `False` — skipped); set it to `True` and re-run that cell to produce the seed CSV. A human annotates the `human_label` column. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
@@ -252,6 +260,8 @@ Data Sets/
     ├── HITL/
     │   ├── llm_bootstrap_labels.csv        ← LLM-labelled seed (HITL CSV schema)
     │   ├── llm_bootstrap_labels_full.pkl   ← labels + confidence + rationale
+    │   ├── llm_bootstrap_seen_ids_AI.json  ← ids the LLM has seen — EXCLUDE from eval
+    │   ├── llm_bootstrap_usage_*.json      ← measured token/cost record, one per run
     │   ├── llm_bootstrap_checkpoint_*.pkl  ← intermediate saves every 1 000 tweets
     │   ├── hitl_review_batch_00.csv        ← optional human-labelled seed (Path B)
     │   └── hitl_review_batch_01.csv        ← ... 04.csv (filled after each loop)

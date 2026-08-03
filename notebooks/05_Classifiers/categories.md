@@ -122,11 +122,21 @@ The `rationale` column instructs the model to quote the deciding phrase, so a di
 
 ---
 
-## Run-size cap
+## Run-size cap, selection, and the seen-ids basket
 
 Notebook `01` enforces a hard ceiling of `MAX_LLM_TWEETS = 1_000` tweets per run, at three independent layers (config constant → dataframe truncation + assertion → a per-call counter inside `classify_tweet` that raises rather than exceed the budget). The cap binds **regardless of `SMOKE_TEST`**. Raising it is a deliberate edit, not a side effect of flipping the smoke-test flag.
 
 This exists because the criteria above are still being tuned. The full ~10 000-tweet bootstrap partition should not be spent on a definition that has not yet survived a read-through of its own low-confidence rows.
+
+A second, independent ceiling caps **token** spend: `MAX_SESSION_TOKENS = 2_000_000` per run. A full 1 000-tweet run measures ~1.4 M tokens, so the row cap is what normally stops a run and this is a backstop — it fires only if something inflates per-call cost (a much longer criteria block, a model whose thinking budget is not actually off, or a raised `MAX_LLM_TWEETS`). It can only be checked *between* calls, since `usage_metadata` arrives with the response, so the guarantee is "no further calls once crossed", with overshoot bounded by one call. **If it fires the run stops cleanly rather than raising** — completed rows are saved, basketed, and flagged `stopped_early` in both JSON artifacts. That matters because `CHECKPOINT_EVERY = 1_000`: an uncaught exception partway through a capped run would discard everything.
+
+**Selection is a fixed permutation, not a fresh sample.** The partition is sorted by `id`, permuted once with `SELECTION_SEED`, and sliced from the head. So the 100 tweets of a smoke run are a strict **subset** of the 1 000 of a full run — successive runs extend the labelled set instead of drawing a new one. (Two `df.sample(n=…)` calls sharing a seed but differing in `n` do *not* nest; that was the earlier behaviour and it would have produced two largely disjoint sets.) Treat `SELECTION_SEED` as frozen once a real run has happened — changing it re-draws which tweets get labelled.
+
+**Every tweet sent to the LLM is recorded** in `Classifiers_Data/HITL/llm_bootstrap_seen_ids_{DATASET_TYPE}.json`, which accumulates across runs (`ids`, `parse_error_ids`, and a per-run log). **These ids are training data — exclude them from any held-out evaluation set.**
+
+`partition_ids.pkl` cannot serve this purpose. It records which tweets are *eligible* for bootstrap labelling (~10 000), but with the cap only a fraction is ever labelled; the remaining ~9 000 of the bootstrap partition stay unseen and are legitimately usable as held-out data. The basket is the only record of where that line actually falls.
+
+**Token spend is measured, not estimated.** A pre-flight cell prints projected tokens and cost before the loop runs (and warns above `COST_ALERT_USD`); the run cell reports the `usage_metadata` the API actually billed, including the implicit-cache hit rate; and each run appends a `llm_bootstrap_usage_<timestamp>.json`. Roughly 96% of every prompt is the identical criteria scaffold, so the cache-hit figure is the number to watch — if it is near zero, the Batch API (50% cheaper, and this workload is not latency-sensitive) is the next lever.
 
 ---
 
