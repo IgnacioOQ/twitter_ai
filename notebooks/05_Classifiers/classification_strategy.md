@@ -28,7 +28,7 @@ The taxonomy is currently **two labels**, deliberately:
 
 Starting at one substantive category keeps the bootstrap's errors attributable — a wrong label traces to a specific clause of one definition rather than to an unknown interaction between several. `categories.md` carries the decision test, worked examples, exclusions, confidence calibration, and the checklist for adding category *N+1* (including the two things that must be decided at that point: what happens to existing `none` rows, and whether the single-label assumption still holds).
 
-Because notebook `01` does not clone this repo on Colab, the criteria cannot be read from `categories.md` at runtime — they are embedded as a literal in cell 7. **Editing `categories.md` requires re-pasting its Criteria block into that cell.**
+The prompt itself — scaffold and criteria together, in the form the model receives — is `llm_bootstrap_prompt.md` in this folder. Because notebook `01` does not clone this repo on Colab, no markdown here is readable at runtime, so that file is embedded in the notebook as a literal. **The embedding is mechanical: edit `llm_bootstrap_prompt.md`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`.** `sync_prompt.py --check` exits non-zero while the notebook and the prompt file disagree. The notebook writes the same file back out next to `llm_bootstrap_labels.csv`, byte-identical, so the copy a reviewer reads is the copy in git.
 
 ---
 
@@ -92,6 +92,8 @@ The seed training set is produced by one of two paths — they can also be combi
 **Token ceiling.** `MAX_SESSION_TOKENS = 2_000_000` bounds total tokens per run independently of the row cap. At ~1.4 M for a full 1 000-tweet run it is a backstop rather than the binding limit — it fires only if per-call cost inflates unexpectedly. Enforcement is between calls (`usage_metadata` arrives with the response), so overshoot is bounded by a single call. **A breach stops the loop cleanly instead of raising:** completed rows are saved and basketed, and `stopped_early` is recorded in both the usage record and the basket's run log. The clean stop is load-bearing — `CHECKPOINT_EVERY = 1_000` means an uncaught exception partway through a capped run would otherwise discard the entire run.
 
 The `llm_bootstrap_labels_full.pkl` companion file carries `confidence` and `rationale` alongside the labels, and is the artifact to read when tuning the criteria — the `rationale` instructs the model to quote the phrase that decided the label, so a disagreement is traceable to a specific clause.
+
+**Prompt record for reviewers.** The Save section writes `llm_bootstrap_prompt.md` beside the CSV — the repo's own copy, byte for byte, asserted on write. The humans filling in `human_label` therefore read exactly the text the model was given, and the author tuning the prompt edits that same file in git. It carries no run metadata on purpose: a generated header would make the two copies differ, and then neither could be trusted as *the* prompt. Model, passes, per-pass temperatures, max output tokens, the effective thinking budget, whether the response schema was enforced, and a `sha256` of the prompt file go into `llm_bootstrap_usage_<timestamp>.json` instead. That fingerprint is what ties a CSV to the prompt version that produced it once the prompt has been tuned further — the decoding fields are read from the *effective* config rather than the Configuration cell, because the client cell probes `thinking_budget` and silently falls back when a model rejects it.
 
 **Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. The export is guarded by an `EXPORT_HUMAN_SEED` flag at the bottom of `00` (default `False` — skipped); set it to `True` and re-run that cell to produce the seed CSV. A human annotates the `human_label` column. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
 
@@ -260,6 +262,7 @@ Data Sets/
     ├── HITL/
     │   ├── llm_bootstrap_labels.csv        ← LLM-labelled seed (HITL CSV schema)
     │   ├── llm_bootstrap_labels_full.pkl   ← labels + confidence + rationale
+    │   ├── llm_bootstrap_prompt.md         ← the repo's prompt file, copied verbatim
     │   ├── llm_bootstrap_seen_ids_AI.json  ← ids the LLM has seen — EXCLUDE from eval
     │   ├── llm_bootstrap_usage_*.json      ← measured token/cost record, one per run
     │   ├── llm_bootstrap_checkpoint_*.pkl  ← intermediate saves every 1 000 tweets

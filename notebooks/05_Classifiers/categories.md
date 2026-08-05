@@ -5,9 +5,9 @@
 - last_checked: 2026-08-01
 <!-- content -->
 
-This document is the **source of truth for the label taxonomy** used by the classifiers in this folder. `01_llm_bootstrap_labelling.ipynb` carries a verbatim copy of the [Criteria block](#criteria-block-verbatim-prompt-text) below in its `CATEGORY_CRITERIA` cell.
+This document is the **source of truth for what the labels mean**. The prompt that puts those meanings in front of the model is `llm_bootstrap_prompt.md` in this folder — see [Where the criteria live](#where-the-criteria-live).
 
-> **Sync obligation.** Notebook `01` does **not** clone this repo on Colab — it only mounts Drive — so `categories.md` is not on disk at runtime and the criteria cannot be read from this file. The text is embedded in the notebook instead. **When you edit the Criteria block, re-paste it into cell 7 of `01_llm_bootstrap_labelling.ipynb`.**
+> **The sync obligation is now mechanical.** Notebook `01` does **not** clone this repo on Colab — it only mounts Drive — so no markdown in this folder is readable at runtime and the prompt has to be embedded in the notebook. That embedding is done by `sync_prompt.py`, not by hand, and `sync_prompt.py --check` fails while the notebook and the prompt file disagree.
 
 The taxonomy deliberately starts at **one substantive category**. The point is a labelling run whose errors are legible: you read the model's `rationale` column, disagree with a specific decision, tighten one definition, and re-run. Growing the label space before that loop works makes every error harder to attribute. See [Adding a category](#adding-a-category) for the extension procedure.
 
@@ -36,74 +36,29 @@ This framing sits inside a wider debate the project already maps: `docs/Theories
 
 ---
 
-## Criteria block (verbatim prompt text)
+## Where the criteria live
 
-Everything inside the fence is copied into `CATEGORY_CRITERIA` in cell 7 of notebook `01` **exactly as written**. It is deliberately terse and imperative — it is re-sent on every one of the run's API calls (`TOKENOPT_REF.md` §3).
+**The criteria are no longer duplicated here.** They live in `llm_bootstrap_prompt.md` in this
+folder, which is the single authored copy of the prompt — scaffold and criteria together, in
+the form the model actually receives.
 
-```text
-### originality
+That file is embedded into notebook `01` verbatim by `sync_prompt.py`, and written back out
+next to `llm_bootstrap_labels.csv` unchanged, so the version a reviewer reads in Drive, the
+version in the notebook, and the version in git are the same bytes. Previously this section
+held one copy and the notebook held another, kept in step by hand.
 
-Definition. Originality in art refers to something which is non-trivially new in a work of
-art. It relates to ideas of creativity (in the positive) and ideas about copying (in the
-negative). Tweets that are referencing the importance of originality may mention creativity,
-newness, difference to prior works, or theft, copying, tracing, plagiarising, replicating.
-Label this category when that appeal is used as a criterion for the value of art.
+To change what the model is told:
 
-Decision test. Label `originality` only when BOTH halves are present:
-  (a) the tweet invokes newness or its absence — creative, original, novel, derivative,
-      copy, steal, trace, plagiarise, replicate, rip off, regurgitate, unoriginal; AND
-  (b) that invocation does evaluative work about art — it is offered as a reason the
-      work, the practice, or the maker is good, bad, real, fake, valuable or worthless art.
-Vocabulary alone is not enough. An evaluation of art on some other ground is not enough.
-
-Positive examples.
-
-1. -> originality, high confidence. Plagiarism is named outright as the condition under which
-   the art would be unacceptable.
-i don't mind ai art as long as it's not plagiarism...i also think some people a bit too lazy with it, seen some make a few posts with ai art that you can clearly see have flaws. yours is great, i really like it. but i feel like others should touch up the ai art before posting...
-
-2. -> originality, medium confidence. The appeal is carried by the analogy rather than stated
-   directly, and the scare-quoted "create" is doing the evaluative work.
-and farmers learned from other farmers how to crow their crop and harvest. what's your point? the difference is that no farmer or artist is taking another's product and mixing it with yet another stolen product to "create" something. ai is just fancy photoshop for thieves.
-
-3. -> originality, medium confidence. Theft and derivation are explicit, but the tweet is
-   framed inside the jobs/automation argument, which competes for the tweet's main point.
-sick and absolutely fucking tired of seeing people defending ai art "don't worry they're not taking away your jobs! people thought the same when cameras were invented!" homie that is not the point ai literally steals from artists, it takes whole ass aspects from existing pieces
-
-Negative examples.
-
-4. -> none. The objection is consent and payment, not that the output fails to be new.
-they scraped every portfolio on the internet without asking and pay us nothing for it
-
-5. -> none. Art is being evaluated, but on expression and emotion, not on newness.
-ai art is empty. there is no human feeling behind any of it.
-
-Exclusions — label `none`:
-- Other value criteria. The tweet evaluates art on a ground other than newness: skill or
-  effort, soul or emotion, meaning or understanding, beauty or formal qualities, morality,
-  social or political function, or the experience of making it.
-- Economic, consent or labour objections. The complaint is pay, permission, licensing or
-  jobs rather than the work being derivative. If the tweet ALSO argues the output is not
-  genuinely new, label originality instead.
-- Novelty talk outside art. New models, products, research results, memes.
-- Non-evaluative mention. Reporting, defining or quoting a copying dispute with no claim
-  about artistic worth.
-
-### none
-
-No category above applies. This is the residual bucket — it is not a claim that the tweet
-is unrelated to art or to AI.
-
-Confidence.
-0.8-1.0   Explicit: the vocabulary is present and the link to art's worth is stated outright.
-0.5-0.79  Implicit: the appeal is inferred from framing, or shares the tweet with a competing
-          theme (jobs, automation, consent) of equal or greater weight.
-0.0-0.49  Contested: one plausible reading supports the label, another equally plausible
-          reading does not.
-Score confidence for whichever label you chose, including `none`.
-
-In `rationale`, quote the phrase from the tweet that decided the label.
+```bash
+$EDITOR notebooks/05_Classifiers/llm_bootstrap_prompt.md    # edit inside the fence
+python3 notebooks/05_Classifiers/sync_prompt.py             # embed it in the notebook
 ```
+
+`sync_prompt.py --check` exits non-zero while the two disagree, which is the form to wire into
+a pre-commit hook.
+
+This document keeps what the prompt has no room for: why the taxonomy is shaped this way, what
+`none` is for, the expected class balance, and what must be settled before adding a category.
 
 **Examples 1-3 are real corpus tweets** carried over from the original draft with the confidence annotations attached to them. **Examples 4-5 are author-written placeholders** — replace them with real `none` tweets drawn from the first smoke-test run, which will surface the negative cases that actually occur in this corpus rather than the ones we imagined.
 
@@ -111,12 +66,12 @@ In `rationale`, quote the phrase from the tweet that decided the label.
 
 ## Confidence and rationale are the interpretability surface
 
-`01` writes two artifacts. `llm_bootstrap_labels.csv` carries only the HITL schema; `llm_bootstrap_labels_full.pkl` additionally carries `confidence` and `rationale`. **The `.pkl` is the one to read when tuning this file.** The intended loop:
+`01` writes the labels in two shapes. `llm_bootstrap_labels.csv` carries only the HITL schema; `llm_bootstrap_labels_full.pkl` additionally carries `confidence` and `rationale`. **The `.pkl` is the one to read when tuning this file.** The intended loop:
 
 1. Run with `SMOKE_TEST = True` (capped — see below).
 2. Open the `.pkl`, sort by `confidence` ascending, and read the bottom rows. Low-confidence rows are where the definition is underspecified.
 3. Read a sample of *high*-confidence `originality` rows too — a confident wrong answer means a boundary is missing from the Exclusions, which is the more expensive failure.
-4. Edit the Criteria block, re-paste into cell 7, re-run. Repeat.
+4. Edit the fence in `llm_bootstrap_prompt.md`, run `sync_prompt.py`, re-run the notebook. Repeat.
 
 The `rationale` column instructs the model to quote the deciding phrase, so a disagreement can usually be traced to a specific clause rather than argued in the abstract.
 
@@ -153,9 +108,9 @@ With `DATASET_TYPE = 'AI'`, `originality` is expected to be a **small minority**
 
 The taxonomy is designed to grow. When adding category *N+1*:
 
-1. Add a `### <label>` block to the Criteria block above with the same four parts — Definition, Decision test, Examples (positive **and** negative), Exclusions.
+1. Add a `### <label>` block inside the fence in `llm_bootstrap_prompt.md` with the same four parts — Definition, Decision test, Examples (positive **and** negative), Exclusions — and add the label to the category line near the top of that fence.
 2. Add the label to the [Label set](#label-set) table.
-3. Add the label string to `CATEGORIES` in cell 7 of notebook `01`, and re-paste the whole Criteria block into `CATEGORY_CRITERIA`. The response schema derives its `enum` from `CATEGORIES`, so no other cell needs editing.
+3. Add the label string to `CATEGORIES` in the Label Set cell of notebook `01`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`. The response schema derives its `enum` from `CATEGORIES`, so no other cell needs editing — and the Prompt Builder cell asserts `CATEGORIES` against the fence's category line, so doing step 3 without step 1 fails on the next run rather than silently sending a prompt that never mentions the new label.
 4. Revisit the exclusions of **every existing category** — a new category almost always carves territory out of an old one's `none` bucket, and the old category's exclusion list is where that boundary has to be written down.
 5. Decide what happens to existing `none` rows. They were labelled against the old taxonomy, so any tweet belonging to the new category is currently sitting in `none`. Either re-run the affected rows or treat the new category as valid only from that run forward — and record which, because it changes what the label set means.
 6. Re-check the single-label assumption (below).
