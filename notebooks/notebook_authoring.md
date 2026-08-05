@@ -143,6 +143,9 @@ write_notebook("notebooks/05_Classifiers/my_notebook.ipynb", cells)
 - [ ] Does Cell 1 include `RUNNING_LOCALLY`, `BASE_PATH`, and all required path variables?
 - [ ] Are pip installs guarded by `if not RUNNING_LOCALLY`?
 - [ ] Are all imports explicit (no wildcard `import *` from external libraries)?
+- [ ] Are sections written as `#` (not `##`), each given a stable cell id, and listed in
+      `metadata.colab.collapsed_sections` + `jp-MarkdownHeadingCollapsed`? See
+      `notebook_setup.md` § Collapsible Sections.
 - [ ] After creation, does `python3 -c "import json; json.load(open('my_notebook.ipynb'))"` succeed without error?
 
 ---

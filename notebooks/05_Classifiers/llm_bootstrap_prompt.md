@@ -152,7 +152,13 @@ raise `MAX_OUTPUT_TOKENS` before suspecting anything else.
 | `text` | The tweet verbatim. This exact string is what replaced `{{TWEET}}`. |
 | `likes`, `retweets` | Engagement counts, for your context only. **Not** part of the prompt — the model saw the text alone and knew nothing about how the tweet performed. |
 | `predicted_label` | The model's answer. Leave it as it is; it is the record of what the model said. |
+| `rationale` | **Why the model said it** — one sentence, instructed to quote the phrase from the tweet that decided the call. Read this before disagreeing: it usually points at the exact clause of the fence above that produced the label. |
 | `human_label` | **Yours.** Empty on delivery — fill it in for every row you review. |
+
+**Rows are ordered positive-class first** — every `originality` row, then every `none` row,
+then any `PARSE_ERROR`. Start at the top: those are the rows where a wrong label means an
+exclusion is missing from the fence above, which is the more expensive kind of error to leave
+in. Within each class the rows keep the run's own order, so they are not sorted by confidence.
 
 The model's `confidence`, its `rationale`, and whether the independent passes agreed are
 **not** in the CSV. They are in the sibling `llm_bootstrap_labels_full.pkl`. The rationale is

@@ -175,6 +175,43 @@ Only import the `src` submodules that the notebook actually uses.
 | 4 | Explicit library imports | Always |
 | 5 | `src/` imports | Only if the notebook uses internal `src` modules |
 
+## Collapsible Sections — Collapsed by Default
+- status: active
+<!-- content -->
+Every notebook opens showing **only its title and its section headings**, with each
+section folded to a single line. Long notebooks are unreadable otherwise.
+
+Three rules make this work:
+
+1. **Sections are `#` (h1), not `##`.** Only an h1 markdown cell opens a top-level
+   collapsible section in Colab; `##` nests *inside* the enclosing h1 and cannot be
+   folded on its own. Use `##` for subsections within a section.
+2. **The fold state is notebook-level metadata keyed by cell id** — not anything in
+   the markdown. Colab reads `metadata.colab.collapsed_sections`, a list of the
+   **heading cells' ids**:
+
+   ```json
+   "metadata": {
+     "colab": { "provenance": [], "toc_visible": true,
+                "collapsed_sections": ["sec-setup", "sec-run", "sec-teardown"] }
+   }
+   ```
+
+3. **JupyterLab and VS Code ignore `collapsed_sections` entirely.** They use a
+   per-cell flag instead, so each collapsed heading cell also needs:
+
+   ```json
+   "metadata": { "id": "sec-setup", "jp-MarkdownHeadingCollapsed": true }
+   ```
+
+**Leave the title h1 expanded.** List every *other* section h1 in `collapsed_sections`
+so the notebook opens on its title and abstract with the work folded away.
+
+**Colab rewrites this metadata every time Colab saves.** The stored state reflects the
+last save, so "collapsed by default" survives only until someone expands a section and
+saves from Colab. Treat it as a good *initial* state, not an invariant — re-apply it
+when a notebook drifts.
+
 ## Teardown Section — Disconnect from Runtime
 - status: active
 <!-- content -->
@@ -265,4 +302,7 @@ AI Public Trust/
 - **Using `from src.network.imports import *`** — this hides what is actually imported and makes the notebook harder to debug. Always list imports explicitly in Cell 4.
 - **Missing `igraph as ig`** — `igraph` must be imported explicitly even though it is pip-installed in Cell 3.
 - **Putting imports before pip installs** — Cell 4 must come after Cell 3, since packages like `igraph` and `leidenalg` must be installed before they can be imported.
+- **Writing sections as `##` under a single `#` title** — they cannot be folded
+  independently, so the notebook opens fully expanded no matter what is listed in
+  `collapsed_sections`. Sections are `#`; subsections are `##`.
 - **Breaking the Colab cell shape when editing a notebook's JSON** — this project's notebooks are Colab-flavored (`nbformat_minor: 0`): each cell's id lives at `metadata.id`, **not** as a top-level `id` field, and Colab's loader hard-crashes (`TypeError: Cannot read properties of undefined (reading 'id')`) on any cell missing the `metadata` key — the notebook becomes unloadable from GitHub. When inserting or rewriting cells programmatically, give every cell a `metadata` dict with its id inside. Check the whole repo with `notebooks/analyze_notebooks.py` (the `colab_ok` column); see `docs/COLAB_MCP_WORKFLOW.md` § Troubleshooting.
