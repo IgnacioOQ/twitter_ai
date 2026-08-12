@@ -1041,19 +1041,13 @@ def densify_fancy_speed_up(
 #     return net_new
 
 
-def compute_drl_layout(G):
+def compute_drl_layout(ig_graph):
     """
     Computes the Distributed Recursive Layout (DrL) using igraph.
     Suitable for medium-sized graphs (10k-100k nodes).
     """
-    import igraph as ig
     import pandas as pd
     import time
-    
-    print(f"Converting networkx graph ({G.number_of_nodes()} nodes) to igraph...")
-    t0 = time.time()
-    ig_graph = ig.Graph.from_networkx(G)
-    print(f"Conversion took {time.time() - t0:.1f}s")
     
     print("Running igraph DrL layout...")
     t0 = time.time()
@@ -1061,7 +1055,7 @@ def compute_drl_layout(G):
     print(f"DrL layout completed in {time.time() - t0:.1f}s")
     
     coords = [drl_layout[i] for i in range(ig_graph.vcount())]
-    node_names = [v['_nx_name'] for v in ig_graph.vs]
+    node_names = ig_graph.vs["node_label"]
     
     df = pd.DataFrame(coords, index=node_names, columns=['x', 'y'])
     df.index.name = 'n'
