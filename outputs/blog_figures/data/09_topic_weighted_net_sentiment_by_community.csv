@@ -1,0 +1,253 @@
+community_id,display_label,n_authors,topic_id,topic_label,membership_weight_author_equivalents,effective_n_kish,weighted_net_sentiment,adequate_support,plotted_weighted_net_sentiment,support_rule
+1,General ChatGPT Discussion,44718,0,Marketing/Social,387.948464,3458.053431941595,0.20431583545032753,True,0.20431583545032753,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,1,AI Art Discourse,18691.189232999997,32789.99455931968,-0.02977647744715858,True,-0.02977647744715858,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,2,AI Tools/Code,9651.213028,24810.396587253625,0.1903792531588332,True,0.1903792531588332,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,3,Bard/LLMs,605.429921,4407.860786572448,0.2069093078524912,True,0.2069093078524912,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,4,Visual AI Art,256.438291,1281.777927859883,0.2566517330322229,True,0.2566517330322229,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,5,Bot/Spam,157.686497,2970.8287525699343,0.10342087921717821,True,0.10342087921717821,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,6,Tech/Programming,279.94212799999997,2835.879705559609,0.2237159887250232,True,0.2237159887250232,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,7,News/Updates,261.612036,2851.1609024156196,0.26036795208411806,True,0.26036795208411806,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,8,NFT/Crypto,227.318022,2134.161993694777,0.1272095544846275,True,0.1272095544846275,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,9,Web3/DeFi,112.469808,1376.6082528084378,0.192535639615096,True,0.192535639615096,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,10,General AI,13857.474816,28756.32053856076,0.1454956344747042,True,0.1454956344747042,membership_weight >= 10 and Kish effective_n >= 30
+1,General ChatGPT Discussion,44718,11,Trading/Invest,229.278042,2175.460432643672,0.10519432947902702,True,0.10519432947902702,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,0,Marketing/Social,202.105818,2535.0301338894587,-0.2930876590203212,True,-0.2930876590203212,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,1,AI Art Discourse,36284.494236,40416.633967260255,-0.3679628031521747,True,-0.3679628031521747,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,2,AI Tools/Code,1460.821724,6740.7512879341375,-0.21677372397010172,True,-0.21677372397010172,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,3,Bard/LLMs,1204.721346,5242.79540255293,-0.007806322625698067,True,-0.007806322625698067,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,4,Visual AI Art,279.725214,1968.0251935299555,-0.19103521449570568,True,-0.19103521449570568,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,5,Bot/Spam,105.668311,2024.209680309705,-0.30933192772053336,True,-0.30933192772053336,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,6,Tech/Programming,37.396874999999994,912.4586371408693,-0.24991843809090308,True,-0.24991843809090308,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,7,News/Updates,105.331875,2400.4333529502087,-0.22565964694304097,True,-0.22565964694304097,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,8,NFT/Crypto,89.228264,1669.8499904728394,-0.33803234171023216,True,-0.33803234171023216,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,9,Web3/DeFi,53.018514,1067.6879010852088,-0.2808960105313339,True,-0.2808960105313339,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,10,General AI,1662.215513,7576.467337656517,-0.26627330087824563,True,-0.26627330087824563,membership_weight >= 10 and Kish effective_n >= 30
+0,Anti-AI-Art Discourse,41574,11,Trading/Invest,89.274712,1841.9856516653394,-0.2908597641996824,True,-0.2908597641996824,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,0,Marketing/Social,147.430986,1354.222184175315,-0.05637758481406667,True,-0.05637758481406667,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,1,AI Art Discourse,10639.79922,14798.322627782549,-0.2260002003976083,True,-0.2260002003976083,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,2,AI Tools/Code,1551.275591,5008.154140198364,-0.0017241477980813622,True,-0.0017241477980813622,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,3,Bard/LLMs,293.935939,1599.6329474889349,0.02522891817330757,True,0.02522891817330757,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,4,Visual AI Art,75.085486,355.97085716158097,0.06691942947644211,True,0.06691942947644211,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,5,Bot/Spam,130.514813,1795.0173173432759,-0.14301820836753748,True,-0.14301820836753748,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,6,Tech/Programming,48.064583,484.0370434024363,-0.058817419356026905,True,-0.058817419356026905,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,7,News/Updates,84.80180800000001,1219.2302082819026,-0.030762161147506805,True,-0.030762161147506805,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,8,NFT/Crypto,125.18803299999999,854.5307324207139,0.03702253567996435,True,0.03702253567996435,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,9,Web3/DeFi,48.947158,383.35216184251004,0.08452596667745926,True,0.08452596667745926,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,10,General AI,4072.360475,9236.977269546387,-0.10921700696889294,True,-0.10921700696889294,membership_weight >= 10 and Kish effective_n >= 30
+3,General ChatGPT Debate,17422,11,Trading/Invest,204.596606,1042.432017392367,0.04331629264090302,True,0.04331629264090302,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,0,Marketing/Social,137.996897,739.7506234437958,0.43617225532990567,True,0.43617225532990567,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,1,AI Art Discourse,6580.614542,10124.572617686887,0.27511447736733174,True,0.27511447736733174,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,2,AI Tools/Code,1619.7231339999998,5172.146744458417,0.37916073785635396,True,0.37916073785635396,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,3,Bard/LLMs,1395.2122,4348.200158907214,0.5368446557142481,True,0.5368446557142481,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,4,Visual AI Art,957.0542350000001,2910.123981894575,0.44015462791005083,True,0.44015462791005083,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,5,Bot/Spam,45.235768,768.8564805720434,0.2853175857158746,True,0.2853175857158746,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,6,Tech/Programming,25.985031,307.2270922148185,0.33453251593775046,True,0.33453251593775046,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,7,News/Updates,119.370144,1648.5656730542933,0.493787910031772,True,0.493787910031772,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,8,NFT/Crypto,249.494986,1736.6965006248806,0.40307563259460116,True,0.40307563259460116,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,9,Web3/DeFi,129.012948,881.4949677227763,0.4638160799809031,True,0.4638160799809031,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,10,General AI,1358.312828,4264.422868729706,0.32668555923616555,True,0.32668555923616555,membership_weight >= 10 and Kish effective_n >= 30
+8,AI-Art & NFT Posting,12679,11,Trading/Invest,60.987539,760.4752094684046,0.3229699967249946,True,0.3229699967249946,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,0,Marketing/Social,362.071645,1908.757584732121,0.31387570746599347,True,0.31387570746599347,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,1,AI Art Discourse,3132.721242,5939.535581381064,0.08620146066475493,True,0.08620146066475493,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,2,AI Tools/Code,3664.83321,6775.718498279688,0.2938829370207872,True,0.2938829370207872,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,3,Bard/LLMs,214.444646,917.0386422289243,0.26374129442683353,True,0.26374129442683353,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,4,Visual AI Art,96.638162,404.9463199389355,0.2818119132612373,True,0.2818119132612373,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,5,Bot/Spam,75.468188,764.941603291862,0.22921725192151265,True,0.22921725192151265,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,6,Tech/Programming,111.27803200000001,637.5325960574237,0.2938835051303498,True,0.2938835051303498,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,7,News/Updates,106.138954,741.8658201355784,0.35129350643112567,True,0.35129350643112567,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,8,NFT/Crypto,115.878971,619.5944363681934,0.29108111594490954,True,0.29108111594490954,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,9,Web3/DeFi,102.74739000000001,411.93147491375123,0.3978688462176916,True,0.3978688462176916,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,10,General AI,2277.752875,5130.086077027161,0.2667160641545112,True,0.2667160641545112,membership_weight >= 10 and Kish effective_n >= 30
+2,ChatGPT SEO/Content,10348,11,Trading/Invest,88.02641000000001,703.9882589037202,0.21500084550147086,True,0.21500084550147086,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,0,Marketing/Social,122.15783300000001,759.8786248309301,0.4663147025374965,True,0.4663147025374965,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,1,AI Art Discourse,1252.825338,2689.1065665292476,0.2128289004442708,True,0.2128289004442708,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,2,AI Tools/Code,1097.009589,2781.1240913093166,0.44310793273421306,True,0.44310793273421306,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,3,Bard/LLMs,248.978231,999.2437018555868,0.6588680779805357,True,0.6588680779805357,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,4,Visual AI Art,50.575059,301.3146923918113,0.4350690114084531,True,0.4350690114084531,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,5,Bot/Spam,95.719847,1368.5252107133383,0.5981776548938937,True,0.5981776548938937,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,6,Tech/Programming,50.523486000000005,403.6070095500159,0.4142829310951749,True,0.4142829310951749,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,7,News/Updates,120.478942,1670.4595959336664,0.6469026441922296,True,0.6469026441922296,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,8,NFT/Crypto,1681.201108,2772.12692409658,0.742093346562846,True,0.742093346562846,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,9,Web3/DeFi,1168.026096,2245.6833508924647,0.7552683079145056,True,0.7552683079145056,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,10,General AI,1520.340478,3022.6790186268586,0.41808204596027765,True,0.41808204596027765,membership_weight >= 10 and Kish effective_n >= 30
+12,"AI Tokens, Launchpads & AI",7502,11,Trading/Invest,94.16382,583.8958569457633,0.5163192107967524,True,0.5163192107967524,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,0,Marketing/Social,126.063799,889.1258566511585,0.6641880673270845,True,0.6641880673270845,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,1,AI Art Discourse,352.369194,932.6038266262082,0.5266789818893358,True,0.5266789818893358,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,2,AI Tools/Code,823.29882,3384.8749947659403,0.7380870496523713,True,0.7380870496523713,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,3,Bard/LLMs,369.64533400000005,2015.8550040991183,0.7375279254393841,True,0.7375279254393841,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,4,Visual AI Art,36.968059,256.6432925526058,0.6347107754605351,True,0.6347107754605351,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,5,Bot/Spam,70.829577,959.4644193843366,0.7636437284689171,True,0.7636437284689171,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,6,Tech/Programming,10.431633,56.23429685946993,0.6542999907392332,True,0.6542999907392332,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,7,News/Updates,63.051636,822.9366371374851,0.7075424652367984,True,0.7075424652367984,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,8,NFT/Crypto,823.7415589999999,4249.717706248781,0.7681438964193482,True,0.7681438964193482,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,9,Web3/DeFi,3969.1537080000003,6197.354937624147,0.7976225002530473,True,0.7976225002530473,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,10,General AI,784.847255,1980.917988427221,0.6982118384563661,True,0.6982118384563661,membership_weight >= 10 and Kish effective_n >= 30
+4,AI/Crypto Launchpads,7497,11,Trading/Invest,66.59960899999999,465.19953203349434,0.6770321408866713,True,0.6770321408866713,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,0,Marketing/Social,81.77147199999999,604.9808935768218,0.511577629485009,True,0.511577629485009,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,1,AI Art Discourse,1972.255249,4058.4699170362546,0.30613418969832334,True,0.30613418969832334,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,2,AI Tools/Code,850.4521520000001,2650.886898977951,0.5028537920169421,True,0.5028537920169421,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,3,Bard/LLMs,224.71777200000002,1158.0311612768076,0.5341369702634549,True,0.5341369702634549,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,4,Visual AI Art,66.35849400000001,350.35187041650005,0.5308004077105163,True,0.5308004077105163,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,5,Bot/Spam,50.460344,681.9599560573505,0.4893112639008519,True,0.4893112639008519,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,6,Tech/Programming,25.641849,262.9455587176335,0.48914256379784765,True,0.48914256379784765,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,7,News/Updates,71.225829,867.0674760824414,0.5695127707735849,True,0.5695127707735849,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,8,NFT/Crypto,973.558307,3474.3672187637358,0.5330334931755554,True,0.5330334931755554,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,9,Web3/DeFi,1005.3117510000001,3103.9810714294144,0.6591748210810577,True,0.6591748210810577,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,10,General AI,1629.068326,3729.3997278743514,0.4905195011469458,True,0.4905195011469458,membership_weight >= 10 and Kish effective_n >= 30
+9,AI-Blockchain Promotion,7256,11,Trading/Invest,305.178451,1748.2114529273754,0.5459328618727476,True,0.5459328618727476,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,0,Marketing/Social,229.48657599999999,960.1153002217513,0.4289894825514107,True,0.4289894825514107,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,1,AI Art Discourse,1296.118974,2821.1880233419433,0.12375918917628541,True,0.12375918917628541,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,2,AI Tools/Code,1082.99096,2967.409359308334,0.3448870209732793,True,0.3448870209732793,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,3,Bard/LLMs,192.131758,691.160695545677,0.439146602614197,True,0.439146602614197,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,4,Visual AI Art,91.576741,290.11461235244747,0.3435649151763996,True,0.3435649151763996,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,5,Bot/Spam,92.715576,990.614190179535,0.29763919917649106,True,0.29763919917649106,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,6,Tech/Programming,534.3938370000001,1351.5047582598484,0.3615599470238555,True,0.3615599470238555,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,7,News/Updates,126.82859400000001,441.8624630415033,0.5325201915712364,True,0.5325201915712364,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,8,NFT/Crypto,76.745232,348.1137515121075,0.38631543070387225,True,0.38631543070387225,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,9,Web3/DeFi,54.601799,137.0397618453892,0.5163540572809698,True,0.5163540572809698,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,10,General AI,3304.611382,5126.013386230386,0.3613613731624578,True,0.3613613731624578,membership_weight >= 10 and Kish effective_n >= 30
+16,Data Science/ML Headlines,7132,11,Trading/Invest,49.798572,378.97291137108147,0.33317841646911306,True,0.33317841646911306,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,0,Marketing/Social,33.764479,263.0958057377755,-0.07668437720128068,True,-0.07668437720128068,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,1,AI Art Discourse,4479.028051,5205.634245448937,-0.23151588864366124,True,-0.23151588864366124,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,2,AI Tools/Code,308.788995,1102.5687835340868,-0.054757459312551875,True,-0.054757459312551875,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,3,Bard/LLMs,153.954208,710.4088702517016,0.014389860146763732,True,0.014389860146763732,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,4,Visual AI Art,60.80340400000001,297.1441062609678,0.00649347843618669,True,0.00649347843618669,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,5,Bot/Spam,19.516183,305.9304238237955,-0.19686271469841674,True,-0.19686271469841674,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,6,Tech/Programming,7.610487999999999,133.095433518781,-0.08186254197075106,False,,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,7,News/Updates,16.330970999999998,288.0387430469319,-0.08071352346497576,True,-0.08071352346497576,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,8,NFT/Crypto,14.196749999999998,175.94394320698072,-0.10021556339500504,True,-0.10021556339500504,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,9,Web3/DeFi,8.086751,96.14719591376421,-0.08958539635323527,False,,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,10,General AI,372.677694,1377.2085977977372,-0.13334560665254364,True,-0.13334560665254364,membership_weight >= 10 and Kish effective_n >= 30
+7,AI-Art Authenticity Disputes,5490,11,Trading/Invest,15.242259,185.90612601334047,-0.13309713291948838,True,-0.13309713291948838,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,0,Marketing/Social,75.726531,495.88462731101885,0.28112889965591564,True,0.28112889965591564,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,1,AI Art Discourse,1593.3725650000001,2671.3196721027803,-0.028055645296019588,True,-0.028055645296019588,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,2,AI Tools/Code,701.939388,1900.8310875177865,0.23689762653498772,True,0.23689762653498772,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,3,Bard/LLMs,125.116994,604.3955478658165,0.2623784249464226,True,0.2623784249464226,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,4,Visual AI Art,32.903497,132.11109604445292,0.288504005558713,True,0.288504005558713,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,5,Bot/Spam,38.03218,443.9356094096343,0.1686102975201553,True,0.1686102975201553,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,6,Tech/Programming,35.998121000000005,288.96985722715067,0.33131441286543456,True,0.33131441286543456,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,7,News/Updates,44.147838,265.4737086371168,0.32527783877564415,True,0.32527783877564415,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,8,NFT/Crypto,32.287894,197.5078392425264,0.3034613985065783,True,0.3034613985065783,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,9,Web3/DeFi,18.885074000000003,86.37902570752003,0.46904510427220003,True,0.46904510427220003,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,10,General AI,1785.1285939999998,2927.976372257278,0.2457353864713135,True,0.2457353864713135,membership_weight >= 10 and Kish effective_n >= 30
+10,ChatGPT & AI/Tech News,4542,11,Trading/Invest,58.460972999999996,266.7872996476113,0.21949392884611296,True,0.21949392884611296,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,0,Marketing/Social,33.959074,256.29181221720575,0.03742619299366377,True,0.03742619299366377,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,1,AI Art Discourse,2388.2306959999996,3390.734488603204,-0.14827473715035308,True,-0.14827473715035308,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,2,AI Tools/Code,426.592107,1407.009919909695,0.023235401861643,True,0.023235401861643,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,3,Bard/LLMs,181.081616,595.7387061383305,0.15541693734618994,True,0.15541693734618994,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,4,Visual AI Art,29.268219000000002,144.38164282868277,0.10698340222738369,True,0.10698340222738369,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,5,Bot/Spam,27.996427,447.96280876464976,-0.08652270894668249,True,-0.08652270894668249,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,6,Tech/Programming,10.993894,114.30878352600342,0.0505912265535664,True,0.0505912265535664,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,7,News/Updates,27.559846,200.25257026114704,0.14569702987493602,True,0.14569702987493602,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,8,NFT/Crypto,11.325276,108.4840803529216,0.0006234476301640032,True,0.0006234476301640032,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,9,Web3/DeFi,8.234885,85.91023020900188,0.06471589437309844,False,,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,10,General AI,932.4612890000001,1969.1951999598273,-0.006577362858575189,True,-0.006577362858575189,membership_weight >= 10 and Kish effective_n >= 30
+6,Mixed AI Art/ChatGPT,4098,11,Trading/Invest,20.296702,217.7396515045926,-0.04279487394903048,True,-0.04279487394903048,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,0,Marketing/Social,38.225738,257.1489100322538,0.46869292442891464,True,0.46869292442891464,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,1,AI Art Discourse,1331.007361,2278.280332841907,0.3415942814934719,True,0.3415942814934719,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,2,AI Tools/Code,475.991373,1406.3710607929315,0.47295064392289804,True,0.47295064392289804,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,3,Bard/LLMs,572.063682,1406.7752638435015,0.6058044292373128,True,0.6058044292373128,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,4,Visual AI Art,72.82695199999999,367.4544583738198,0.5322573663820377,True,0.5322573663820377,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,5,Bot/Spam,15.228950000000001,190.2312469674972,0.37614972875086916,True,0.37614972875086916,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,6,Tech/Programming,6.747807,111.13326368066733,0.4122822343407358,False,,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,7,News/Updates,45.50755100000001,354.92262614629885,0.5767108877971874,True,0.5767108877971874,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,8,NFT/Crypto,208.459432,923.6663133843239,0.5530335016883805,True,0.5530335016883805,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,9,Web3/DeFi,344.558637,780.2406440363993,0.6836284769008306,True,0.6836284769008306,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,10,General AI,450.35623,1140.4678018810125,0.4495001763239331,True,0.4495001763239331,membership_weight >= 10 and Kish effective_n >= 30
+5,"NFTs, AI Tokens & AI",3607,11,Trading/Invest,46.026438999999996,334.2137999276631,0.4559812391930336,True,0.4559812391930336,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,0,Marketing/Social,24.507896,233.54610150001096,0.37252432430021787,True,0.37252432430021787,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,1,AI Art Discourse,806.739912,1764.9242538967546,0.0966465507272146,True,0.0966465507272146,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,2,AI Tools/Code,738.21169,2012.9826548904578,0.3148993783066733,True,0.3148993783066733,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,3,Bard/LLMs,78.922361,476.95050556262055,0.4462767416718665,True,0.4462767416718665,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,4,Visual AI Art,10.806056,78.98783507785711,0.42712099098139084,True,0.42712099098139084,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,5,Bot/Spam,13.777852,251.13899081804442,0.3020581306508892,True,0.3020581306508892,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,6,Tech/Programming,22.683272000000002,250.57168721992505,0.39006102024184475,True,0.39006102024184475,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,7,News/Updates,53.120265,315.081184716158,0.47844671677109385,True,0.47844671677109385,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,8,NFT/Crypto,4.043843,94.84232896198354,0.2746902669348065,False,,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,9,Web3/DeFi,19.082023999999997,66.79267281935613,0.5011441379121172,True,0.5011441379121172,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,10,General AI,1502.873219,2525.538890439322,0.3275938120855306,True,0.3275938120855306,membership_weight >= 10 and Kish effective_n >= 30
+18,ChatGPT in Education,3281,11,Trading/Invest,6.231626,108.48789894741897,0.1813720957223245,False,,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,0,Marketing/Social,42.783401,331.4671314106812,0.28060623035365495,True,0.28060623035365495,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,1,AI Art Discourse,1086.699231,1812.683810326527,-0.04970258063799908,True,-0.04970258063799908,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,2,AI Tools/Code,492.72854299999995,1170.4334362164675,0.16950532632797544,True,0.16950532632797544,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,3,Bard/LLMs,76.838598,303.893826260828,0.35828156416531814,True,0.35828156416531814,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,4,Visual AI Art,17.707573000000004,91.54387597409287,0.11369640442298487,True,0.11369640442298487,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,5,Bot/Spam,43.370287000000005,200.37218262770568,0.45981162793204,True,0.45981162793204,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,6,Tech/Programming,19.175306,146.1394566311001,0.2909193534896854,True,0.2909193534896854,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,7,News/Updates,21.098869999999998,126.30839878513764,0.30935925014050525,True,0.30935925014050525,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,8,NFT/Crypto,14.549097,117.63229293376143,0.15524328160814335,True,0.15524328160814335,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,9,Web3/DeFi,8.568484999999999,58.2814066194672,0.30667576102741917,False,,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,10,General AI,986.198373,1714.7697978296558,0.193743391627942,True,0.193743391627942,membership_weight >= 10 and Kish effective_n >= 30
+14,India-Linked ChatGPT/AI News,2834,11,Trading/Invest,24.282004999999998,219.9134139425309,0.19172088958117495,True,0.19172088958117495,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,0,Marketing/Social,47.988203,237.4583015529797,0.1801472017939968,True,0.1801472017939968,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,1,AI Art Discourse,1434.294095,2002.920187785729,-0.09560656349010176,True,-0.09560656349010176,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,2,AI Tools/Code,425.104461,1006.6310266703803,0.15375937401031692,True,0.15375937401031692,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,3,Bard/LLMs,90.195915,382.052571838043,0.10144357415638547,True,0.10144357415638547,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,4,Visual AI Art,17.864513000000002,94.60350794862325,0.26712443386820744,True,0.26712443386820744,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,5,Bot/Spam,13.462099,106.05997045740678,0.07322969142620421,True,0.07322969142620421,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,6,Tech/Programming,16.535138,126.63230723034651,0.1338603138905902,True,0.1338603138905902,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,7,News/Updates,14.658740000000002,201.4721194044915,0.21687784948485306,True,0.21687784948485306,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,8,NFT/Crypto,18.755358,143.8068183298482,0.2521497320787237,True,0.2521497320787237,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,9,Web3/DeFi,19.670517,123.05501155414808,0.27366736913745215,True,0.27366736913745215,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,10,General AI,584.145221,1156.7741767408284,0.15061608241031893,True,0.15061608241031893,membership_weight >= 10 and Kish effective_n >= 30
+13,ChatGPT + Regional-Language Markers,2699,11,Trading/Invest,16.325433,152.52983918958432,0.1876693713763366,True,0.1876693713763366,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,0,Marketing/Social,22.715372000000002,188.6582763055151,-0.14292229656760821,True,-0.14292229656760821,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,1,AI Art Discourse,1562.1021770000002,1848.0271297983381,-0.25294945447280587,True,-0.25294945447280587,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,2,AI Tools/Code,126.103977,393.4270328492328,0.010046032904059017,True,0.010046032904059017,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,3,Bard/LLMs,117.36028900000001,380.2774974629211,-0.02410648813642157,True,-0.02410648813642157,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,4,Visual AI Art,13.597305,69.01853122499236,-0.054593623781975416,True,-0.054593623781975416,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,5,Bot/Spam,7.7554300000000005,101.07875627123417,-0.1441396571667712,False,,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,6,Tech/Programming,4.0218169999999995,40.02336126836491,-0.027539756818042837,False,,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,7,News/Updates,6.706372999999999,115.81559682867183,-0.08095421518353593,False,,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,8,NFT/Crypto,6.986834,79.12358929902018,-0.0978586491955062,False,,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,9,Web3/DeFi,4.58627,63.59898682542279,-0.07138889809576587,False,,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,10,General AI,126.62431899999999,415.0364247335049,-0.0816618792175989,True,-0.0816618792175989,membership_weight >= 10 and Kish effective_n >= 30
+15,AI-Art Criticism & Pop Culture,2005,11,Trading/Invest,6.439741,84.11432215295186,-0.018498960067819543,False,,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,0,Marketing/Social,8.398685,65.65367731955143,0.25583478969937395,False,,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,1,AI Art Discourse,824.051888,1036.4488599862727,0.07718692875892985,True,0.07718692875892985,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,2,AI Tools/Code,59.820406000000006,223.09165667072855,0.2883426440135354,True,0.2883426440135354,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,3,Bard/LLMs,75.15555499999999,251.84896429618732,0.4595684906886371,True,0.4595684906886371,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,4,Visual AI Art,199.421332,384.83619385557444,0.4158880627807634,True,0.4158880627807634,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,5,Bot/Spam,20.426702999999996,47.33509234209352,0.17032296549062861,True,0.17032296549062861,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,6,Tech/Programming,1.189603,17.45165800014875,0.15365005530073164,False,,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,7,News/Updates,7.968228,113.34448714649702,0.4225088921738636,False,,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,8,NFT/Crypto,4.635,18.9867782018766,0.3080717214553145,False,,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,9,Web3/DeFi,3.217624,17.554100925294403,0.4187395137128509,False,,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,10,General AI,38.083864,164.0800536006669,0.16218513698726195,True,0.16218513698726195,membership_weight >= 10 and Kish effective_n >= 30
+11,Anime AI Art/Stable Diffusion,1245,11,Trading/Invest,2.6310650000000004,56.535470615285305,0.11934182697522057,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,0,Marketing/Social,13.431498,89.30600844347873,0.09921535917636792,True,0.09921535917636792,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,1,AI Art Discourse,620.509963,910.6100540212207,-0.07777252690544763,True,-0.07777252690544763,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,2,AI Tools/Code,214.54668900000001,506.09741357874077,0.1224537495594313,True,0.1224537495594313,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,3,Bard/LLMs,31.499077000000003,137.0483670329857,0.11907987678754833,True,0.11907987678754833,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,4,Visual AI Art,8.607638999999999,35.22672049576706,0.1792344838837729,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,5,Bot/Spam,5.177199,60.416143866311515,0.07445147578476338,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,6,Tech/Programming,6.430275999999999,60.18915213987931,0.1526875311217125,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,7,News/Updates,6.979375999999999,54.44239154541275,0.2108176076442518,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,8,NFT/Crypto,8.957887,64.32397160295466,0.09158263293755572,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,9,Web3/DeFi,5.002352,36.34031227043329,0.07213357332574703,False,,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,10,General AI,236.641502,529.2086126391134,0.0855392999563872,True,0.0855392999563872,membership_weight >= 10 and Kish effective_n >= 30
+17,Mixed ChatGPT Usage,1166,11,Trading/Invest,8.216393,93.0061417730179,0.0509206741711217,False,,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,0,Marketing/Social,7.271033,69.9405966380478,0.45069931939148755,False,,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,1,AI Art Discourse,169.554385,383.7639571845948,0.15175262760037156,True,0.15175262760037156,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,2,AI Tools/Code,110.609699,355.4411253676054,0.3483607975740088,True,0.3483607975740088,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,3,Bard/LLMs,18.94803,157.9553062953499,0.47987769863291296,True,0.47987769863291296,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,4,Visual AI Art,2.4077100000000002,26.995470004221346,0.4131917902128495,False,,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,5,Bot/Spam,3.554946,82.83953439800771,0.38884845554556796,False,,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,6,Tech/Programming,14.592301999999998,82.00209505893186,0.4303831887868965,True,0.4303831887868965,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,7,News/Updates,11.193821,118.7522147305573,0.46871407370843804,True,0.46871407370843804,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,8,NFT/Crypto,1.8782640000000002,35.76209680895744,0.35133607491179475,False,,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,9,Web3/DeFi,2.657396,40.91919407400125,0.3708051986705179,False,,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,10,General AI,714.338307,910.7818948418919,0.45039694353994447,True,0.45039694353994447,membership_weight >= 10 and Kish effective_n >= 30
+24,Medical Imaging AI,1060,11,Trading/Invest,2.994212,66.65493678397111,0.37107513754130306,False,,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,0,Marketing/Social,15.907582999999999,80.54116423271199,0.4163980040011857,True,0.4163980040011857,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,1,AI Art Discourse,275.672165,435.845541439525,0.11411282851886416,True,0.11411282851886416,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,2,AI Tools/Code,101.70120399999999,246.44120633669897,0.277334011522505,True,0.277334011522505,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,3,Bard/LLMs,69.228487,139.29007069005405,0.5915103542296465,True,0.5915103542296465,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,4,Visual AI Art,23.348278,78.21248219256829,0.37279576393091085,True,0.37279576393091085,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,5,Bot/Spam,5.152298999999999,61.593782761350596,0.22350459197446146,False,,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,6,Tech/Programming,3.147733,23.938355846755147,0.35885933373077333,False,,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,7,News/Updates,13.634174,42.0314332596652,0.423292308566016,True,0.423292308566016,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,8,NFT/Crypto,2.046127,29.6460295984653,0.37785634358464637,False,,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,9,Web3/DeFi,1.401193,5.1395093426431995,0.38813502181109877,False,,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,10,General AI,96.88443800000002,243.66318843845147,0.2130115131614498,True,0.2130115131614498,membership_weight >= 10 and Kish effective_n >= 30
+28,Mixed AI/Creative Content,610,11,Trading/Invest,1.876289,30.226415498822156,0.24596281766963451,False,,membership_weight >= 10 and Kish effective_n >= 30

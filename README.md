@@ -11,6 +11,7 @@ The work centres on a single longitudinal dataset (`AI Public Trust`) and is wri
 - **Storage:** Google Drive — `My Drive/Colab Projects/AI Public Trust/`.
 - **Language:** Python 3.10, Jupyter notebooks, plus markdown definitions for AI agents and conventions.
 - **Entry point for new readers:** [notebooks/notebook_setup.md](notebooks/notebook_setup.md) — describes how every notebook is structured and which Drive paths it touches.
+- **Completed network-aligned community analysis and blog figures:** [docs/blog_analysis/README.md](docs/blog_analysis/README.md) — validated labels, compact results, final figures and reproducibility commands.
 
 ## Repository Structure
 
