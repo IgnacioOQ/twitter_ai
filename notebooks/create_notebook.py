@@ -350,9 +350,9 @@ nb1_cells = [
          "    df = df.sample(n=min(SMOKE_TEST_N, len(df)), random_state=42).reset_index(drop=True)\n"
          "    print(f'SMOKE_TEST mode → using {len(df)} tweets')\n"
          "\n"
-         "for col in ('id', 'text', 'likes', 'retweets'):\n"
+         "for col in ('id', 'text', 'processed_text', 'type', 'likes', 'retweets'):\n"
          "    if col not in df.columns:\n"
-         "        df[col] = '' if col in ('id', 'text') else 0\n"
+         "        df[col] = '' if col in ('id', 'text', 'processed_text', 'type') else 0\n"
          "\n"
          "df['text'] = df['text'].astype(str)"),
 
@@ -366,6 +366,8 @@ nb1_cells = [
          "    results.append({\n"
          "        'id': row['id'],\n"
          "        'text': row['text'],\n"
+         "        'processed_text': row.get('processed_text', ''),\n"
+         "        'type': row.get('type', ''),\n"
          "        'likes': row.get('likes', 0),\n"
          "        'retweets': row.get('retweets', 0),\n"
          "        'predicted_label': classification['label'],\n"
@@ -387,7 +389,7 @@ nb1_cells = [
        "- **`llm_bootstrap_labels.csv`** — same schema as `hitl_review_batch_*.csv`, ready to drop into `02_hitl_training_loop.ipynb`.\n"
        "- **`llm_bootstrap_labels_full.pkl`** — same data **plus** `confidence` and `rationale` columns for inspection."),
 
-    code("hitl_schema_cols = ['id', 'text', 'likes', 'retweets', 'predicted_label', 'human_label']\n"
+    code("hitl_schema_cols = ['id', 'text', 'processed_text', 'type', 'likes', 'retweets', 'predicted_label', 'human_label']\n"
          "out_df[hitl_schema_cols].to_csv(OUTPUT_CSV, index=False)\n"
          "out_df.to_pickle(OUTPUT_PKL)\n"
          "\n"
@@ -462,7 +464,7 @@ nb0_cells = [
          "df['id']   = df['id'].astype(str)\n"
          "df['text'] = df['text'].astype(str)\n"
          "\n"
-         "df = df[['id', 'text', 'likes', 'retweets']].copy()\n"
+         "df = df[['id', 'text', 'processed_text', 'type', 'likes', 'retweets']].copy()\n"
          "df['predicted_label'] = np.nan\n"
          "df['human_label']     = np.nan\n"
          "print(f'Normalised: {len(df):,} tweets')"),
@@ -603,6 +605,49 @@ nb0_cells = [
          "out_path = hitl_folder / 'hitl_review_batch_00.csv'\n"
          "seed.to_csv(out_path, index=False)\n"
          "print(f'Saved → {out_path}')"),
+]
+
+# ── Notebook 0b: Base Label Playground ───────────────────────────────────────
+
+nb0b_cells = [
+    md("# 00b - Base Label Playground\n\n"
+       "Exports a small random sample (e.g., 500 tweets) from `base_dataset.pkl` to a CSV.\n"
+       "Use this file for exploratory hand-labelling to get a feel for the data before\n"
+       "formalizing categories or criteria."),
+
+    code(setup_cell(EXTRA_PATHS)),
+
+    code("import pandas as pd\n"
+         "from pathlib import Path"),
+
+    md("## Configuration"),
+
+    code("SAMPLE_SIZE = 500\n"
+         "INPUT_PATH  = hitl_folder / 'base_dataset.pkl'\n"
+         "OUTPUT_CSV  = hitl_folder / 'base_playground_sample.csv'"),
+
+    md("## Load and Sample"),
+
+    code("assert INPUT_PATH.exists(), f'Input not found: {INPUT_PATH}. Run 00_hitl_data_preparation.ipynb first.'\n"
+         "df = pd.read_pickle(INPUT_PATH)\n"
+         "print(f'Loaded {len(df):,} tweets from {INPUT_PATH.name}')\n"
+         "\n"
+         "sample_df = df.sample(n=min(SAMPLE_SIZE, len(df)), random_state=42).copy()\n"
+         "print(f'Sampled {len(sample_df)} tweets.')"),
+
+    md("## Export to CSV\n\n"
+       "The CSV uses the standard schema so it can be easily inspected or dropped into the pipeline later if desired."),
+
+    code("if 'text' in sample_df.columns:\n"
+         "    sample_df['text'] = sample_df['text'].astype(str).str.replace('\\n', ' ', regex=False)\n"
+         "\n"
+         "hitl_schema_cols = ['id', 'text', 'processed_text', 'type', 'likes', 'retweets', 'predicted_label', 'human_label']\n"
+         "for col in hitl_schema_cols:\n"
+         "    if col not in sample_df.columns:\n"
+         "        sample_df[col] = ''\n"
+         "\n"
+         "sample_df[hitl_schema_cols].to_csv(OUTPUT_CSV, index=False)\n"
+         "print(f'Saved → {OUTPUT_CSV}')")
 ]
 
 # ── Notebook 2: Active Learning Loop ─────────────────────────────────────────
@@ -1087,6 +1132,7 @@ nb4_cells = [
 
 if __name__ == "__main__":
     write_notebook(f"{NB_DIR}/00_hitl_data_preparation.ipynb",   nb0_cells)
+    write_notebook(f"{NB_DIR}/00b_base_label_playground.ipynb",  nb0b_cells)
     write_notebook(f"{NB_DIR}/01_llm_bootstrap_labelling.ipynb", nb1_cells)
     write_notebook(f"{NB_DIR}/02_hitl_training_loop.ipynb",      nb2_cells)
     write_notebook(f"{NB_DIR}/03_final_inference.ipynb",         nb3_cells)
