@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1117.666168pt" height="494.439969pt" viewBox="0 0 1117.666168 494.439969" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-08-21T20:11:23.005569</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 494.439969
+L 1117.666168 494.439969
+L 1117.666168 0
+L 0 0
+z
+" style="fill: #121217"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 11.52 458.17
+L 1094.4 458.17
+L 1094.4 69.37
+L 11.52 69.37
+z
+" style="fill: #121217"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(54.080225 471.612031)">Nov</text>
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(52.072803 481.131219)">2022</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(306.892676 471.612031)">Dec</text>
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(304.885254 481.131219)">2022</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(568.879631 471.612031)">Jan</text>
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(566.124787 481.131219)">2023</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4"/>
+     <g id="text_4">
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(829.620648 471.612031)">Feb</text>
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(827.36432 481.131219)">2023</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5"/>
+     <g id="text_5">
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(1065.583155 471.612031)">Mar</text>
+      <text style="font-size: 9px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(1063.322608 481.131219)">2023</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2"/>
+   <g id="LineCollection_1">
+    <path d="M 45.228327 263.77
+L 1060.691673 263.77
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #b4b5bd; stroke-width: 1.5"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 255.90537 263.77
+L 255.90537 204.6724
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #8f63b8; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 306.46786 263.77
+L 306.46786 325.978
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #d9822b; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 365.457432 263.77
+L 365.457432 170.458
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #8f63b8; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 761.530272 263.77
+L 761.530272 355.83784
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #3f8f66; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 837.374008 263.77
+L 812.092763 210.8932
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #d9822b; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 879.509416 263.77
+L 879.509416 322.8676
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #d9822b; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 887.936498 263.77
+L 930.071907 167.3476
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #3579a8; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 1031.196887 263.77
+L 1031.196887 355.83784
+" clip-path="url(#pd9fc04fe96)" style="fill: none; stroke: #b24f61; stroke-width: 1.1; stroke-linecap: square"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(241.172862 169.47259)">24 Nov</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(196.537221 179.841625)">Stable Diffusion 2.0 released</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(291.735352 356.826766)">30 Nov</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(230.308126 367.340881)">ChatGPT research preview launched</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(350.724924 121.95259)">07 Dec</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(306.089283 132.321625)">Stable Diffusion 2.1 released</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(747.5701 398.298766)">23 Jan</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(683.480022 408.820321)">Microsoft extends OpenAI partnership</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(797.617458 178.11259)">01 Feb</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(758.152763 188.481625)">ChatGPT Plus announced</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(865.034112 352.506766)">06 Feb</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(794.73701 363.020881)">Google introduces Bard to trusted testers</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(915.596602 117.523606)">07 Feb</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(837.016688 127.892641)">AI-powered Bing and Edge preview launched</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(1016.721582 398.298766)">24 Feb</text>
+    <text style="font-size: 9.3px; font-family: 'Arial'; fill: #f2f2f4" transform="translate(956.247606 408.667801)">Meta introduces LLaMA for research</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8.8px; font-family: 'Arial'; fill: #b4b5bd" transform="translate(45.228327 283.136125)">Collection begins</text>
+    <text style="font-size: 8.8px; font-family: 'Arial'; fill: #b4b5bd" transform="translate(45.228327 292.5469)">30 Oct 2022</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8.8px; font-family: 'Arial'; fill: #b4b5bd" transform="translate(1000.525798 239.75335)">Collection ends</text>
+    <text style="font-size: 8.8px; font-family: 'Arial'; fill: #b4b5bd" transform="translate(963.839423 249.061)">27 Feb 2023, 12:00 UTC</text>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m909462b1d9" d="M 0 3.354102
+C 0.889518 3.354102 1.742724 3.000693 2.371708 2.371708
+C 3.000693 1.742724 3.354102 0.889518 3.354102 0
+C 3.354102 -0.889518 3.000693 -1.742724 2.371708 -2.371708
+C 1.742724 -3.000693 0.889518 -3.354102 0 -3.354102
+C -0.889518 -3.354102 -1.742724 -3.000693 -2.371708 -2.371708
+C -3.000693 -1.742724 -3.354102 -0.889518 -3.354102 0
+C -3.354102 0.889518 -3.000693 1.742724 -2.371708 2.371708
+C -1.742724 3.000693 -0.889518 3.354102 0 3.354102
+z
+" style="stroke: #f2f2f4; stroke-width: 0.5"/>
+    </defs>
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#m909462b1d9" x="45.228327" y="263.77" style="fill: #f2f2f4; stroke: #f2f2f4; stroke-width: 0.5"/>
+     <use xlink:href="#m909462b1d9" x="1060.691673" y="263.77" style="fill: #f2f2f4; stroke: #f2f2f4; stroke-width: 0.5"/>
+    </g>
+   </g>
+   <g id="PathCollection_2">
+    <defs>
+     <path id="mc427cae5fa" d="M 0 4.242641
+C 1.125161 4.242641 2.204391 3.795609 3 3
+C 3.795609 2.204391 4.242641 1.125161 4.242641 0
+C 4.242641 -1.125161 3.795609 -2.204391 3 -3
+C 2.204391 -3.795609 1.125161 -4.242641 0 -4.242641
+C -1.125161 -4.242641 -2.204391 -3.795609 -3 -3
+C -3.795609 -2.204391 -4.242641 -1.125161 -4.242641 0
+C -4.242641 1.125161 -3.795609 2.204391 -3 3
+C -2.204391 3.795609 -1.125161 4.242641 0 4.242641
+z
+" style="stroke: #121217"/>
+    </defs>
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#mc427cae5fa" x="255.90537" y="263.77" style="fill: #8f63b8; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_3">
+    <defs>
+     <path id="m82a3c9d77f" d="M 0 4.242641
+C 1.125161 4.242641 2.204391 3.795609 3 3
+C 3.795609 2.204391 4.242641 1.125161 4.242641 0
+C 4.242641 -1.125161 3.795609 -2.204391 3 -3
+C 2.204391 -3.795609 1.125161 -4.242641 0 -4.242641
+C -1.125161 -4.242641 -2.204391 -3.795609 -3 -3
+C -3.795609 -2.204391 -4.242641 -1.125161 -4.242641 0
+C -4.242641 1.125161 -3.795609 2.204391 -3 3
+C -2.204391 3.795609 -1.125161 4.242641 0 4.242641
+z
+" style="stroke: #121217"/>
+    </defs>
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#m82a3c9d77f" x="306.46786" y="263.77" style="fill: #d9822b; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_4">
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#mc427cae5fa" x="365.457432" y="263.77" style="fill: #8f63b8; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_5">
+    <defs>
+     <path id="mb632c27c16" d="M 0 4.242641
+C 1.125161 4.242641 2.204391 3.795609 3 3
+C 3.795609 2.204391 4.242641 1.125161 4.242641 0
+C 4.242641 -1.125161 3.795609 -2.204391 3 -3
+C 2.204391 -3.795609 1.125161 -4.242641 0 -4.242641
+C -1.125161 -4.242641 -2.204391 -3.795609 -3 -3
+C -3.795609 -2.204391 -4.242641 -1.125161 -4.242641 0
+C -4.242641 1.125161 -3.795609 2.204391 -3 3
+C -2.204391 3.795609 -1.125161 4.242641 0 4.242641
+z
+" style="stroke: #121217"/>
+    </defs>
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#mb632c27c16" x="761.530272" y="263.77" style="fill: #3f8f66; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_6">
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#m82a3c9d77f" x="837.374008" y="263.77" style="fill: #d9822b; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_7">
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#m82a3c9d77f" x="879.509416" y="263.77" style="fill: #d9822b; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_8">
+    <defs>
+     <path id="m310d3c5e0d" d="M 0 4.242641
+C 1.125161 4.242641 2.204391 3.795609 3 3
+C 3.795609 2.204391 4.242641 1.125161 4.242641 0
+C 4.242641 -1.125161 3.795609 -2.204391 3 -3
+C 2.204391 -3.795609 1.125161 -4.242641 0 -4.242641
+C -1.125161 -4.242641 -2.204391 -3.795609 -3 -3
+C -3.795609 -2.204391 -4.242641 -1.125161 -4.242641 0
+C -4.242641 1.125161 -3.795609 2.204391 -3 3
+C -2.204391 3.795609 -1.125161 4.242641 0 4.242641
+z
+" style="stroke: #121217"/>
+    </defs>
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#m310d3c5e0d" x="887.936498" y="263.77" style="fill: #3579a8; stroke: #121217"/>
+    </g>
+   </g>
+   <g id="PathCollection_9">
+    <defs>
+     <path id="m7fb56526a8" d="M 0 4.242641
+C 1.125161 4.242641 2.204391 3.795609 3 3
+C 3.795609 2.204391 4.242641 1.125161 4.242641 0
+C 4.242641 -1.125161 3.795609 -2.204391 3 -3
+C 2.204391 -3.795609 1.125161 -4.242641 0 -4.242641
+C -1.125161 -4.242641 -2.204391 -3.795609 -3 -3
+C -3.795609 -2.204391 -4.242641 -1.125161 -4.242641 0
+C -4.242641 1.125161 -3.795609 2.204391 -3 3
+C -2.204391 3.795609 -1.125161 4.242641 0 4.242641
+z
+" style="stroke: #121217"/>
+    </defs>
+    <g clip-path="url(#pd9fc04fe96)">
+     <use xlink:href="#m7fb56526a8" x="1031.196887" y="263.77" style="fill: #b24f61; stroke: #121217"/>
+    </g>
+   </g>
+  </g>
+  <g id="legend_1">
+   <g id="patch_3">
+    <path d="M 301.139766 21.107734
+L 316.439766 21.107734
+L 316.439766 15.157734
+L 301.139766 15.157734
+z
+" style="fill: #8f63b8"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #f2f2f4" x="323.239766" y="21.107734" transform="rotate(-0 323.239766 21.107734)">Image generation</text>
+   </g>
+   <g id="patch_4">
+    <path d="M 402.141016 21.107734
+L 417.441016 21.107734
+L 417.441016 15.157734
+L 402.141016 15.157734
+z
+" style="fill: #d9822b"/>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #f2f2f4" x="424.241016" y="21.107734" transform="rotate(-0 424.241016 21.107734)">Conversational AI</text>
+   </g>
+   <g id="patch_5">
+    <path d="M 503.611094 21.107734
+L 518.911094 21.107734
+L 518.911094 15.157734
+L 503.611094 15.157734
+z
+" style="fill: #3f8f66"/>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #f2f2f4" x="525.711094" y="21.107734" transform="rotate(-0 525.711094 21.107734)">Industry</text>
+   </g>
+   <g id="patch_6">
+    <path d="M 568.694531 21.107734
+L 583.994531 21.107734
+L 583.994531 15.157734
+L 568.694531 15.157734
+z
+" style="fill: #3579a8"/>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #f2f2f4" x="590.794531" y="21.107734" transform="rotate(-0 590.794531 21.107734)">Search and platform</text>
+   </g>
+   <g id="patch_7">
+    <path d="M 680.080391 21.107734
+L 695.380391 21.107734
+L 695.380391 15.157734
+L 680.080391 15.157734
+z
+" style="fill: #b24f61"/>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8.5px; font-family: 'Arial'; text-anchor: start; fill: #f2f2f4" x="702.180391" y="21.107734" transform="rotate(-0 702.180391 21.107734)">Foundation model</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pd9fc04fe96">
+   <rect x="11.52" y="69.37" width="1082.88" height="388.8"/>
+  </clipPath>
+ </defs>
+</svg>

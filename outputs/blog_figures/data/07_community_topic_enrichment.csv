@@ -1,0 +1,253 @@
+community_id,display_label,n_authors,topic_label,log2_enrichment,topic_id
+1,General ChatGPT Discussion,44718,Marketing/Social,-0.4005743451792022,0
+0,Anti-AI-Art Discourse,41574,Marketing/Social,-1.2361544028125069,0
+3,General ChatGPT Debate,17422,Marketing/Social,-0.4364541731097737,0
+8,AI-Art & NFT Posting,12679,Marketing/Social,-0.0733888306442774,0
+2,ChatGPT SEO/Content,10348,Marketing/Social,1.61133954622002,0
+12,"AI Tokens, Launchpads & AI",7502,Marketing/Social,0.5078155131226216,0
+4,AI/Crypto Launchpads,7497,Marketing/Social,0.5541850438540044,0
+9,AI-Blockchain Promotion,7256,Marketing/Social,-0.0231605385351303,0
+16,Data Science/ML Headlines,7132,Marketing/Social,1.4904474626624709,0
+7,AI-Art Authenticity Disputes,5490,Marketing/Social,-0.8968835467060124,0
+10,ChatGPT & AI/Tech News,4542,Marketing/Social,0.5418874411619272,0
+6,Mixed AI Art/ChatGPT,4098,Marketing/Social,-0.466706558272934,0
+5,"NFTs, AI Tokens & AI",3607,Marketing/Social,-0.1118387618494136,0
+18,ChatGPT in Education,3281,Marketing/Social,-0.6164726533096596,0
+14,India-Linked ChatGPT/AI News,2834,Marketing/Social,0.3986277198326791,0
+13,ChatGPT + Regional-Language Markers,2699,Marketing/Social,0.634671119313638,0
+15,AI-Art Criticism & Pop Culture,2005,Marketing/Social,-0.0155169984621409,0
+11,Anime AI Art/Stable Diffusion,1245,Marketing/Social,-0.7634940712170392,0
+17,Mixed ChatGPT Usage,1166,Marketing/Social,0.008468733595954,0
+24,Medical Imaging AI,1060,Marketing/Social,-0.7394157101979802,0
+28,Mixed AI/Creative Content,610,Marketing/Social,1.1872498075066689,0
+1,General ChatGPT Discussion,44718,AI Art Discourse,-0.294592188247149,1
+0,Anti-AI-Art Discourse,41574,AI Art Discourse,0.7675767119032795,1
+3,General ChatGPT Debate,17422,AI Art Discourse,0.25246578873558,1
+8,AI-Art & NFT Posting,12679,AI Art Discourse,0.0177583734424601,1
+2,ChatGPT SEO/Content,10348,AI Art Discourse,-0.7599585402040087,1
+12,"AI Tokens, Launchpads & AI",7502,AI Art Discourse,-1.618184853606456,1
+4,AI/Crypto Launchpads,7497,AI Art Discourse,-3.4472485820791454,1
+9,AI-Blockchain Promotion,7256,AI Art Discourse,-0.9154230653748232,1
+16,Data Science/ML Headlines,7132,AI Art Discourse,-1.4962034367774966,1
+7,AI-Art Authenticity Disputes,5490,AI Art Discourse,0.6702846655202017,1
+10,ChatGPT & AI/Tech News,4542,AI Art Discourse,-0.5473389531035968,1
+6,Mixed AI Art/ChatGPT,4098,AI Art Discourse,0.1849273323467513,1
+5,"NFTs, AI Tokens & AI",3607,AI Art Discourse,-0.4743757598753212,1
+18,ChatGPT in Education,3281,AI Art Discourse,-1.0600549430137864,1
+14,India-Linked ChatGPT/AI News,2834,AI Art Discourse,-0.4189819483685378,1
+13,ChatGPT + Regional-Language Markers,2699,AI Art Discourse,0.0518210084411144,1
+15,AI-Art Criticism & Pop Culture,2005,AI Art Discourse,0.6037916997742288,1
+11,Anime AI Art/Stable Diffusion,1245,AI Art Discourse,0.368566458435856,1
+17,Mixed ChatGPT Usage,1166,AI Art Discourse,0.053863604542393,1
+24,Medical Imaging AI,1060,AI Art Discourse,-1.6803391506817889,1
+28,Mixed AI/Creative Content,610,AI Art Discourse,-0.1819505255874175,1
+1,General ChatGPT Discussion,44718,AI Tools/Code,0.6488358756553093,2
+0,Anti-AI-Art Discourse,41574,AI Tools/Code,-1.9699201770813888,2
+3,General ChatGPT Debate,17422,AI Tools/Code,-0.628473980772524,2
+8,AI-Art & NFT Posting,12679,AI Tools/Code,-0.1077124754883788,2
+2,ChatGPT SEO/Content,10348,AI Tools/Code,1.3633768422717805,2
+12,"AI Tokens, Launchpads & AI",7502,AI Tools/Code,0.0872102282927652,2
+4,AI/Crypto Launchpads,7497,AI Tools/Code,-0.3259159838518277,2
+9,AI-Blockchain Promotion,7256,AI Tools/Code,-0.2319631264074632,2
+16,Data Science/ML Headlines,7132,AI Tools/Code,0.1416238523395165,2
+7,AI-Art Authenticity Disputes,5490,AI Tools/Code,-1.2912035522795688,2
+10,ChatGPT & AI/Tech News,4542,AI Tools/Code,0.1670000140642293,2
+6,Mixed AI Art/ChatGPT,4098,AI Tools/Code,-0.4030814518598505,2
+5,"NFTs, AI Tokens & AI",3607,AI Tools/Code,-0.0608827372017119,2
+18,ChatGPT in Education,3281,AI Tools/Code,0.7088802497604189,2
+14,India-Linked ChatGPT/AI News,2834,AI Tools/Code,0.3369345488598669,2
+13,ChatGPT + Regional-Language Markers,2699,AI Tools/Code,0.1943736816963632,2
+15,AI-Art Criticism & Pop Culture,2005,AI Tools/Code,-1.1300072013898128,2
+11,Anime AI Art/Stable Diffusion,1245,AI Tools/Code,-1.518454875185722,2
+17,Mixed ChatGPT Usage,1166,AI Tools/Code,0.4187051082328615,2
+24,Medical Imaging AI,1060,AI Tools/Code,-0.3996051085355864,2
+28,Mixed AI/Creative Content,610,AI Tools/Code,0.2764368709593363,2
+1,General ChatGPT Discussion,44718,Bard/LLMs,-1.3106921080261795,3
+0,Anti-AI-Art Discourse,41574,Bard/LLMs,-0.212850398850317,3
+3,General ChatGPT Debate,17422,Bard/LLMs,-0.9932049046539152,3
+8,AI-Art & NFT Posting,12679,Bard/LLMs,1.7121752725837287,3
+2,ChatGPT SEO/Content,10348,Bard/LLMs,-0.6965430812197408,3
+12,"AI Tokens, Launchpads & AI",7502,Bard/LLMs,-0.0171239789663736,3
+4,AI/Crypto Launchpads,7497,Bard/LLMs,0.5539599761773784,3
+9,AI-Blockchain Promotion,7256,Bard/LLMs,-0.1169285541661237,3
+16,Data Science/ML Headlines,7132,Bard/LLMs,-0.3180790212365129,3
+7,AI-Art Authenticity Disputes,5490,Bard/LLMs,-0.260173172528537,3
+10,ChatGPT & AI/Tech News,4542,Bard/LLMs,-0.2859182734780697,3
+6,Mixed AI Art/ChatGPT,4098,Bard/LLMs,0.3958517781188928,3
+5,"NFTs, AI Tokens & AI",3607,Bard/LLMs,2.239508009185581,3
+18,ChatGPT in Education,3281,Bard/LLMs,-0.4814978972464053,3
+14,India-Linked ChatGPT/AI News,2834,Bard/LLMs,-0.3088049814873321,3
+13,ChatGPT + Regional-Language Markers,2699,Bard/LLMs,-0.0071593009409954,3
+15,AI-Art Criticism & Pop Culture,2005,Bard/LLMs,0.80147376796951,3
+11,Anime AI Art/Stable Diffusion,1245,Bard/LLMs,0.8459375812290251,3
+17,Mixed ChatGPT Usage,1166,Bard/LLMs,-0.3140546528059484,3
+24,Medical Imaging AI,1060,Bard/LLMs,-0.9098128225733848,3
+28,Mixed AI/Creative Content,610,Bard/LLMs,1.756688251366921,3
+1,General ChatGPT Discussion,44718,Visual AI Art,-1.14867639236861,4
+0,Anti-AI-Art Discourse,41574,Visual AI Art,-0.9181036861709524,4
+3,General ChatGPT Debate,17422,Visual AI Art,-1.5607367098219085,4
+8,AI-Art & NFT Posting,12679,Visual AI Art,2.569727292788526,4
+2,ChatGPT SEO/Content,10348,Visual AI Art,-0.4451194643784109,4
+12,"AI Tokens, Launchpads & AI",7502,Visual AI Art,-0.915281591274958,4
+4,AI/Crypto Launchpads,7497,Visual AI Art,-1.3664665311089643,4
+9,AI-Blockchain Promotion,7256,Visual AI Art,-0.4753257371176809,4
+16,Data Science/ML Headlines,7132,Visual AI Art,0.0142420947682839,4
+7,AI-Art Authenticity Disputes,5490,Visual AI Art,-0.1990864819666601,4
+10,ChatGPT & AI/Tech News,4542,Visual AI Art,-0.8115192096738604,4
+6,Mixed AI Art/ChatGPT,4098,Visual AI Art,-0.8320174514315709,4
+5,"NFTs, AI Tokens & AI",3607,Visual AI Art,0.6672406166105089,4
+18,ChatGPT in Education,3281,Visual AI Art,-1.9487279563938829,4
+14,India-Linked ChatGPT/AI News,2834,Visual AI Art,-1.0249056944859571,4
+13,ChatGPT + Regional-Language Markers,2699,Visual AI Art,-0.9417608173760292,4
+15,AI-Art Criticism & Pop Culture,2005,Visual AI Art,-0.9067139266130032,4
+11,Anime AI Art/Stable Diffusion,1245,Visual AI Art,3.655169668867117,4
+17,Mixed ChatGPT Usage,1166,Visual AI Art,-0.7843107362419417,4
+24,Medical Imaging AI,1060,Visual AI Art,-2.4847631506206684,4
+28,Mixed AI/Creative Content,610,Visual AI Art,1.5900025772422426,4
+1,General ChatGPT Discussion,44718,Bot/Spam,-0.6406634531699126,5
+0,Anti-AI-Art Discourse,41574,Bot/Spam,-1.1130056844089309,5
+3,General ChatGPT Debate,17422,Bot/Spam,0.4464363938242614,5
+8,AI-Art & NFT Posting,12679,Bot/Spam,-0.6237720056560356,5
+2,ChatGPT SEO/Content,10348,Bot/Spam,0.407721668999668,5
+12,"AI Tokens, Launchpads & AI",7502,Bot/Spam,1.214675915528909,5
+4,AI/Crypto Launchpads,7497,Bot/Spam,0.7811716119502727,5
+9,AI-Blockchain Promotion,7256,Bot/Spam,0.3391086733466045,5
+16,Data Science/ML Headlines,7132,Bot/Spam,1.2416381133176275,5
+7,AI-Art Authenticity Disputes,5490,Bot/Spam,-0.6290021452043351,5
+10,ChatGPT & AI/Tech News,4542,Bot/Spam,0.6070260180755277,5
+6,Mixed AI Art/ChatGPT,4098,Bot/Spam,0.3134558205566178,5
+5,"NFTs, AI Tokens & AI",3607,Bot/Spam,-0.3808498605994178,5
+18,ChatGPT in Education,3281,Bot/Spam,-0.3886515202074264,5
+14,India-Linked ChatGPT/AI News,2834,Bot/Spam,1.477000319590335,5
+13,ChatGPT + Regional-Language Markers,2699,Bot/Spam,-0.1403885177552508,5
+15,AI-Art Criticism & Pop Culture,2005,Bot/Spam,-0.5071904701530346,5
+11,Anime AI Art/Stable Diffusion,1245,Bot/Spam,1.5774437080723416,5
+17,Mixed ChatGPT Usage,1166,Bot/Spam,-0.3081910225017942,5
+24,Medical Imaging AI,1060,Bot/Spam,-0.7130316266777984,5
+28,Mixed AI/Creative Content,610,Bot/Spam,0.6195401638595313,5
+1,General ChatGPT Discussion,44718,Tech/Programming,-0.1071224730915971,6
+0,Anti-AI-Art Discourse,41574,Tech/Programming,-2.906087357419921,6
+3,General ChatGPT Debate,17422,Tech/Programming,-1.2892595481802185,6
+8,AI-Art & NFT Posting,12679,Tech/Programming,-1.7180836980265737,6
+2,ChatGPT SEO/Content,10348,Tech/Programming,0.673421431904775,6
+12,"AI Tokens, Launchpads & AI",7502,Tech/Programming,-0.0017164974178604,6
+4,AI/Crypto Launchpads,7497,Tech/Programming,-2.276743802172439,6
+9,AI-Blockchain Promotion,7256,Tech/Programming,-0.9320695788114576,6
+16,Data Science/ML Headlines,7132,Tech/Programming,3.4741293421793524,6
+7,AI-Art Authenticity Disputes,5490,Tech/Programming,-2.282140698371055,6
+10,ChatGPT & AI/Tech News,4542,Tech/Programming,0.2331984783846014,6
+6,Mixed AI Art/ChatGPT,4098,Tech/Programming,-1.3296129293433447,6
+5,"NFTs, AI Tokens & AI",3607,Tech/Programming,-1.849704227089135,6
+18,ChatGPT in Education,3281,Tech/Programming,0.0360977467575808,6
+14,India-Linked ChatGPT/AI News,2834,Tech/Programming,0.0050144227243843,6
+13,ChatGPT + Regional-Language Markers,2699,Tech/Programming,-0.1382853101841983,6
+15,AI-Art Criticism & Pop Culture,2005,Tech/Programming,-1.7490783131775305,6
+11,Anime AI Art/Stable Diffusion,1245,Tech/Programming,-2.818989065907247,6
+17,Mixed ChatGPT Usage,1166,Tech/Programming,-0.290010640749971,6
+24,Medical Imaging AI,1060,Tech/Programming,1.029747808432542,6
+28,Mixed AI/Creative Content,610,Tech/Programming,-0.3858914897843856,6
+1,General ChatGPT Discussion,44718,News/Updates,-0.2658145008035464,7
+0,Anti-AI-Art Discourse,41574,News/Updates,-1.4731272303776215,7
+3,General ChatGPT Debate,17422,News/Updates,-0.53113107396511,7
+8,AI-Art & NFT Posting,12679,News/Updates,0.42061332962915,7
+2,ChatGPT SEO/Content,10348,News/Updates,0.5442145252019679,7
+12,"AI Tokens, Launchpads & AI",7502,News/Updates,1.1910460860428274,7
+4,AI/Crypto Launchpads,7497,News/Updates,0.2578326506562459,7
+9,AI-Blockchain Promotion,7256,News/Updates,0.480838300533108,7
+16,Data Science/ML Headlines,7132,News/Updates,1.338113683456334,7
+7,AI-Art Authenticity Disputes,5490,News/Updates,-1.2415833284532112,7
+10,ChatGPT & AI/Tech News,4542,News/Updates,0.4666273303291372,7
+6,Mixed AI Art/ChatGPT,4098,News/Updates,-0.0647399096600392,7
+5,"NFTs, AI Tokens & AI",3607,News/Updates,0.842918774455676,7
+18,ChatGPT in Education,3281,News/Updates,1.2027389981631893,7
+14,India-Linked ChatGPT/AI News,2834,News/Updates,0.0819382239655168,7
+13,ChatGPT + Regional-Language Markers,2699,News/Updates,-0.373051627470754,7
+15,AI-Art Criticism & Pop Culture,2005,News/Updates,-1.0723853571545092,7
+11,Anime AI Art/Stable Diffusion,1245,News/Updates,-0.1362026602559992,7
+17,Mixed ChatGPT Usage,1166,News/Updates,-0.232785579039679,7
+24,Medical Imaging AI,1060,News/Updates,0.5862505663291896,7
+28,Mixed AI/Creative Content,610,News/Updates,1.6679584004032255,7
+1,General ChatGPT Discussion,44718,NFT/Crypto,-2.2892867204948995,8
+0,Anti-AI-Art Discourse,41574,NFT/Crypto,-3.533252007445093,8
+3,General ChatGPT Debate,17422,NFT/Crypto,-1.7899567145920918,8
+8,AI-Art & NFT Posting,12679,NFT/Crypto,-0.3365732631817024,8
+2,ChatGPT SEO/Content,10348,NFT/Crypto,-1.1498763024205465,8
+12,"AI Tokens, Launchpads & AI",7502,NFT/Crypto,3.172930117193487,8
+4,AI/Crypto Launchpads,7497,NFT/Crypto,2.1446633474346983,8
+9,AI-Blockchain Promotion,7256,NFT/Crypto,2.4328779024420903,8
+16,Data Science/ML Headlines,7132,NFT/Crypto,-1.2073727029279584,8
+7,AI-Art Authenticity Disputes,5490,NFT/Crypto,-3.2643885735767726,8
+10,ChatGPT & AI/Tech News,4542,NFT/Crypto,-1.805477484792929,8
+6,Mixed AI Art/ChatGPT,4098,NFT/Crypto,-3.168516896782521,8
+5,"NFTs, AI Tokens & AI",3607,NFT/Crypto,1.2177521998764065,8
+18,ChatGPT in Education,3281,NFT/Crypto,-4.333479824260611,8
+14,India-Linked ChatGPT/AI News,2834,NFT/Crypto,-2.2750532662289307,8
+13,ChatGPT + Regional-Language Markers,2699,NFT/Crypto,-1.838265297551143,8
+15,AI-Art Criticism & Pop Culture,2005,NFT/Crypto,-2.83403458983953,8
+11,Anime AI Art/Stable Diffusion,1245,NFT/Crypto,-2.738647620326557,8
+17,Mixed ChatGPT Usage,1166,NFT/Crypto,-1.693480538108897,8
+24,Medical Imaging AI,1060,NFT/Crypto,-3.809735625963657,8
+28,Mixed AI/Creative Content,610,NFT/Crypto,-2.889056670916438,8
+1,General ChatGPT Discussion,44718,Web3/DeFi,-3.89995058792321,9
+0,Anti-AI-Art Discourse,41574,Web3/DeFi,-4.87974611299637,9
+3,General ChatGPT Debate,17422,Web3/DeFi,-3.74024594136344,9
+8,AI-Art & NFT Posting,12679,Web3/DeFi,-1.8835577901080167,9
+2,ChatGPT SEO/Content,10348,Web3/DeFi,-1.918882903285392,9
+12,"AI Tokens, Launchpads & AI",7502,Web3/DeFi,2.052020742966285,9
+4,AI/Crypto Launchpads,7497,Web3/DeFi,3.817741529299448,9
+9,AI-Blockchain Promotion,7256,Web3/DeFi,1.8836919988861052,9
+16,Data Science/ML Headlines,7132,Web3/DeFi,-2.2939909086803323,9
+7,AI-Art Authenticity Disputes,5490,Web3/DeFi,-4.671806745184916,9
+10,ChatGPT & AI/Tech News,4542,Web3/DeFi,-3.174713960175376,9
+6,Mixed AI Art/ChatGPT,4098,Web3/DeFi,-4.2237322673823,9
+5,"NFTs, AI Tokens & AI",3607,Web3/DeFi,1.3472455024422545,9
+18,ChatGPT in Education,3281,Web3/DeFi,-2.690554081055017,9
+14,India-Linked ChatGPT/AI News,2834,Web3/DeFi,-3.6343604012373945,9
+13,ChatGPT + Regional-Language Markers,2699,Web3/DeFi,-2.3650227913822435,9
+15,AI-Art Criticism & Pop Culture,2005,Web3/DeFi,-4.036841731745979,9
+11,Anime AI Art/Stable Diffusion,1245,Web3/DeFi,-3.860710780469241,9
+17,Mixed ChatGPT Usage,1166,Web3/DeFi,-3.129521995389596,9
+24,Medical Imaging AI,1060,Web3/DeFi,-3.9046118192407295,9
+28,Mixed AI/Creative Content,610,Web3/DeFi,-4.030786247769884,9
+1,General ChatGPT Discussion,44718,General AI,0.6112324592774797,10
+0,Anti-AI-Art Discourse,41574,General AI,-2.343078472408355,10
+3,General ChatGPT Debate,17422,General AI,0.2044506638563729,10
+8,AI-Art & NFT Posting,12679,General AI,-0.9211295400243968,10
+2,ChatGPT SEO/Content,10348,General AI,0.117754915225075,10
+12,"AI Tokens, Launchpads & AI",7502,General AI,-0.0014570746906506,10
+4,AI/Crypto Launchpads,7497,General AI,-0.9544058503557252,10
+9,AI-Blockchain Promotion,7256,General AI,0.1462963974790371,10
+16,Data Science/ML Headlines,7132,General AI,1.1915976587224173,10
+7,AI-Art Authenticity Disputes,5490,General AI,-1.5793820335279978,10
+10,ChatGPT & AI/Tech News,4542,General AI,0.9541240373556302,10
+6,Mixed AI Art/ChatGPT,4098,General AI,0.1656194931291998,10
+5,"NFTs, AI Tokens & AI",3607,General AI,-0.7002371598841326,10
+18,ChatGPT in Education,3281,General AI,1.1750114551442488,10
+14,India-Linked ChatGPT/AI News,2834,General AI,0.7785337586209196,10
+13,ChatGPT + Regional-Language Markers,2699,General AI,0.0933977411970366,10
+15,AI-Art Criticism & Pop Culture,2005,General AI,-1.683552082460919,10
+11,Anime AI Art/Stable Diffusion,1245,General AI,-2.729398330696976,10
+17,Mixed ChatGPT Usage,1166,General AI,0.0006309701976647,10
+24,Medical Imaging AI,1060,General AI,1.7320388685156207,10
+28,Mixed AI/Creative Content,610,General AI,-0.3530486462311208,10
+1,General ChatGPT Discussion,44718,Trading/Invest,-0.5294227056318217,11
+0,Anti-AI-Art Discourse,41574,Trading/Invest,-1.7850233167763914,11
+3,General ChatGPT Debate,17422,Trading/Invest,0.6662067272244974,11
+8,AI-Art & NFT Posting,12679,Trading/Invest,-0.6215197924529522,11
+2,ChatGPT SEO/Content,10348,Trading/Invest,0.2009911427194228,11
+12,"AI Tokens, Launchpads & AI",7502,Trading/Invest,0.7622323507313978,11
+4,AI/Crypto Launchpads,7497,Trading/Invest,0.2635350707443405,11
+9,AI-Blockchain Promotion,7256,Trading/Invest,2.5067414999351105,11
+16,Data Science/ML Headlines,7132,Trading/Invest,-0.0838675646137035,11
+7,AI-Art Authenticity Disputes,5490,Trading/Invest,-1.4143946484517809,11
+10,ChatGPT & AI/Tech News,4542,Trading/Invest,0.7984809004069818,11
+6,Mixed AI Art/ChatGPT,4098,Trading/Invest,-0.5793398951280666,11
+5,"NFTs, AI Tokens & AI",3607,Trading/Invest,0.7859981699891913,11
+18,ChatGPT in Education,3281,Trading/Invest,-1.9621202726697364,11
+14,India-Linked ChatGPT/AI News,2834,Trading/Invest,0.2113825591507822,11
+13,ChatGPT + Regional-Language Markers,2699,Trading/Invest,-0.2909689543825349,11
+15,AI-Art Criticism & Pop Culture,2005,Trading/Invest,-1.2041929003306948,11
+11,Anime AI Art/Stable Diffusion,1245,Trading/Invest,-1.80809218121362,11
+17,Mixed ChatGPT Usage,1166,Trading/Invest,-0.0706559287784387,11
+24,Medical Imaging AI,1060,Trading/Invest,-1.389481221642234,11
+28,Mixed AI/Creative Content,610,Trading/Invest,-1.2665924175816867,11
