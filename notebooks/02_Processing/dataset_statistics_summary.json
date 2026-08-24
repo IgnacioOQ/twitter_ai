@@ -1,0 +1,132 @@
+{
+  "timeframe": {
+    "start_date": "2022-10-31",
+    "end_date": "2023-02-27",
+    "timespan_days": 120,
+    "earliest_filter_cutoff": "2022-10-31"
+  },
+  "volume_and_funnel": {
+    "raw_records_scanned": 36560405,
+    "unique_raw_tweet_ids": 25637570,
+    "duplicates_skipped": 8494403,
+    "dropped_no_ai_keyword": 10429950,
+    "dropped_non_english": 76363,
+    "dropped_before_cutoff": 149654,
+    "final_ai_tweets_pruned": 17410035,
+    "final_ai_art_tweets_pruned": 3583101
+  },
+  "authors": {
+    "unique_authors_pruned_ai": 4775711,
+    "unique_authors_pruned_art": 1440802,
+    "unique_authors_in_network": 3379040
+  },
+  "tweet_typology": {
+    "original": 4061626,
+    "retweeted": 9638407,
+    "replied_to": 3221048,
+    "quoted": 488954,
+    "total_count": 17410035,
+    "exceptions": 0
+  },
+  "network_topology": {
+    "num_nodes": 3379040,
+    "num_edges": 7768720,
+    "total_weight": 9638407,
+    "num_wcc": 49464,
+    "lwcc_nodes": 3264499,
+    "lwcc_share_pct": 96.61,
+    "top_retweeted_authors": [
+      {
+        "author_id": "1156482001",
+        "retweets_received": 92733
+      },
+      {
+        "author_id": "44196397",
+        "retweets_received": 81395
+      },
+      {
+        "author_id": "1556992059575128065",
+        "retweets_received": 77583
+      },
+      {
+        "author_id": "856155592578158592",
+        "retweets_received": 69858
+      },
+      {
+        "author_id": "23359932",
+        "retweets_received": 57161
+      },
+      {
+        "author_id": "1345102860732788740",
+        "retweets_received": 48608
+      },
+      {
+        "author_id": "1059462898953515009",
+        "retweets_received": 48593
+      },
+      {
+        "author_id": "1552871185431527424",
+        "retweets_received": 44214
+      },
+      {
+        "author_id": "247180104",
+        "retweets_received": 42353
+      },
+      {
+        "author_id": "1618937075218219009",
+        "retweets_received": 40835
+      }
+    ],
+    "top_active_retweeters": [
+      {
+        "author_id": "1356588046616043527",
+        "retweets_made": 45503
+      },
+      {
+        "author_id": "935446829730291717",
+        "retweets_made": 18696
+      },
+      {
+        "author_id": "1264433760",
+        "retweets_made": 9396
+      },
+      {
+        "author_id": "1565280726156804099",
+        "retweets_made": 8366
+      },
+      {
+        "author_id": "1576344842585645058",
+        "retweets_made": 8117
+      },
+      {
+        "author_id": "709564705304498176",
+        "retweets_made": 7912
+      },
+      {
+        "author_id": "190097582",
+        "retweets_made": 7520
+      },
+      {
+        "author_id": "737142202481016832",
+        "retweets_made": 7098
+      },
+      {
+        "author_id": "770285228929712128",
+        "retweets_made": 6704
+      },
+      {
+        "author_id": "992943418052460544",
+        "retweets_made": 6640
+      }
+    ]
+  },
+  "text_cleaning_and_hygiene": {
+    "tweets_with_urls": 6941574,
+    "tweets_with_mentions": 13503243,
+    "tweets_with_hashtags": 4738899,
+    "total_raw_chars": 2489897755,
+    "total_processed_chars": 1986610596,
+    "avg_raw_chars": 143.0,
+    "avg_processed_chars": 114.1
+  }
+}
