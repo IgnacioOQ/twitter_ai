@@ -9,30 +9,24 @@ This document is the **source of truth for what the labels mean**. The prompt th
 
 > **The sync obligation is now mechanical.** Notebook `01` does **not** clone this repo on Colab — it only mounts Drive — so no markdown in this folder is readable at runtime and the prompt has to be embedded in the notebook. That embedding is done by `sync_prompt.py`, not by hand, and `sync_prompt.py --check` fails while the notebook and the prompt file disagree.
 
-The taxonomy deliberately starts at **one substantive category**. The point is a labelling run whose errors are legible: you read the model's `rationale` column, disagree with a specific decision, tighten one definition, and re-run. Growing the label space before that loop works makes every error harder to attribute. See [Adding a category](#adding-a-category) for the extension procedure.
-
 ---
 
 ## Label set
 
+The pipeline uses a **multi-label classification** approach. A single tweet can invoke more than one of these conceptual frameworks simultaneously. The categories correspond to answers to the questions "What is art?" and "What makes art valuable?".
+
 | Label | Meaning |
 | :--- | :--- |
-| `originality` | The tweet appeals to originality — newness, creativity, copying, theft — **as a criterion for the value of art**. |
+| `intentionalism` | Meaning/value is determined by the artist's intent. |
+| `anti_intentionalism` | Meaning/value is independent of the artist's intent; set by language/imagery. |
+| `cognitivism` | Art is valuable because it gives knowledge, understanding, or makes us think. |
+| `expressivism` | Art is valuable because it expresses or evokes emotion. |
+| `hedonism` | Art is valuable because of the pleasure or enjoyment it provides. |
+| `originality` | Art is valuable because it is non-trivially new, creative, and not copied/stolen. |
+| `achievement` | Art is valuable because it requires human effort, skill, and mastery. |
 | `none` | No category in the current taxonomy applies. |
 
-`none` is a **residual bucket, not the negation of `originality`.** The distinction matters the moment a second category exists: a row labelled `none` means "no category applied *as of the run that produced it*", so `none` rows from an earlier run are stale evidence about a category that did not exist yet. Naming the complement `none` rather than `not_originality` is what makes that reading available — the label does not have to be renamed or remapped when the taxonomy grows.
-
----
-
-## The discriminating condition
-
-The category is **not** "mentions copying" and **not** "is about AI art". It is an *evaluative move* with two halves:
-
-> *this work is (not) new / (not) copied* **→ therefore** *it is (not) good, real, or valuable art.*
-
-Vocabulary alone fails the test (a tweet can say "stolen" about wages). An art evaluation alone fails it (a tweet can call AI art soulless without any claim about newness). Both halves must be present.
-
-This framing sits inside a wider debate the project already maps: `docs/Theories on the Value of Art.md` lists ten competing accounts of what makes art valuable — hedonism, expressivism, cognitivism, formal value, moral, social, political, process, achievement, pluralism. Originality is not one of the ten in its own right; it lives closest to Gaut's cluster property *"being an exercise of creative imagination"*. That is precisely why the exclusions below are worth stating explicitly: **most tweets that evaluate art are appealing to one of the other nine accounts**, and those are the errors this category is most likely to absorb if the boundary is left implicit.
+`none` is a **residual bucket.** It means "no category applied *as of the run that produced it*". 
 
 ---
 
@@ -44,8 +38,7 @@ the form the model actually receives.
 
 That file is embedded into notebook `01` verbatim by `sync_prompt.py`, and written back out
 next to `llm_bootstrap_labels.csv` unchanged, so the version a reviewer reads in Drive, the
-version in the notebook, and the version in git are the same bytes. Previously this section
-held one copy and the notebook held another, kept in step by hand.
+version in the notebook, and the version in git are the same bytes.
 
 To change what the model is told:
 
@@ -57,21 +50,15 @@ python3 notebooks/05_Classifiers/sync_prompt.py             # embed it in the no
 `sync_prompt.py --check` exits non-zero while the two disagree, which is the form to wire into
 a pre-commit hook.
 
-This document keeps what the prompt has no room for: why the taxonomy is shaped this way, what
-`none` is for, the expected class balance, and what must be settled before adding a category.
-
-One thing to fix there when the first results land: inside that fence, **examples 1-3 are real corpus tweets** carried over from the original draft, but **examples 4-5 are author-written placeholders**. Replace them with real `none` tweets from the smoke run — the negative cases that actually occur in this corpus, rather than the ones we imagined.
-
 ---
 
 ## Confidence and rationale are the interpretability surface
 
-`01` writes the labels in two shapes. `llm_bootstrap_labels.csv` carries only the HITL schema; `llm_bootstrap_labels_full.pkl` additionally carries `confidence` and `rationale`. **The `.pkl` is the one to read when tuning this file.** The intended loop:
+`01` writes the labels in two shapes. `llm_bootstrap_labels.csv` carries only the HITL schema (one-hot columns for multi-label); `llm_bootstrap_labels_full.pkl` additionally carries `confidence` and `rationale` for each predicted label. **The `.pkl` is the one to read when tuning this file.** The intended loop:
 
 1. Run with `SMOKE_TEST = True` (capped — see below).
 2. Open the `.pkl`, sort by `confidence` ascending, and read the bottom rows. Low-confidence rows are where the definition is underspecified.
-3. Read a sample of *high*-confidence `originality` rows too — a confident wrong answer means a boundary is missing from the Exclusions, which is the more expensive failure.
-4. Edit the fence in `llm_bootstrap_prompt.md`, run `sync_prompt.py`, re-run the notebook. Repeat.
+3. Edit the fence in `llm_bootstrap_prompt.md`, run `sync_prompt.py`, re-run the notebook. Repeat.
 
 The `rationale` column instructs the model to quote the deciding phrase, so a disagreement can usually be traced to a specific clause rather than argued in the abstract.
 
@@ -95,30 +82,10 @@ A second, independent ceiling caps **token** spend: `MAX_SESSION_TOKENS = 6_000_
 
 ---
 
-## Expected class balance
-
-With `DATASET_TYPE = 'AI'`, `originality` is expected to be a **small minority** of the corpus — the partition is drawn from AI-trust discourse at large, not from art discourse. Two consequences:
-
-- Measure prevalence on the first capped run before spending the full partition. If `originality` lands in single-digit percentages, a 10 000-tweet bootstrap yields only a few hundred positives, which is thin for seeding a classifier.
-- If prevalence is too low to be useful, the options are: run the bootstrap against `DATASET_TYPE = 'Art'` where the base rate should be far higher, or pre-filter the partition on the cue vocabulary before labelling and accept that the seed set is enriched rather than representative (which changes what the downstream accuracy numbers mean, and must be recorded if done).
-
----
-
 ## Adding a category
 
 The taxonomy is designed to grow. When adding category *N+1*:
 
-1. Add a `### <label>` block inside the fence in `llm_bootstrap_prompt.md` with the same four parts — Definition, Decision test, Examples (positive **and** negative), Exclusions — and add the label to the category line near the top of that fence.
+1. Add a `### <label>` block inside the fence in `llm_bootstrap_prompt.md` with the same parts — Definition, Example.
 2. Add the label to the [Label set](#label-set) table.
-3. Add the label string to `CATEGORIES` in the Label Set cell of notebook `01`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`. The response schema derives its `enum` from `CATEGORIES`, so no other cell needs editing — and the Prompt Builder cell asserts `CATEGORIES` against the fence's category line, so doing step 3 without step 1 fails on the next run rather than silently sending a prompt that never mentions the new label.
-4. Revisit the exclusions of **every existing category** — a new category almost always carves territory out of an old one's `none` bucket, and the old category's exclusion list is where that boundary has to be written down.
-5. Decide what happens to existing `none` rows. They were labelled against the old taxonomy, so any tweet belonging to the new category is currently sitting in `none`. Either re-run the affected rows or treat the new category as valid only from that run forward — and record which, because it changes what the label set means.
-6. Re-check the single-label assumption (below).
-
-`docs/Theories on the Value of Art.md` is the natural source for the next categories: each of the ten accounts of artistic value is a candidate, and several already appear in this file's exclusion list — *achievement / skill*, *expression / emotion*, *meaning / understanding*, *moral value* — which is where the boundary work has already been half-done.
-
-### The single-label assumption
-
-Notebook `01` is **single-label by construction**: the prompt asks for exactly one category and the response schema admits exactly one `label` string. That is sound for a two-label taxonomy where one label is a residual bucket.
-
-It stops being sound once two substantive categories exist, and the original draft of this file already anticipated it — example 3 was annotated *"originality more implicit, automation higher"*, which is a per-category score across two categories on a single tweet, not a single choice between them. **Resolve this before adding category 2**, not after: the decision changes the prompt, the response schema, the CSV schema (`predicted_label` becomes one column per category, or a list), the HITL review interface, and every metric in `02_hitl_training_loop.ipynb`. The cheap interim option is to keep single-label and add a *precedence rule* ("if two categories apply, label the one the tweet's main point rests on"); the honest option is multi-label with a score per category.
+3. Add the label string to `CATEGORIES` in the Label Set cell of notebook `01`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`. The response schema derives its `enum` from `CATEGORIES`, so no other cell needs editing — and the Prompt Builder cell asserts `CATEGORIES` against the fence's category line.
