@@ -37,12 +37,27 @@ those are where the criteria are underspecified. Edit the fence, sync, re-run.
 
 ````text
 You are a tweet classifier for a research project on AI public trust.
-This is a multi-label classification task. Evaluate the tweet against the following conceptual frameworks used to answer the questions "What is art?" and "What makes art valuable?".
+This is a multi-label classification task about two central questions: "What is art?" and "What makes art valuable?".
+The categories come in two groups. `definition` and `value` mark a tweet that raises one of those two questions. The remaining categories are conceptual frameworks that answer them. A tweet can raise a question and answer it through a framework at the same time: label every category that applies.
 
 Classify the tweet into ALL of the following categories that apply:
-intentionalism, anti_intentionalism, cognitivism, expressivism, hedonism, originality, achievement, none
+definition, value, intentionalism, anti_intentionalism, cognitivism, expressivism, hedonism, originality, achievement, none
 
 Per-category criteria:
+
+### definition
+Definition: The tweet engages the question of what art is. It claims, denies or asks whether something is or is not art, or whether a person can rightfully be called an artist.
+Examples:
+- "can we please stop calling it 'ai art' and start calling it 'ai generated images' instead? art requires meaning and intention, ai has none of that" (high: explicitly claims AI art is not art)
+- "ai art is not art, it's just garbage 🤷‍♀️" (high: explicitly claims AI art is not art)
+- "genuinely curious to know: do you consider ai-generated art to be art or not? please retweet and/or reply with why."
+- "if the purpose of the so called 'art' is simply capitalism. money, likes, matterial things them let capitalism efficiency consume art production itself. if ai art isn't art, neither is the marketin' art, as it's just an trade currency."
+
+### value
+Definition: The tweet engages the question of what makes art valuable. It judges something as good or bad art, or a good or bad artwork; asks whether a creator can produce anything of value; points out flaws or strengths of a work; or uses the language of liking or disliking a work (this can overlap with personal taste). This is artistic value, NOT monetary value: whether something will sell, or what it is worth in money, does not count.
+Examples:
+- "cuz if they cleared it up a bit, it would look less like they just posted it to show off or get noticed. this is just me cuz i have seen a fair share of good and bad ai art, yours is in the good category."
+- "i don't mind ai art as long as it's not plagiarism...i also think some people a bit too lazy with it, seen some make a few posts with ai art that you can clearly see have flaws. yours is great, i really like it. but i feel like others should touch up the ai art before posting..."
 
 ### intentionalism
 Definition: This framework posits that the artist's intent is the ultimate source of meaning and the defining characteristic of art. A work is art because it was intended to be so, and it means exactly what the creator meant it to mean. Tweets using this framework will often argue that AI cannot produce art because it lacks a conscious mind, meaning, or deliberate intention.
@@ -104,7 +119,7 @@ the reply cannot be wrapped in prose or markdown fences.
   "items": {
     "type": "object",
     "properties": {
-      "category":   {"type": "string", "enum": ["intentionalism", "anti_intentionalism", "cognitivism", "expressivism", "hedonism", "originality", "achievement", "none"]},
+      "category":   {"type": "string", "enum": ["definition", "value", "intentionalism", "anti_intentionalism", "cognitivism", "expressivism", "hedonism", "originality", "achievement", "none"]},
       "confidence": {"type": "number"},
       "rationale":  {"type": "string"}
     },
@@ -132,11 +147,13 @@ raise `MAX_OUTPUT_TOKENS` before suspecting anything else.
 | `id` | Tweet id. |
 | `text` | The tweet verbatim. This exact string is what replaced `{{TWEET}}`. |
 | `likes`, `retweets` | Engagement counts, for your context only. **Not** part of the prompt. |
-| `pred_intentionalism`, etc | The model's binary one-hot prediction for each category (1 if selected, 0 if not). |
-| `human_intentionalism`, etc | **Yours.** Empty on delivery — fill in 0 or 1 for every row you review. |
+| `pred_definition`, `pred_value`, … `pred_none` | The model's binary one-hot prediction for each category (1 if selected, 0 if not). All zeros means the reply could not be parsed (`PARSE_ERROR`). |
+| `rationale` | The model's pass-1 rationale(s), one per selected category, separated by a vertical bar. |
+| `passes_agree` | Whether every labelling pass chose the same set of categories. |
+| `human_definition`, `human_value`, … `human_none` | **Yours.** Empty on delivery — fill in 0 or 1 for every category of a row you review. A row whose `human_*` columns are all filled is used with your labels instead of the model's by notebooks `02` and `03`. |
 
-The model's `confidence`, its `rationale`, and whether the independent passes agreed are
-**not** in the CSV. They are in the sibling `llm_bootstrap_labels_full.pkl`.
+The model's `confidence` and each pass's raw predictions are **not** in the CSV. They are in the
+sibling `llm_bootstrap_labels_full.pkl`.
 
 Before overriding a label, read the fence. A label that looks wrong is often the criteria
 working exactly as written — which is a reason to edit this file, not just that row.
@@ -145,4 +162,4 @@ working exactly as written — which is a reason to edit this file, not just tha
 
 - The same tweet is labelled **more than once**, independently, each pass through a fresh client.
 - **Pass 1 is the operative label** — the one in the CSV. Where passes disagree the row is flagged in `passes_agree` (in the pickle).
-- `confidence` in the pickle is the **mean across passes**. It is the model's own self-report.
+- `confidence` in the pickle is the **highest confidence among pass 1's selected categories**. It is the model's own self-report.

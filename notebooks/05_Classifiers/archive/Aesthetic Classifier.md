@@ -89,59 +89,11 @@ e.g.
 
    
    
-   
-   
  
 
 \_\_  
 (further notes/unfinished below)
 
-   
-   
-   
-   
-   
-   
-**Aesthetic formalism**   
-qualities in works   
-   
-   
- 
-
-* Skill — 1   
-* Skills — 1   
-* Art — 1   
-* ? — 2   
-* Positive — 1   
-* Feeling — 1   
-* Theft — 2 
-
- 
-
-* Beauty? — 1 
-
-Taste — 1   
-Taste might refer to   
-   
-None? — 1   
-Value — 1   
- 
-
-* Game — 1 
-
-   
-Morality — 1   
-   
-   
- 
-
-* Monetary value — 1   
-* Social? — 1 
-
-   
-   
-Effort   
-   
    
    
 **Subjectivity**   
@@ -152,10 +104,7 @@ Objectivity about art is the idea that there is a truth of the matter about what
  
 
 *    
-* negative / Negative — 5 
-
-   
-   
+* negative / Negative — 5
    
    
 **“Humanity” “Soul” etc**   

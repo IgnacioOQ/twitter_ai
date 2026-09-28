@@ -13,10 +13,12 @@ This document is the **source of truth for what the labels mean**. The prompt th
 
 ## Label set
 
-The pipeline uses a **multi-label classification** approach. A single tweet can invoke more than one of these conceptual frameworks simultaneously. The categories correspond to answers to the questions "What is art?" and "What makes art valuable?".
+The pipeline uses a **multi-label classification** approach: a single tweet can carry several labels at once. The labels come in two groups. `definition` and `value` mark a tweet that *raises* one of the two central questions, "What is art?" and "What makes art valuable?". The seven frameworks are *answers* to those questions. A tweet can raise a question and answer it through a framework at the same time.
 
 | Label | Meaning |
 | :--- | :--- |
+| `definition` | The tweet engages what art is: whether something is or is not art, or whether someone is an artist. |
+| `value` | The tweet engages what makes art valuable: good/bad art, flaws/strengths of a work, liking/disliking it. Artistic value, not monetary. |
 | `intentionalism` | Meaning/value is determined by the artist's intent. |
 | `anti_intentionalism` | Meaning/value is independent of the artist's intent; set by language/imagery. |
 | `cognitivism` | Art is valuable because it gives knowledge, understanding, or makes us think. |
@@ -88,4 +90,5 @@ The taxonomy is designed to grow. When adding category *N+1*:
 
 1. Add a `### <label>` block inside the fence in `llm_bootstrap_prompt.md` with the same parts — Definition, Example.
 2. Add the label to the [Label set](#label-set) table.
-3. Add the label string to `CATEGORIES` in the Label Set cell of notebook `01`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`. The response schema derives its `enum` from `CATEGORIES`, so no other cell needs editing — and the Prompt Builder cell asserts `CATEGORIES` against the fence's category line.
+3. Add the label string to `CATEGORIES` in the Label Set cell of notebook `01`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`. The response schema derives its `enum` from `CATEGORIES`, and the Prompt Builder cell asserts `CATEGORIES` against the fence's category line.
+4. Add it, in the same position, to `CATEGORIES` in the Configuration cell of notebook `02`. Notebooks `03` and `04` read the label set from the trained model's config, so they need no edit — but they need a model retrained by `02` on the new set.

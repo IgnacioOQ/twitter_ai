@@ -19,14 +19,7 @@ The goal is to train a text classifier on tweets and use it to annotate the enti
 
 **`categories.md` is the source of truth for what the labels mean.** This document describes the *machinery*; that one describes the *label set* the machinery carries.
 
-The taxonomy is currently **two labels**, deliberately:
-
-| Label | Meaning |
-| :--- | :--- |
-| `originality` | The tweet appeals to originality — newness, creativity, copying, theft — **as a criterion for the value of art**. |
-| `none` | Residual bucket: no category in the current taxonomy applies. |
-
-Starting at one substantive category keeps the bootstrap's errors attributable — a wrong label traces to a specific clause of one definition rather than to an unknown interaction between several. `categories.md` carries the decision test, worked examples, exclusions, confidence calibration, and the checklist for adding category *N+1* (including the two things that must be decided at that point: what happens to existing `none` rows, and whether the single-label assumption still holds).
+The taxonomy is **multi-label, ten labels**: `definition` and `value` (the tweet raises the question of what art is / what makes it valuable), the seven aesthetic frameworks that answer those questions (`intentionalism`, `anti_intentionalism`, `cognitivism`, `expressivism`, `hedonism`, `originality`, `achievement`), and `none` (residual: nothing else applies). Every labelled CSV carries one 0/1 column per label — `pred_<label>` for a model, `human_<label>` for a reviewer. `categories.md` carries the label table and the checklist for adding a category.
 
 The prompt itself — scaffold and criteria together, in the form the model receives — is `llm_bootstrap_prompt.md` in this folder. Because notebook `01` does not clone this repo on Colab, no markdown here is readable at runtime, so that file is embedded in the notebook as a literal. **The embedding is mechanical: edit `llm_bootstrap_prompt.md`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`.** `sync_prompt.py --check` exits non-zero while the notebook and the prompt file disagree. The notebook writes the same file back out next to `llm_bootstrap_labels.csv`, byte-identical, so the copy a reviewer reads is the copy in git.
 
@@ -79,25 +72,25 @@ The **remaining ~17 million tweets** in the full corpus are classified separatel
 
 The seed training set is produced by one of two paths — they can also be combined.
 
-**Path A — LLM Bootstrap (default).** The tweets in the **LLM Bootstrap** partition are labelled by an LLM (Gemini) in `01_llm_bootstrap_labelling.ipynb`. The notebook embeds the full per-category criteria in the prompt, constrains the response with a native JSON schema (`label`, `confidence`, `rationale`) whose `label` enum is derived from `CATEGORIES`, retries on transient errors, and writes `llm_bootstrap_labels.csv` with the **same schema** as `hitl_review_batch_*.csv`. This CSV is read by `02_hitl_training_loop.ipynb` exactly like a human-labelled batch.
+**Path A — LLM Bootstrap (default).** The tweets in the **LLM Bootstrap** partition are labelled by an LLM (Gemini) in `01_llm_bootstrap_labelling.ipynb`. The notebook embeds the full per-category criteria in the prompt, constrains the response with a native JSON schema (an array of `{category, confidence, rationale}`, one per selected label) whose `category` enum is derived from `CATEGORIES`, retries on transient errors, and writes `llm_bootstrap_labels.csv` with one-hot `pred_<label>` and empty `human_<label>` columns. `02_hitl_training_loop.ipynb` and `03_final_inference.ipynb` read it as training data / known labels: the `pred_*` columns are the label, unless a reviewer has filled in all of a row's `human_*` columns, which then win. All-zero rows are `PARSE_ERROR`s and are skipped.
 
 > **The partition is ~10 000 tweets but the notebook currently ships a hard cap of `MAX_LLM_TWEETS = 2_000` per run**, enforced independently of `SMOKE_TEST` at three layers (dataframe truncation, an assertion before the loop, and a per-call counter in `classify_tweet` that raises rather than exceed the budget). It caps *tweets*, not requests: with `N_LABEL_PASSES = 2` the request ceiling is 4 000. The cap is there because the prompt in `llm_bootstrap_prompt.md` is still being tuned; the full partition should not be spent on a definition that has not yet survived a read of its own low-confidence rows. Raising it is a deliberate edit to the Configuration cell.
 
-> **`CHECKPOINT_EVERY` / `CHECKPOINT_PREFIX` are declared in the Configuration cell but never used** — the labelling loop writes nothing until it finishes. A disconnect partway through loses the whole run. The clean-stop paths (budget exceeded, quota exhausted, fatal request error) do save what completed; an unhandled kernel death does not.
+> **Checkpoints.** Every `CHECKPOINT_EVERY` tweets of each pass, the loop pickles the passes so far to `Classifiers_Data/HITL/llm_bootstrap_checkpoint_{DATASET_TYPE}.pkl`, so a disconnect does not lose labels already paid for. There is no automatic resume: recovering means loading that pickle by hand. The clean-stop paths (budget exceeded, quota exhausted, fatal request error) save the completed rows as normal.
 
 **Which tweets get labelled, and the record of it.** Selection is a fixed permutation of the partition (sorted by `id`, permuted with `SELECTION_SEED`, sliced from the head), so a smoke run's tweets are a strict subset of a full run's and successive runs *extend* the labelled set rather than redraw it. Every id sent to the LLM is appended to `Classifiers_Data/HITL/llm_bootstrap_seen_ids_{DATASET_TYPE}.json`, which accumulates across runs.
 
 > **This file, not `partition_ids.pkl`, defines the bootstrap training set.** The manifest records which tweets are *eligible* for bootstrap labelling; with the cap, only a fraction is actually labelled and the remaining ~9 000 of the partition stay unseen — legitimately usable as held-out evaluation data. Any downstream accuracy measurement must exclude the ids in the basket, or it is scoring the model on its own training data.
 
-**Token accounting** (`TOKENOPT_REF.md` §16-17): a pre-flight cell projects tokens and cost before the loop and warns above `COST_ALERT_USD`; the run cell reports the billed `usage_metadata` including the implicit-cache hit rate; each run appends `llm_bootstrap_usage_<timestamp>.json`. Measured prompt size is ~4 389 chars (~1 100 input tokens), essentially all of it the static scaffold that is identical on every call and therefore implicit-cache eligible. The current smoke run (`SMOKE_TEST_N = 500`) issues 1 000 requests over two passes and measures ~1.1 M tokens; a run that reached the 2 000-tweet cap would issue 4 000 and measure ~4.4 M.
+**Token accounting** (`TOKENOPT_REF.md` §16-17): a pre-flight cell projects tokens and cost before the loop and warns above `COST_ALERT_USD`; the run cell reports the billed `usage_metadata` including the implicit-cache hit rate; each run appends `llm_bootstrap_usage_<timestamp>.json`. Those measurements (~1 100 input tokens per call) were taken with the one-category prompt. The ten-category prompt is ~6 700 chars (~1 650 input tokens), still essentially all static scaffold that is identical on every call and therefore implicit-cache eligible; output is up to `MAX_OUTPUT_TOKENS = 512`, since the reply is one object per selected label. Re-measure with a smoke run before trusting a cost figure.
 
-**Token ceiling.** `MAX_SESSION_TOKENS = 6_000_000` bounds total tokens per run independently of the row cap. It has to be sized against the *request* ceiling (`MAX_LLM_TWEETS × N_LABEL_PASSES` = 4 000 calls, ~5.6 M tokens at a padded 1 400 per call), not against the tweet count — sized below that it stops being a backstop and silently truncates runs. It fires only if per-call cost inflates unexpectedly. Enforcement is between calls (`usage_metadata` arrives with the response), so overshoot is bounded by a single call. **A breach stops the loop cleanly instead of raising:** completed rows are saved and basketed, and `stopped_early` is recorded in both the usage record and the basket's run log. The clean stop is load-bearing — `CHECKPOINT_EVERY = 1_000` means an uncaught exception partway through a capped run would otherwise discard the entire run.
+**Token ceiling.** `MAX_SESSION_TOKENS = 9_000_000` bounds total tokens per run independently of the row cap. It has to be sized against the *request* ceiling (`MAX_LLM_TWEETS × N_LABEL_PASSES` = 4 000 calls, ~8.8 M tokens at ~2 200 per call), not against the tweet count — sized below that it stops being a backstop and silently truncates runs. It fires only if per-call cost inflates unexpectedly. Enforcement is between calls (`usage_metadata` arrives with the response), so overshoot is bounded by a single call. **A breach stops the loop cleanly instead of raising:** completed rows are saved and basketed, and `stopped_early` is recorded in both the usage record and the basket's run log.
 
 The `llm_bootstrap_labels_full.pkl` companion file carries `confidence` and `rationale` alongside the labels, and is the artifact to read when tuning the criteria — the `rationale` instructs the model to quote the phrase that decided the label, so a disagreement is traceable to a specific clause.
 
-**Prompt record for reviewers.** The Save section writes `llm_bootstrap_prompt.md` beside the CSV — the repo's own copy, byte for byte, asserted on write. The humans filling in `human_label` therefore read exactly the text the model was given, and the author tuning the prompt edits that same file in git. It carries no run metadata on purpose: a generated header would make the two copies differ, and then neither could be trusted as *the* prompt. Model, passes, per-pass temperatures, max output tokens, the effective thinking budget, whether the response schema was enforced, and a `sha256` of the prompt file go into `llm_bootstrap_usage_<timestamp>.json` instead. That fingerprint is what ties a CSV to the prompt version that produced it once the prompt has been tuned further — the decoding fields are read from the *effective* config rather than the Configuration cell, because the client cell probes `thinking_budget` and silently falls back when a model rejects it.
+**Prompt record for reviewers.** The Save section writes `llm_bootstrap_prompt.md` beside the CSV — the repo's own copy, byte for byte, asserted on write. The humans filling in the `human_<label>` columns therefore read exactly the text the model was given, and the author tuning the prompt edits that same file in git. It carries no run metadata on purpose: a generated header would make the two copies differ, and then neither could be trusted as *the* prompt. Model, passes, per-pass temperatures, max output tokens, the effective thinking budget, whether the response schema was enforced, and a `sha256` of the prompt file go into `llm_bootstrap_usage_<timestamp>.json` instead. That fingerprint is what ties a CSV to the prompt version that produced it once the prompt has been tuned further — the decoding fields are read from the *effective* config rather than the Configuration cell, because the client cell probes `thinking_budget` and silently falls back when a model rejects it.
 
-**Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. The export is guarded by an `EXPORT_HUMAN_SEED` flag at the bottom of `00` (default `False` — skipped); set it to `True` and re-run that cell to produce the seed CSV. A human annotates the `human_label` column. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
+**Path B — Human Seed (alternative or supplement).** 10 000 tweets are sampled at random from the **Base** partition and exported to `hitl_review_batch_00.csv` by `00_hitl_data_preparation.ipynb`. The export is guarded by an `EXPORT_HUMAN_SEED` flag at the bottom of `00` (default `False` — skipped); set it to `True` and re-run that cell to produce the seed CSV. A human fills in the `human_<label>` columns. Run this in addition to Path A if you want a human-verified subset on top of the LLM labels.
 
 No model prediction is needed at this stage. The output of either path (or both) is the initial training set consumed by Step 1.
 
@@ -148,10 +141,10 @@ The best model is applied to the **next pending 50k batch**. From those predicti
 These 10 000 tweets are exported to `hitl_review_batch_XX.csv`, containing:
 
 ```
-id | text | processed_text | type | likes | retweets | predicted_label | human_label
+id | text | processed_text | type | likes | retweets | pred_<label> (one per label) | confidence | human_<label> (one per label)
 ```
 
-`text` is the raw tweet body (what the human reads to label); `processed_text` is the cleaned variant carried alongside so downstream training can pick whichever input the chosen model prefers. `type` is always one of `original`, `replied_to`, or `quoted` here — retweets are excluded from HITL review by construction. The human then fills in the `human_label` column and saves the file.
+`text` is the raw tweet body (what the human reads to label); `processed_text` is the cleaned variant carried alongside so downstream training can pick whichever input the chosen model prefers. `type` is always one of `original`, `replied_to`, or `quoted` here — retweets are excluded from HITL review by construction. The human then fills in every `human_<label>` column (0 or 1) of each reviewed row and saves the file; only rows with all of them filled are used.
 
 ---
 
@@ -194,7 +187,7 @@ The third branch is a safety net for retweets whose `referenced_tweets_dictionar
 
 | Value | Meaning |
 | :--- | :--- |
-| `human` | HITL-labelled (`human_label` non-null after a review round) |
+| `human` | Human-labelled: all `human_<label>` columns filled, in a review batch or in `llm_bootstrap_labels.csv` |
 | `llm_bootstrap` | Gemini-labelled in `01_llm_bootstrap_labelling.ipynb` |
 | `model_original` | Twitter-RoBERTa on a partitionable tweet (`type ∈ {original, replied_to, quoted}`) |
 | `model_synthetic_retweet` | Twitter-RoBERTa on a representative retweet, used as the canonical label for a missing referenced original |
@@ -233,7 +226,7 @@ All notebooks consume `DATASET_TYPE` (default `'AI'`); set it to `'Art'` to run 
 | Notebook | Run when |
 | :--- | :--- |
 | `00_hitl_data_preparation.ipynb` | **Once per `DATASET_TYPE`, first** — partitions the data into LLM Bootstrap / Base / HITL / Inference and writes the `partition_ids.pkl` manifest |
-| `01_llm_bootstrap_labelling.ipynb` | **Once per `DATASET_TYPE`, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels.csv`. Reads its label set and criteria from `categories.md` (pasted in, see [Label Taxonomy](#label-taxonomy)); capped at `MAX_LLM_TWEETS` per run |
+| `01_llm_bootstrap_labelling.ipynb` | **Once per `DATASET_TYPE`, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels.csv`. Its prompt is `llm_bootstrap_prompt.md`, embedded by `sync_prompt.py` (see [Label Taxonomy](#label-taxonomy)); capped at `MAX_LLM_TWEETS` per run |
 | `02_hitl_training_loop.ipynb` | **After each labelling round** — trains all models and exports the next review batch |
 | `03_final_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the HITL remainder and merges with labelled data |
 | `04_full_dataset_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the entire remaining corpus |
