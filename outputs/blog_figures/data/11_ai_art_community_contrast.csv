@@ -1,0 +1,41 @@
+community_id,display_label,metric_group,metric,value,is_other
+0,Anti-AI-Art Discourse,topic_share,AI Art Discourse,0.872768899696926,False
+0,Anti-AI-Art Discourse,topic_share,AI Tools/Code,0.0351378679944195,False
+0,Anti-AI-Art Discourse,topic_share,Bard/LLMs,0.0289777588396594,False
+0,Anti-AI-Art Discourse,topic_share,Visual AI Art,0.0067283690287198,False
+0,Anti-AI-Art Discourse,topic_share,General AI,0.0399820924856881,False
+0,Anti-AI-Art Discourse,topic_share,Other topics,0.016405011954587323,True
+8,AI-Art & NFT Posting,topic_share,AI Art Discourse,0.5190168421799827,False
+8,AI-Art & NFT Posting,topic_share,AI Tools/Code,0.1277484923101191,False
+8,AI-Art & NFT Posting,topic_share,Bard/LLMs,0.1100411862134237,False
+8,AI-Art & NFT Posting,topic_share,Visual AI Art,0.0754834162788863,False
+8,AI-Art & NFT Posting,topic_share,General AI,0.1071309115860872,False
+8,AI-Art & NFT Posting,topic_share,Other topics,0.060579151431500944,True
+0,Anti-AI-Art Discourse,sentiment,positive,0.1543554900991288,
+0,Anti-AI-Art Discourse,sentiment,neutral,0.345651335879133,
+0,Anti-AI-Art Discourse,sentiment,negative,0.4999925216122647,
+8,AI-Art & NFT Posting,sentiment,positive,0.4767894532710395,
+8,AI-Art & NFT Posting,sentiment,neutral,0.3902491101994905,
+8,AI-Art & NFT Posting,sentiment,negative,0.1329613275561699,
+0,Anti-AI-Art Discourse,emotion,anger,0.4923307953480368,
+0,Anti-AI-Art Discourse,emotion,anticipation,0.2803966258624367,
+0,Anti-AI-Art Discourse,emotion,disgust,0.4965533140777232,
+0,Anti-AI-Art Discourse,emotion,fear,0.0837777868497016,
+0,Anti-AI-Art Discourse,emotion,joy,0.2768567649836054,
+0,Anti-AI-Art Discourse,emotion,love,0.0456611536877759,
+0,Anti-AI-Art Discourse,emotion,optimism,0.2070327977309453,
+0,Anti-AI-Art Discourse,emotion,pessimism,0.0860148834403672,
+0,Anti-AI-Art Discourse,emotion,sadness,0.2137356156280374,
+0,Anti-AI-Art Discourse,emotion,surprise,0.0991715062571134,
+0,Anti-AI-Art Discourse,emotion,trust,0.0491925877249991,
+8,AI-Art & NFT Posting,emotion,anger,0.1408859295811527,
+8,AI-Art & NFT Posting,emotion,anticipation,0.4334328242674414,
+8,AI-Art & NFT Posting,emotion,disgust,0.1488776024966807,
+8,AI-Art & NFT Posting,emotion,fear,0.0592107676311861,
+8,AI-Art & NFT Posting,emotion,joy,0.6144150461590332,
+8,AI-Art & NFT Posting,emotion,love,0.1465833393787972,
+8,AI-Art & NFT Posting,emotion,optimism,0.4685125553685403,
+8,AI-Art & NFT Posting,emotion,pessimism,0.0416000808103292,
+8,AI-Art & NFT Posting,emotion,sadness,0.0830665373655933,
+8,AI-Art & NFT Posting,emotion,surprise,0.1215088035468846,
+8,AI-Art & NFT Posting,emotion,trust,0.1255874295633139,

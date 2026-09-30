@@ -1,0 +1,9 @@
+date,event,category,source_title,source_url,dataset_start_utc,dataset_end_utc,date_verified
+2022-11-24 00:00:00+00:00,Stable Diffusion 2.0 released,Image generation,Stable Diffusion 2.0 Release,https://stability.ai/news-updates/stable-diffusion-v2-release,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2022-11-30 00:00:00+00:00,ChatGPT research preview launched,Conversational AI,Introducing ChatGPT,https://openai.com/index/chatgpt/,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2022-12-07 00:00:00+00:00,Stable Diffusion 2.1 released,Image generation,Stable Diffusion v2.1 and DreamStudio Updates,https://stability.ai/news-updates/stablediffusion2-1-release7-dec-2022,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2023-01-23 00:00:00+00:00,Microsoft extends OpenAI partnership,Industry,Microsoft and OpenAI extend partnership,https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenaiextendpartnership/,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2023-02-01 00:00:00+00:00,ChatGPT Plus announced,Conversational AI,Introducing ChatGPT Plus,https://openai.com/index/chatgpt-plus/,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2023-02-06 00:00:00+00:00,Google introduces Bard to trusted testers,Conversational AI,An important next step on our AI journey,https://blog.google/innovation-and-ai/technology/ai/bard-google-ai-search-updates/,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2023-02-07 00:00:00+00:00,AI-powered Bing and Edge preview launched,Search and platform,Reinventing search with a new AI-powered Microsoft Bing and Edge,https://blogs.microsoft.com/blog/2023/02/07/reinventing-search-with-a-new-ai-powered-microsoft-bing-and-edge-your-copilot-for-the-web/,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
+2023-02-24 00:00:00+00:00,Meta introduces LLaMA for research,Foundation model,Introducing LLaMA,https://ai.meta.com/blog/large-language-model-llama-meta-ai/,2022-10-30T00:00:00Z,2023-02-27T12:00:00Z,True
