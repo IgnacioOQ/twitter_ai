@@ -469,6 +469,7 @@ def load_overrides() -> dict:
     data.setdefault("alternatives", [])
     data.setdefault("glob_artifacts", [])
     data.setdefault("friendly_labels", {})
+    data.setdefault("manual_edges", [])
     return data
 
 
@@ -538,6 +539,26 @@ def build_graph(notebooks: list[Path], overrides: dict) -> tuple[nx.DiGraph, lis
         if len(pair) == 2 and pair[0] in G and pair[1] in G:
             G.add_edge(pair[0], pair[1], direction="alternative", style="alternative")
             G.add_edge(pair[1], pair[0], direction="alternative", style="alternative")
+
+    # Hand-declared edges for I/O the parser cannot see (paths assembled inside
+    # user-defined functions, registry dicts, src/ workflows that write files).
+    # Each entry: {notebook, artifact, direction: write|read, note}. The artifact
+    # is a Drive path in the same form the parser emits (BASE_PATH prefix
+    # stripped), e.g. "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/X.gml".
+    for entry in overrides.get("manual_edges", []):
+        nb_id = entry.get("notebook")
+        art_id = canonical_artifact_id(entry.get("artifact", ""))
+        direction = entry.get("direction", "write")
+        if nb_id not in G or not art_id or direction not in ("write", "read"):
+            warnings.append(f"manual edge skipped (unknown notebook or bad entry): {entry}")
+            continue
+        if art_id not in G:
+            G.add_node(art_id, kind="artifact", drive_path=art_id,
+                       glob=art_id in canonical_for_glob, templated=False, bipartite=1)
+        if direction == "write":
+            G.add_edge(nb_id, art_id, direction="write", manual=True)
+        else:
+            G.add_edge(art_id, nb_id, direction="read", manual=True)
 
     return G, warnings
 
@@ -721,9 +742,9 @@ def render_projection(G: nx.DiGraph, out_path: Path):
 
 
 _DOC_TAG_RE = re.compile(
-    r"\[(written by|used by)\s+(\d{2})_[A-Za-z_]+/(\d{2})\]"
-    r"|\[(\d{2})/(\d{2})\]"
-)
+    r"\[(written by|used by)\s+(\d{2})_[A-Za-z_]+/(\d{2}[a-z]?)\]"
+    r"|\[(\d{2})/(\d{2}[a-z]?)\]"
+)   # index may carry a letter suffix: 02b, 01b (corrected copies of a step)
 
 
 def parse_doc_tags():
@@ -769,7 +790,7 @@ def validate(G: nx.DiGraph) -> list[str]:
             continue
         fname = Path(v).name
         # collapse stage/index from notebook id like 02_Processing/02_sanity_check_...
-        m = re.match(r"^(\d+)_[A-Za-z_]+/(\d+)_", u)
+        m = re.match(r"^(\d+)_[A-Za-z_]+/(\d+[a-z]?)_", u)
         if m:
             parser_writers.setdefault(fname, set()).add(f"{m.group(1)}/{m.group(2)}")
 

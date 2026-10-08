@@ -96,7 +96,11 @@ AI Public Trust/                                  (BASE_PATH)
 │   ├── Networks/
 │   │   ├── {test,full}_network_dict.pkl                                [02/02]
 │   │   ├── {Test,Full}_Network.json                                    [02/02]
-│   │   └── Full_Network.gml                                            [04/01]
+│   │   ├── Full_Network.gml                                            [02/02]
+│   │   ├── Full_Network_{Influence,InfoFlow}.gml                        [02/02b]
+│   │   ├── Full_RetweetedOnce_{Influence,InfoFlow}.gml                  [02/02b]  ← authors retweeted ≥ 1x
+│   │   ├── Full_RetweetedOnce_Influence_<method>.gml, _InfoFlow_infomap.gml [04/01b]
+│   │   └── Full_RetweetedOnce_author_communities.json                   [04/01b]
 │   │
 │   └── Classifiers_Data/
 │       ├── HITL/
