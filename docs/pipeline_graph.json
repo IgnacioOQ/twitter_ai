@@ -929,9 +929,9 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_Influence.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_InfoFlow.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_Influence.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_InfoFlow.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1129,17 +1129,17 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network_InfoFlow.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_Influence.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network_InfoFlow.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_Influence.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_InfoFlow.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network_InfoFlow.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_InfoFlow.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network_InfoFlow.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1177,33 +1177,33 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_label_propagation.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_label_propagation.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_label_propagation.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_label_propagation.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_louvain.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_louvain.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_louvain.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_louvain.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_fast.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_fast.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_directed.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_directed.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_directed.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_directed.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1249,33 +1249,33 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_label_propagation.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_label_propagation.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_label_propagation.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_label_propagation.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_louvain.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_louvain.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_louvain.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_louvain.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_fast.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_fast.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_fast.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_fast.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_directed.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_directed.gml",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_directed.gml",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_directed.gml",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1770,25 +1770,25 @@
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_label_propagation.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_label_propagation.gml",
       "direction": "write",
       "manual": true
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_louvain.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_louvain.gml",
       "direction": "write",
       "manual": true
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_fast.gml",
       "direction": "write",
       "manual": true
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_directed.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_directed.gml",
       "direction": "write",
       "manual": true
     },
@@ -1800,25 +1800,25 @@
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_label_propagation.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_label_propagation.gml",
       "direction": "write",
       "manual": true
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_louvain.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_louvain.gml",
       "direction": "write",
       "manual": true
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_fast.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_fast.gml",
       "direction": "write",
       "manual": true
     },
     {
       "src": "04_Network_Analysis/01_network_analysis",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_directed.gml",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_directed.gml",
       "direction": "write",
       "manual": true
     },
@@ -2311,7 +2311,7 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_Influence.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_InfoFlow.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read"
     },
@@ -2381,43 +2381,37 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence.gml",
-      "dst": "04_Network_Analysis/01_network_analysis",
-      "direction": "read",
-      "manual": true
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_label_propagation.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_label_propagation.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_louvain.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_louvain.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_fast.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_fast.gml",
       "dst": "04_Network_Analysis/02_network_visualization",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_directed.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_leiden_directed.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
@@ -2429,37 +2423,31 @@
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence.gml",
-      "dst": "04_Network_Analysis/01_network_analysis",
-      "direction": "read",
-      "manual": true
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_label_propagation.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_label_propagation.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_louvain.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_louvain.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_fast.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_fast.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_directed.gml",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_leiden_directed.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
       "manual": true
