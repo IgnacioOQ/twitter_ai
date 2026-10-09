@@ -100,7 +100,10 @@ AI Public Trust/                                  (BASE_PATH)
 │   │   ├── Full_Network_{Influence,InfoFlow}.gml                        [02/02b]
 │   │   ├── Full_RetweetedOnce_{Influence,InfoFlow}.gml                  [02/02b]  ← authors retweeted ≥ 1x
 │   │   ├── Full_RetweetedOnce_Influence_<method>.gml, _InfoFlow_infomap.gml [04/01b]
-│   │   └── Full_RetweetedOnce_author_communities.json                   [04/01b]
+│   │   ├── Full_RetweetedOnce_author_communities.json                   [04/01b]
+│   │   ├── Full_LWCC_{Influence,InfoFlow}.gml                           [02/02b]  ← LWCC, self-loops removed (direction-neutral)
+│   │   ├── Full_LWCC_Influence_<method>.gml, _InfoFlow_infomap.gml      [04/01b]
+│   │   └── Full_LWCC_author_communities.json                            [04/01b]
 │   │
 │   └── Classifiers_Data/
 │       ├── HITL/

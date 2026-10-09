@@ -294,7 +294,12 @@ AI Public Trust/
 │       ├── Full_RetweetedOnce_InfoFlow.gml         [written by 02_Processing/02b]  same authors, transposed; input for Infomap
 │       ├── Full_RetweetedOnce_Influence_<method>.gml   [written by 04_Network_Analysis/01b]  label_propagation, louvain, leiden_fast, leiden_directed
 │       ├── Full_RetweetedOnce_InfoFlow_infomap.gml     [written by 04_Network_Analysis/01b]
-│       └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01b]  {author_id: {method: community}}
+│       ├── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01b]  {author_id: {method: community}}
+│       ├── Full_LWCC_Influence.gml                 [written by 02_Processing/02b]  self-loops removed, largest weakly connected component (3,264,499 authors), edge retweeter → retweeted
+│       ├── Full_LWCC_InfoFlow.gml                  [written by 02_Processing/02b]  same authors, transposed; input for Infomap
+│       ├── Full_LWCC_Influence_<method>.gml        [written by 04_Network_Analysis/01b]  label_propagation, louvain, leiden_fast, leiden_directed
+│       ├── Full_LWCC_InfoFlow_infomap.gml          [written by 04_Network_Analysis/01b]
+│       └── Full_LWCC_author_communities.json       [written by 04_Network_Analysis/01b]  {author_id: {method: community}}
 │
 ├── Literature/                                (literature_folder = BASE_PATH / 'Literature/')
 └── Models/
