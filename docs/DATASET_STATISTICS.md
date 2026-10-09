@@ -122,7 +122,7 @@ Hashtags are additionally recoverable in original casing via `extract_hashtags()
 
 The high mention share (77.6%) reflects the corpus's typology: every retweet carries an `RT @user:` header.
 
-> **Downstream variant.** A later notebook ([03_cleaning_tweets.ipynb](../notebooks/02_Processing/03_cleaning_tweets.ipynb)), operating on the sentiment-augmented corpus, uses a *different* normalization intended for language models: URLs → the token `http`, mentions → the token `@user` (placeholders instead of removal). The two schemes should not be conflated when describing "the" cleaned text.
+> **Downstream variant (historical).** A later notebook (`02_Processing/03_cleaning_tweets.ipynb`, deleted on 2026-10-09 because it ran on the first-generation corpus; it remains in git history), operating on the sentiment-augmented corpus, uses a *different* normalization intended for language models: URLs → the token `http`, mentions → the token `@user` (placeholders instead of removal). The two schemes should not be conflated when describing "the" cleaned text.
 
 ## 5. The Two Corpora
 

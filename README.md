@@ -86,10 +86,11 @@ AI Public Trust/                                  (BASE_PATH)
 │   │   ├── {test,full}_basic_counts_dict.pkl                           [02/02]
 │   │   ├── {test,full}_timeline_dict.pkl                               [02/02]
 │   │   ├── {test,full}_author_corpus_dict.pkl                          [02/02]
-│   │   ├── AItrust_pruned_twits_with_sentiment[_cleaned].json          [03/01, 02/03]
+│   │   ├── AItrust_pruned_twits_with_sentiment.json                    [03/01]
+│   │   ├── AItrust_pruned_twits_with_sentiment_cleaned.json            (legacy: written by 02/03, deleted 2026-10-09)
 │   │   ├── AItrust_topics_k5_metadata.json                             [03/03]
 │   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.json(.gz) [03/03]
-│   │   ├── top_retweets_by_topic_100.csv                               [02/03]
+│   │   ├── top_retweets_by_topic_100.csv                               (legacy: written by 02/03, deleted 2026-10-09)
 │   │   └── Tweet Sheets/
 │   │       ├── top_test_ai_tweets.csv                                  [03/02]
 │   │       └── top_test_art_tweets.csv                                 [03/02]

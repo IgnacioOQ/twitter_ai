@@ -29,13 +29,6 @@
       "bipartite": 0
     },
     {
-      "id": "02_Processing/03_cleaning_tweets",
-      "kind": "notebook",
-      "stage": 2,
-      "path": "notebooks/02_Processing/03_cleaning_tweets.ipynb",
-      "bipartite": 0
-    },
-    {
       "id": "03_Analysis_and_Modeling/01_sentiment_analysis",
       "kind": "notebook",
       "stage": 3,
@@ -390,25 +383,17 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_{K}.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test_with_sentiment.json",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_{K}.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test_with_sentiment.json",
       "glob": false,
-      "templated": true,
+      "templated": false,
       "bipartite": 1
     },
     {
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.json",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test_with_sentiment.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test_with_sentiment.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1462,22 +1447,6 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_cleaned.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_cleaned.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_100.csv",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_100.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_topics_k5_metadata.json",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_topics_k5_metadata.json",
@@ -1677,23 +1646,6 @@
     {
       "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow.gml",
-      "direction": "write",
-      "manual": true
-    },
-    {
-      "src": "02_Processing/03_cleaning_tweets",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_{K}.csv",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/03_cleaning_tweets",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_cleaned.json",
-      "direction": "write",
-      "manual": true
-    },
-    {
-      "src": "02_Processing/03_cleaning_tweets",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_100.csv",
       "direction": "write",
       "manual": true
     },
@@ -2367,17 +2319,12 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.json",
-      "dst": "02_Processing/03_cleaning_tweets",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.json",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test_with_sentiment.json",
       "dst": "03_Analysis_and_Modeling/01_sentiment_analysis",
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_test_with_sentiment.json",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.json",
       "dst": "03_Analysis_and_Modeling/01_sentiment_analysis",
       "direction": "read"
     },

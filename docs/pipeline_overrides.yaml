@@ -219,14 +219,6 @@ manual_edges:
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment.json'
     direction: write
     note: 'cell "For Full Data Set": block files merged into final_output_path'
-  - notebook: '02_Processing/03_cleaning_tweets'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_cleaned.json'
-    direction: write
-    note: 'OUTPUT_JSONL in the Clean Tweets cell'
-  - notebook: '02_Processing/03_cleaning_tweets'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/top_retweets_by_topic_100.csv'
-    direction: write
-    note: 'OUT_CSV = DATA_DIR / f"top_retweets_by_topic_{K}.csv" with K=100 at run time'
   - notebook: '03_Analysis_and_Modeling/03_lda_tweet_topics'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_topics_k5_metadata.json'
     direction: write

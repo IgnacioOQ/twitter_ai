@@ -18,7 +18,7 @@ This document answers one question for every step of the pipeline: **how many tw
 >
 > **Status 2026-10-09.** The `02b-viz` run of 2026-10-08 failed before layout (the cuGraph install cell assumed a cu12 RAPIDS image; Colab GPU runtimes now ship cu13 — fixed in both visualisation notebooks, §9.5). The corrected pipeline was then **extended to a second backbone**: `02b` also exports the direction-neutral LWCC in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`), `01b` clusters both backbones in one pass (`BACKBONE_STEMS`), and `02b-viz` lists `LWCC_*` registry keys (§8 "Corrected notebooks", §9.3, §10.3). **None of the LWCC outputs exist on Drive yet**; the three notebooks are queued for a re-run.
 >
-> **Rename 2026-10-09.** The original `02_Processing/02_sanity_check_and_network_generation.ipynb` was deleted and the corrected `02b_influence_and_flow_networks.ipynb` was renamed to that name (`git mv`, history preserved). Throughout this document `02b` means today's `02_sanity_check_and_network_generation.ipynb`, and `02/02` with a cell number means the deleted original, whose stored outputs are the source of §§1–4. `Full_Network.gml`, `.graphml`, `.gexf`, `.json` and `Test_Network.*` are now legacy files on Drive with no producing notebook; `Full_Network_Influence.gml` is the same graph.
+> **Rename 2026-10-09.** The original `02_Processing/02_sanity_check_and_network_generation.ipynb` was deleted and the corrected `02b_influence_and_flow_networks.ipynb` was renamed to that name (`git mv`, history preserved). Throughout this document `02b` means today's `02_sanity_check_and_network_generation.ipynb`, and `02/02` with a cell number means the deleted original, whose stored outputs are the source of §§1–4. `Full_Network.gml`, `.graphml`, `.gexf`, `.json` and `Test_Network.*` are now legacy files on Drive with no producing notebook; `Full_Network_Influence.gml` is the same graph. `02_Processing/03_cleaning_tweets.ipynb` (§6.3) was deleted the same day: it ran on the first-generation corpus and nothing reads its outputs; `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_100.csv` are legacy files on Drive.
 
 All numbers below are **copied from the outputs stored in the committed `.ipynb` files**. Nothing was re-run. Cell references use the form `cell N` = 0-based position in the notebook's cell list, together with the nearest markdown heading, so a cell can be found either way.
 
@@ -739,7 +739,7 @@ Figure 1 (timeline) needs nothing.
 
 ## 12. File inventory — every artifact of the pipeline
 
-*Added 2026-10-09.* Every file the notebooks read or write, derived from [docs/pipeline_graph.json](pipeline_graph.json) (164 artifacts after the 2026-10-09 rebuild: parsed edges plus the declared ones of `pipeline_overrides.yaml`). Location is the folder, relative to `BASE_PATH` = `My Drive/Colab Projects/AI Public Trust/` unless marked HPC or Colab-local; *written by* / *read by* are notebook ids (`stage/index`, `b` = corrected copy); templated names (`{…}`) are resolved at run time. Descriptions are from the notebooks and §§1–9 of this document. A file with no writer is produced outside the repository or by a cell that no longer exists; a file with no reader is a terminal output. Legacy files that no notebook reads or writes any more (`Test_Network.*`, `Full_Network.graphml/.gexf/.json`, written by the pre-2026-10 `02/02`) still sit on Drive but are not listed. To regenerate the producer/consumer columns after a notebook change, follow §10.5 and re-derive this table from the JSON.
+*Added 2026-10-09.* Every file the notebooks read or write, derived from [docs/pipeline_graph.json](pipeline_graph.json) (161 artifacts after the 2026-10-09 rebuild: parsed edges plus the declared ones of `pipeline_overrides.yaml`). Location is the folder, relative to `BASE_PATH` = `My Drive/Colab Projects/AI Public Trust/` unless marked HPC or Colab-local; *written by* / *read by* are notebook ids (`stage/index`, `b` = corrected copy); templated names (`{…}`) are resolved at run time. Descriptions are from the notebooks and §§1–9 of this document. A file with no writer is produced outside the repository or by a cell that no longer exists; a file with no reader is a terminal output. Legacy files that no notebook reads or writes any more (`Test_Network.*`, `Full_Network.graphml/.gexf/.json` from the pre-2026-10 `02/02`; `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` from the deleted `02/03`) still sit on Drive but are not listed. To regenerate the producer/consumer columns after a notebook change, follow §10.5 and re-derive this table from the JSON.
 
 ### 12.1 `Raw Data/`
 
@@ -769,11 +769,10 @@ Figure 1 (timeline) needs nothing.
 | `AItrust_pruned_twits_test.json` | — | `03/01` | First-generation test corpus; read by sentiment v2. |
 | `AItrust_pruned_twits_test_classified_{MODEL_ALIAS}.json` | `03/01` | `03/01` | Sentiment v2 test output per model alias. |
 | `AItrust_pruned_twits_test_with_sentiment.json` | `03/01` | `03/01` | Sentiment v1 test output (older file name). |
-| `AItrust_pruned_twits_with_sentiment.json` | `03/01` | `02/03`, `03/01` | AI corpus with CardiffNLP sentiment (v1, `03/01`) — first-generation corpus (§6.1, §6.3); input of `02/03` and of the tweet-topic notebook. |
+| `AItrust_pruned_twits_with_sentiment.json` | `03/01` | `03/01` | AI corpus with CardiffNLP sentiment (v1, `03/01`) — first-generation corpus (§6.1, §6.3); input of `02/03` and of the tweet-topic notebook. |
 | `AItrust_pruned_twits_with_sentiment.jsonl` | — | `03/03` | Line-delimited copy of the v1 sentiment file read by the tweet-topic LDA (`03/03`); no producing cell in the repository. |
 | `AItrust_pruned_twits_with_sentiment_and_topics_k5.json` | `03/03` | — | Tweets with sentiment and K = 5 LDA topic weights (`03/03`). |
 | `AItrust_pruned_twits_with_sentiment_and_topics_k5.jsonl.gz` | `03/03` | `03/03` | Compressed line-delimited version of the same, read back by `03/03`. |
-| `AItrust_pruned_twits_with_sentiment_cleaned.json` | `02/03` | — | The v1 sentiment file after the `02/03` text-cleaning pass. |
 | `AItrust_topics_k5_metadata.json` | `03/03` | — | Top terms and settings of the K = 5 tweet-topic model. |
 | `AItrust_twits_pruned_dict.json` | `02/02` | `02/02`, `03/01` | **AI corpus**: 17,410,035 tweets after dedup + AI keyword + English + date ≥ 2022-10-31, with `processed_text` added (§2). |
 | `AItrust_twits_pruned_dict_test.json` | `02/02` | `02/02`, `03/01`, `03/02` | Test-branch AI corpus (881 tweets). |
@@ -792,8 +791,6 @@ Figure 1 (timeline) needs nothing.
 | `test_dual_network_stats.json` | `02/02` | — | Same for the test branch. |
 | `test_pruning_stats.json` | `02/02` | `02/02` | Same counters for the test branch. |
 | `test_timeline_dict.pkl` | `02/02` | `02/02` | Test-branch timeline dictionary. |
-| `top_retweets_by_topic_100.csv` | `02/03` | — | The 100 most-retweeted tweets per topic (`02/03`). |
-| `top_retweets_by_topic_{K}.csv` | `02/03` | — | Templated version of the same for other K. |
 | `{BLOCK_BASENAME}{block_idx}.json` | `03/03` | — | Per-block intermediate outputs of the tweet-topic inference (`03/03`; names resolved at run time). |
 | `{OUT_STEM}.jsonl` | `03/03` | — | Merged line-delimited output of the tweet-topic inference (`03/03`; name resolved at run time). |
 
