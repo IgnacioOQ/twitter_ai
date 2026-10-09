@@ -14,11 +14,14 @@ last_checked: '2026-10-09'
 
 This document answers one question for every step of the pipeline: **how many tweets and authors are there at this point, and which lines of code decided that?** It complements [DATASET_STATISTICS.md](DATASET_STATISTICS.md), which gives the narrative and the master statistics. Where the two overlap, the numbers agree; this document adds the code, the test-run numbers, every downstream consumer in `03_Analysis_and_Modeling`, and three discrepancies that the stored notebook outputs reveal.
 
-> **Status 2026-10-08.** The corrected pipeline has been executed through community detection: `02b` (both networks + the retweeted-once backbone, 202,710 authors) and `01b` (five partitions + JSON export) ran on Colab without errors and their outputs are stored in the notebooks (§9.3). `02b-viz` is running. The original `04/01` / `04/02` outputs on Drive are superseded but not deleted. Still open: the author-level LDA fix (§6.4), the sentiment block drift (§6.2), the first-generation corpus in the tweet-topic notebooks (§6.3), and the blog draft, whose network-dependent sections are built on the retweeter backbone (§11).
+> **Status 2026-10-09.** Shape of the pipeline after today's clean-up:
 >
-> **Status 2026-10-09.** The `02b-viz` run of 2026-10-08 failed before layout (the cuGraph install cell assumed a cu12 RAPIDS image; Colab GPU runtimes now ship cu13 — fixed in both visualisation notebooks, §9.5). The corrected pipeline was then **extended to a second backbone**: `02b` also exports the direction-neutral LWCC in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`), `01b` clusters both backbones in one pass (`BACKBONE_STEMS`), and `02b-viz` lists `LWCC_*` registry keys (§8 "Corrected notebooks", §9.3, §10.3). **None of the LWCC outputs exist on Drive yet**; the three notebooks are queued for a re-run.
+> - `02_Processing/` holds two notebooks: `01_api_data_to_dictionaries` and `02_sanity_check_and_network_generation`. The latter is the October 2026 rewrite of the network section (called `02` until it was renamed over the original on 2026-10-09). It writes the full retweet graph in both orientations and two backbones — retweeted-once (202,710 authors) and LWCC (3,264,499 expected) — and **is being re-run on Colab now**; the LWCC files do not exist on Drive until that run finishes. The pre-2026-10 original and `03_cleaning_tweets` were deleted (git history keeps both).
+> - `04_Network_Analysis/01b` clusters both backbones with five methods and exports one community JSON per backbone (retweeted-once done 2026-10-07; LWCC pending the re-run). `04_Network_Analysis/02b` renders either backbone on a GPU runtime (its 2026-10-08 run failed on the cu13 RAPIDS image; fixed, not yet re-run; §9.5).
+> - The blog-figure package is on `main` under `src/blog_analysis/` (§11). The code that built its inputs — the 198,326 matched authors with community, topic, sentiment and emotion — is in no repository we can reach (§9.4); the published figures descend from the superseded retweeter backbone.
+> - Still open: the author-level LDA loader bug (§6.4), the sentiment block drift (§6.2), the first-generation corpus in `03/03` (§6.3), the viz re-render, and the blog figures on the corrected backbone (§11.3).
 >
-> **Rename 2026-10-09.** The original `02_Processing/02_sanity_check_and_network_generation.ipynb` was deleted and the corrected `02b_influence_and_flow_networks.ipynb` was renamed to that name (`git mv`, history preserved). Throughout this document `02b` means today's `02_sanity_check_and_network_generation.ipynb`, and `02/02` with a cell number means the deleted original, whose stored outputs are the source of §§1–4. `Full_Network.gml`, `.graphml`, `.gexf`, `.json` and `Test_Network.*` are now legacy files on Drive with no producing notebook; `Full_Network_Influence.gml` is the same graph. `02_Processing/03_cleaning_tweets.ipynb` (§6.3) was deleted the same day: it ran on the first-generation corpus and nothing reads its outputs; `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_100.csv` are legacy files on Drive.
+> **Reading conventions.** `02` means today's `02_sanity_check_and_network_generation.ipynb`; passages dated before 2026-10-09 call the same notebook `02`. A reference with a cell number, such as `02/02 cell 44`, points into the **deleted original**, whose stored outputs are the source of every number in §§1–4; the current notebook reproduces those cells unchanged under the same headings, with the network section rewritten. `02/03` is the deleted cleaning notebook. `Full_Network.gml`, `.graphml`, `.gexf`, `.json`, `Test_Network.*`, `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` are legacy files on Drive with no producing notebook; `Full_Network_Influence.gml` is the same graph as `Full_Network.gml`.
 
 All numbers below are **copied from the outputs stored in the committed `.ipynb` files**. Nothing was re-run. Cell references use the form `cell N` = 0-based position in the notebook's cell list, together with the nearest markdown heading, so a cell can be found either way.
 
@@ -43,8 +46,8 @@ All numbers below are **copied from the outputs stored in the committed `.ipynb`
 | Author-level LDA v1 | `03/04` cell 14 | 1,000,000 read → 4,558 kept | 1,704 | LCC filter matches the wrong field (see §6.4) |
 | Author-level LDA v2 | `03/04c` cell 30 | 17,410,035 read → 65,615 kept | 8,000 → 3,682 (≥ 3 tweets) | same bug |
 | Test branch, AI / AI+Art | `02/02` cell 17 | 881 / 216 | 723 / 198 | from one raw window file (233,094 records) |
-| **In-strength ≥ 1 + LWCC** (`Full_RetweetedOnce_Influence.gml`, `02b`) | `02b` full pruning cell | — | **202,710** | authors retweeted ≥ 1× by someone else (363,618 before LWCC); 13.17 % of retweet weight; the corrected backbone (§9.3) |
-| **LWCC, both directions** (`Full_LWCC_{Influence,InfoFlow}.gml`, `02b`) | `02b` full LWCC cell | — | **3,264,499** (expected) | direction-neutral: self-loops removed, giant component — the same graph as strategy 1 (`04/01` cell 13: 3,264,499 nodes, 7,670,516 edges), now in both orientations; added 2026-10-09, not yet run; `01b` clusters it beside the retweeted-once backbone (§9.3) |
+| **In-strength ≥ 1 + LWCC** (`Full_RetweetedOnce_Influence.gml`, `02`) | `02` full pruning cell | — | **202,710** | authors retweeted ≥ 1× by someone else (363,618 before LWCC); 13.17 % of retweet weight; the corrected backbone (§9.3) |
+| **LWCC, both directions** (`Full_LWCC_{Influence,InfoFlow}.gml`, `02`) | `02` full LWCC cell | — | **3,264,499** (expected) | direction-neutral: self-loops removed, giant component — the same graph as strategy 1 (`04/01` cell 13: 3,264,499 nodes, 7,670,516 edges), now in both orientations; added 2026-10-09, not yet run; `01b` clusters it beside the retweeted-once backbone (§9.3) |
 | Blog analysis "matched authors" | branch `origin/add-blog-figures-and-community-analysis` | — | **198,326** | with Leiden-directed community, K=12 topics, sentiment, emotion; provenance not in repo (see §9.4); within 2.2 % of the 202,710 above |
 
 There is **no** author count anywhere in `02`–`04` for "AI+Art authors that are also in the pruned network". The only AI+Art author set computed is the 1,440,802 of `02/02` cell 20. See §7.
@@ -87,7 +90,7 @@ Test branch (cell 12): one file `testing.json` → 233,094 tweet records, 1,272 
 
 ## 2. Stage 2 — Pruning to the AI and AI+Art corpora
 
-Notebook: [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb)
+Notebook: [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb) (cell numbers below are those of the pre-2026-10 version; the headings are unchanged in the current file)
 
 ### 2.1 The filters (cells 12, 14, 15 — heading *Prunning Functions*, *Keywords Filter*)
 
@@ -351,7 +354,7 @@ Full-corpus label distributions from cell 39 (for the record):
 | sentiment-latest × AI General | 17,410,035 | 21.2 % | 47.9 % | 30.8 % |
 | sentiment-latest × AI+Art | 4,057,340 (see above) | 31.4 % | 42.1 % | 26.5 % |
 
-### 6.3 `02/03_cleaning_tweets.ipynb` and `03/03_lda_tweet_topics.ipynb` — the old-generation corpus
+### 6.3 `02/03_cleaning_tweets.ipynb` (deleted 2026-10-09) and `03/03_lda_tweet_topics.ipynb` — the old-generation corpus
 
 Both read `Cleaned Data/AItrust_pruned_twits_with_sentiment.json` (cell 3 of `02/03`; cell 8 of `03/03`, where it is also the source for the K = 5 enrichment file `AItrust_pruned_twits_with_sentiment_and_topics_k5.json`). Their stored outputs do **not** match the 17.41M corpus:
 
@@ -457,14 +460,14 @@ Re-runs that would change results:
 | Author-level LDA, both versions | `03/04`, `03/04c` | LCC filter matches GML indices, not author ids (§6.4) — all stored results are on the wrong author set |
 | AI+Art sentiment (full) | `03/01b` cell 34 | result file has 474,239 surplus lines; delete `art_full__twitter-roberta-base-sentiment-latest` blocks and re-merge (§6.2) |
 | AI emotion-multilabel (full) | `03/01b` cell 35 | block 0 short by 8,975 lines; lower the skip rule from 95 % to 100 % or delete block 0 (§6.2) |
-| Tweet-level LDA, topics-in-time, top-K per topic | `03/03`, `02/03` | computed on the first-generation 22.4M-line corpus (§6.3); must be re-run on `Cleaned Data v2/AItrust_pruned_twits_with_sentiment.json` to be comparable with everything else |
-| Pruned network + communities + JSON export | `04/01` | the intended population is "retweeted ≥ 1"; the rule implemented is "retweeted someone ≥ 1" (§5, §9). **Done 2026-10-07** via `02b` + `01b` (§9.3); `04/01` outputs are superseded, not deleted. **Extended 2026-10-09**: `02b` / `01b` also produce and cluster the direction-neutral LWCC backbone (`Full_LWCC_*`), not yet run |
+| Tweet-level LDA, topics-in-time, top-K per topic | `03/03` (and the deleted `02/03`) | computed on the first-generation 22.4M-line corpus (§6.3); must be re-run on `Cleaned Data v2/AItrust_pruned_twits_with_sentiment.json` to be comparable with everything else |
+| Pruned network + communities + JSON export | `04/01` | the intended population is "retweeted ≥ 1"; the rule implemented is "retweeted someone ≥ 1" (§5, §9). **Done 2026-10-07** via `02` + `01b` (§9.3); `04/01` outputs are superseded, not deleted. **Extended 2026-10-09**: `02` / `01b` also produce and cluster the direction-neutral LWCC backbone (`Full_LWCC_*`), not yet run |
 | Network visualisations (ForceAtlas2, DrL, adjacency blocks) | `04/02` | rendered on `Final_OutThreshold1_leiden_fast.gml`, i.e. the retweeter backbone (§9.2). **2026-10-08 run failed** before layout (cuGraph install on the new cu13 Colab image; patched 2026-10-09, §9.5). To be re-run on `Full_RetweetedOnce_Influence_leiden_fast.gml` and on `Full_LWCC_Influence_leiden_fast.gml`, one network per run |
 | Community-based blog figures 7–11 (and weekly figures 2, 3, 5 if the matched set is network-derived) | branch `add-blog-figures-and-community-analysis` | only if the 198,326 matched authors / their `leiden_directed` labels descend from `Final_OutThreshold1` — to be verified (§9.4) |
 
-**Corrected notebooks (added 2026-10-07).** Three copies implement the fix without touching the originals: [02_Processing/02b_influence_and_flow_networks.ipynb](../notebooks/02_Processing/02b_influence_and_flow_networks.ipynb) builds the influence and information-flow networks and the in-strength ≥ 1 backbone (`Full_RetweetedOnce_{Influence,InfoFlow}.gml`); [04_Network_Analysis/01b_network_analysis_retweeted_once.ipynb](../notebooks/04_Network_Analysis/01b_network_analysis_retweeted_once.ipynb) runs the five community methods on it (Infomap on the flow file), aligns AMI/ARI by author id and exports `Full_RetweetedOnce_author_communities.json`; [04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb](../notebooks/04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb) renders the maps from those files (registry default `RetweetedOnce_leiden_fast`).
+**Corrected notebooks (added 2026-10-07; the first renamed over its original on 2026-10-09).** Three copies implemented the fix without touching the originals: [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb) (named `02b_influence_and_flow_networks.ipynb` until the rename) builds the influence and information-flow networks and the in-strength ≥ 1 backbone (`Full_RetweetedOnce_{Influence,InfoFlow}.gml`); [04_Network_Analysis/01b_network_analysis_retweeted_once.ipynb](../notebooks/04_Network_Analysis/01b_network_analysis_retweeted_once.ipynb) runs the five community methods on it (Infomap on the flow file), aligns AMI/ARI by author id and exports `Full_RetweetedOnce_author_communities.json`; [04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb](../notebooks/04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb) renders the maps from those files (registry default `RetweetedOnce_leiden_fast`).
 
-**Extended 2026-10-09 — a second, direction-neutral backbone.** `02b` additionally exports the largest weakly connected component of the full network, self-loops removed, in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`; helpers `largest_weakly_connected_component` and `export_lwcc_both_directions`, which cuts the information-flow copy from the transpose on the same author set and asserts equal node sets and edge counts; stats under `lwcc` in `full_dual_network_stats.json`). `01b` loops over `BACKBONE_STEMS = ['Full_RetweetedOnce', 'Full_LWCC']` for the backbone check, the five methods, AMI/ARI and the export, writing `Full_LWCC_Influence_<method>.gml`, `Full_LWCC_InfoFlow_infomap.gml` and `Full_LWCC_author_communities.json`; its own Strategy-1 recompute cell was removed as redundant, and a `SKIP_EXISTING_COMMUNITY_FILES` flag makes the multi-hour run resumable. `02b-viz` lists seven `LWCC_*` registry keys next to the `RetweetedOnce_*` ones. Until the three notebooks are re-run, no `Full_LWCC_*` file exists on Drive.
+**Extended 2026-10-09 — a second, direction-neutral backbone.** `02` additionally exports the largest weakly connected component of the full network, self-loops removed, in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`; helpers `largest_weakly_connected_component` and `export_lwcc_both_directions`, which cuts the information-flow copy from the transpose on the same author set and asserts equal node sets and edge counts; stats under `lwcc` in `full_dual_network_stats.json`). `01b` loops over `BACKBONE_STEMS = ['Full_RetweetedOnce', 'Full_LWCC']` for the backbone check, the five methods, AMI/ARI and the export, writing `Full_LWCC_Influence_<method>.gml`, `Full_LWCC_InfoFlow_infomap.gml` and `Full_LWCC_author_communities.json`; its own Strategy-1 recompute cell was removed as redundant, and a `SKIP_EXISTING_COMMUNITY_FILES` flag makes the multi-hour run resumable. `02b-viz` lists seven `LWCC_*` registry keys next to the `RetweetedOnce_*` ones. Until the three notebooks are re-run, no `Full_LWCC_*` file exists on Drive.
 
 ## 9. Impact of the pruning-direction error across the study
 
@@ -483,13 +486,13 @@ Re-runs that would change results:
 |---|---|---|---|---|
 | Corpora, author counts, funnel | `02/01`, `02/02` cells 12–20 | no | **unaffected** | nothing |
 | Retweet graph, topology, top-10 lists | `02/02` cells 44–55 | no (it produces the input) | **unaffected** — direction is correct | nothing |
-| Pruning strategies 1 and 2 (`LWCC.gml`, `90TS_LWCC.gml`) | `04/01` cells 13, 16 | no | **direction-neutral** (LWCC ignores direction; total strength = in + out) | nothing — strategy 1 is since 2026-10-09 also written by `02b` as `Full_LWCC_{Influence,InfoFlow}.gml` so that `01b` can cluster it |
-| Pruning strategy 3 (`Final_OutThreshold1.gml`) | `04/01` cell 18 | — | **wrong population** (retweeters) | replace with an in-strength rule (`02b` notebook) or a direction-neutral backbone (§9.3) — **done**: `Full_RetweetedOnce_*.gml`, 202,710 authors |
+| Pruning strategies 1 and 2 (`LWCC.gml`, `90TS_LWCC.gml`) | `04/01` cells 13, 16 | no | **direction-neutral** (LWCC ignores direction; total strength = in + out) | nothing — strategy 1 is since 2026-10-09 also written by `02` as `Full_LWCC_{Influence,InfoFlow}.gml` so that `01b` can cluster it |
+| Pruning strategy 3 (`Final_OutThreshold1.gml`) | `04/01` cell 18 | — | **wrong population** (retweeters) | replace with an in-strength rule (`02` notebook) or a direction-neutral backbone (§9.3) — **done**: `Full_RetweetedOnce_*.gml`, 202,710 authors |
 | Community detection, five methods; modularity / codelength; AMI-ARI table | `04/01` cells 21–25 | yes | **valid only as a partition of retweeters**; Infomap additionally walks against information flow on this edge orientation | re-run `run_modularity_workflow` on the new backbone (≈ 10 min per method on 2M nodes); Infomap on the flow (transposed) file — **done** in `01b` (§9.3 results table); **2026-10-09**: `01b` also runs all five methods on `Full_LWCC_*` (pending) |
 | Community JSON export (`Final_OutThreshold1_author_communities.json`) | `04/01` cell 27 | yes | same | **done**: `Full_RetweetedOnce_author_communities.json` (`01b`); pending: `Full_LWCC_author_communities.json` |
 | Social-media maps (ForceAtlas2 classic / linlog, DrL), degree CCDF, community-blocked adjacency, `positions_*.parquet`, `network_with_layout.graphml` | `04/02` (`NETWORK = 'Final_leiden_fast'`; stored output: 1,984,599 nodes, 1,458 communities, top 16 cover 87 %) | yes | **maps of the retweeter backbone** | re-render (layout ≈ 15 min GPU budget per recipe) — the `02b-viz` run of 2026-10-08 **failed before layout** (cu13 cuGraph install; patched 2026-10-09, §9.5); pending for `RetweetedOnce_leiden_fast` and `LWCC_leiden_fast` |
 | Sentiment v1 / v4, per tweet | `03/01`, `03/01b` | no | **unaffected** | nothing — but any *per-community* aggregate of these scores inherits the partition |
-| Tweet-level LDA, topics in time, top-K per topic | `03/03`, `02/03` | no | unaffected by direction; still on the first-generation corpus (§6.3) | re-run on the 2026 corpus for other reasons |
+| Tweet-level LDA, topics in time, top-K per topic | `03/03`, `02/03` (deleted) | no | unaffected by direction; still on the first-generation corpus (§6.3) | re-run on the 2026 corpus for other reasons |
 | Author-level LDA v1 / v2 | `03/04`, `03/04c` | no — reads `LWCC.gml` (strategy 1) | unaffected by direction; broken by the GML `id`/`label` bug (§6.4) | fix loader, re-run |
 | Topic–emotion mixing plan | `docs/TOPIC_EMOTION_MIXING_PLAN.md` | no — consumes `04c` θ | inherits §6.4 | after `04c` is re-run |
 | Classifiers | `05_Classifiers` | no | **unaffected** | nothing |
@@ -499,20 +502,20 @@ What survives untouched: every number in §§1–4 of this document, the two cor
 
 ### 9.3 Is degree pruning worth doing at all?
 
-The concern is legitimate: an in-strength ≥ 1 *subgraph* keeps at most the 374,368 authors who were ever retweeted (§4.1) and only the edges *among* them (a retweeted author retweeting another retweeted author). Pure retweeters, who carry most of the 9.6M retweets, disappear with their edges, so the surviving weight will be a small fraction of the original and the graph will fragment before the LWCC step. The `02b` notebook prints the node count and weight kept after each step so this can be read off directly.
+The concern is legitimate: an in-strength ≥ 1 *subgraph* keeps at most the 374,368 authors who were ever retweeted (§4.1) and only the edges *among* them (a retweeted author retweeting another retweeted author). Pure retweeters, who carry most of the 9.6M retweets, disappear with their edges, so the surviving weight will be a small fraction of the original and the graph will fragment before the LWCC step. The `02` notebook prints the node count and weight kept after each step so this can be read off directly.
 
 The options, with their populations:
 
 | Backbone | Rule | Nodes | Direction-sensitive? | Comment |
 |---|---|---:|---|---|
-| A. Full LWCC (`LWCC.gml`) | self-loops removed, giant component | 3,264,499 | no | `LWCC.gml` exists; since 2026-10-09 `02b` also writes it in both orientations as `Full_LWCC_{Influence,InfoFlow}.gml` and `01b` clusters it (pending run) |
+| A. Full LWCC (`LWCC.gml`) | self-loops removed, giant component | 3,264,499 | no | `LWCC.gml` exists; since 2026-10-09 `02` also writes it in both orientations as `Full_LWCC_{Influence,InfoFlow}.gml` and `01b` clusters it (pending run) |
 | B. Total-strength 90 % (`90TS_LWCC.gml`) | drop lowest in+out nodes until 10 % of weight is lost, then LWCC | 2,315,573 | no | already exists; keeps both heavy retweeters and heavily retweeted |
 | C. Out-strength ≥ 1 (`Final_OutThreshold1.gml`) | made ≥ 1 retweet | 1,984,599 | yes — retweeters | current; wrong population |
-| D. In-strength ≥ 1 (`02b`: `*_RetweetedOnce_*`) | received ≥ 1 retweet | ≤ 374,368 before LWCC | yes — retweeted | intended population, but a sparse subgraph |
+| D. In-strength ≥ 1 (`02`: `*_RetweetedOnce_*`) | received ≥ 1 retweet | ≤ 374,368 before LWCC | yes — retweeted | intended population, but a sparse subgraph |
 
 Two things are being conflated by any degree-threshold *subgraph*: the graph on which communities are detected, and the author population reported on. They need not be the same set. Communities can be detected on a direction-neutral backbone (A or B), where every retweeter still contributes structure, and the "retweeted at least once" criterion can then be applied as an **author filter on the community table** (keep rows whose in-strength ≥ 1 in the full graph) rather than as a graph cut. That keeps the retweeters' edges in the clustering while reporting only on amplified authors, and the choice of population becomes a one-line filter that can be changed without re-running Leiden. The in-strength of every author is available from `Full_Network.gml` (`G.in_degree(weight='weight')`).
 
-**The `02b` numbers (Colab run completed 2026-10-07, stored in the notebook and in `Cleaned Data/full_dual_network_stats.json`):**
+**The `02` numbers (Colab run completed 2026-10-07, stored in the notebook and in `Cleaned Data/full_dual_network_stats.json`):**
 
 | Step (influence network) | Nodes | Edges | Weight |
 |---|---:|---:|---:|
@@ -590,7 +593,7 @@ To regenerate either figure the branch needs the external inputs restored under 
 Two places:
 
 - [04_Network_Analysis/02_network_visualization.ipynb](../notebooks/04_Network_Analysis/02_network_visualization.ipynb) on `main`: loads one of the `Final_OutThreshold1*.gml` files (configured `NETWORK = 'Final_leiden_fast'`), undirects, keeps the giant component (1,984,599 nodes), colours the 16 largest precomputed communities, lays out with GPU ForceAtlas2 (`classic`, `linlog`) and, since 2026-08-12, igraph DrL via `src/network/network_utils.py::compute_drl_layout`; writes `social_map_<recipe>_<light|dark>.png`, `positions_<recipe>.parquet`, `05_degree_ccdf.png`, `06_adjacency_blocks.png`, optionally `network_with_layout.graphml`, into `Networks/viz_outputs_Final_leiden_fast/`. Every rendered map is therefore a map of the retweeter backbone (§9.2).
-- [04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb](../notebooks/04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb): the same pipeline with a registry of the `02b` / `01b` files — seven `RetweetedOnce_*` keys and, since 2026-10-09, seven `LWCC_*` keys; one network per run, output in `Networks/viz_outputs_<NETWORK>/`. Its 2026-10-08 run (`RetweetedOnce_leiden_fast`, A100) loaded and preprocessed the 202,710-node graph (undirected: 864,436 edges, one component, 1,089 Leiden-fast communities, top 16 = 91 % of nodes) and then failed at `import cudf`: the cuGraph install cell probed only `*-cu12` packages, and Colab GPU runtimes now ship RAPIDS cu13, so an unpinned cu12 wheel overwrote the preinstalled stack. Both visualisation notebooks now detect the CUDA suffix first and refuse an unpinned install (2026-10-09); the failed outputs were stripped from the committed copy. Still open: the trailing DrL cell imports `src.network.network_utils` although the notebook has no clone cell, so it cannot run on Colab.
+- [04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb](../notebooks/04_Network_Analysis/02b_network_visualization_retweeted_once.ipynb): the same pipeline with a registry of the `02` / `01b` files — seven `RetweetedOnce_*` keys and, since 2026-10-09, seven `LWCC_*` keys; one network per run, output in `Networks/viz_outputs_<NETWORK>/`. Its 2026-10-08 run (`RetweetedOnce_leiden_fast`, A100) loaded and preprocessed the 202,710-node graph (undirected: 864,436 edges, one component, 1,089 Leiden-fast communities, top 16 = 91 % of nodes) and then failed at `import cudf`: the cuGraph install cell probed only `*-cu12` packages, and Colab GPU runtimes now ship RAPIDS cu13, so an unpinned cu12 wheel overwrote the preinstalled stack. Both visualisation notebooks now detect the CUDA suffix first and refuse an unpinned install (2026-10-09); the failed outputs were stripped from the committed copy. Still open: the trailing DrL cell imports `src.network.network_utils` although the notebook has no clone cell, so it cannot run on Colab.
 - The interactive DrL map (`davidfreeborn.github.io/twitter-authors-map`), maintained outside this repository; the blog branch's `nodes.json` naming refers to it.
 
 ## 10. The pipeline graph — machine-derived double check
@@ -603,21 +606,21 @@ Two places:
 python3 src/scripts/pipeline_graph.py              # rebuild the three files in docs/ from the live notebooks
 python3 src/scripts/pipeline_graph.py validate     # compare the provenance tags in README.md / notebook_setup.md with the parser
 python3 src/scripts/pipeline_graph.py upstream   04_Network_Analysis/01b_network_analysis_retweeted_once
-python3 src/scripts/pipeline_graph.py downstream 02_Processing/02b_influence_and_flow_networks
+python3 src/scripts/pipeline_graph.py downstream 02_Processing/02_sanity_check_and_network_generation
 ```
 
 ### 10.1 State on 2026-10-07
 
 - The committed graph dated from 2026-05-18 and covered 19 notebooks. Rebuilt: **28 notebooks, 159 artifacts, 147 write edges, 125 read edges**; `validate` reports **no drift** between the two Drive directory listings and the graph.
 - `validate` initially flagged two **wrong provenance tags** in `notebooks/notebook_setup.md` / `README.md`, now corrected: `top_test_ai_tweets.csv` and `top_test_art_tweets.csv` are written by `03_Analysis_and_Modeling/02`, not `02_Processing/02`; `Full_Network.gml` is written by `02_Processing/02`, not `04_Network_Analysis/01` (which only reads it).
-- The three corrected notebooks (§9, "Corrected notebooks") are registered in [docs/pipeline_overrides.yaml](pipeline_overrides.yaml) as **alternatives** of their originals (dashed edges; both appear in the graph), and the new network artifacts are listed in both directory listings with `[written by …/02b]` / `[…/01b]` tags.
-- **Rebuilt 2026-10-09** after the LWCC extension: **28 notebooks, 169 artifacts, 155 write edges, 132 read edges**; 53 declared edges (20 added: the `02b` LWCC writes for the Test and Full branches, the `01b` reads of all four backbone files and its five LWCC community writes and read-backs, and the two community JSONs — `COMMUNITIES_JSON` is now a dict comprehension over `BACKBONE_STEMS`, which the parser cannot resolve, so `Full_RetweetedOnce_author_communities.json` moved from parsed to declared). `validate` clean.
+- The three corrected notebooks (§9, "Corrected notebooks") are registered in [docs/pipeline_overrides.yaml](pipeline_overrides.yaml) as **alternatives** of their originals (dashed edges; both appear in the graph — since 2026-10-09 only the two `04` pairs remain, the `02` pair having collapsed into one notebook), and the new network artifacts are listed in both directory listings with `[written by …/02b]` / `[…/01b]` tags.
+- **Rebuilt 2026-10-09** after the LWCC extension: **28 notebooks, 169 artifacts, 155 write edges, 132 read edges**; 53 declared edges (20 added: the `02` LWCC writes for the Test and Full branches, the `01b` reads of all four backbone files and its five LWCC community writes and read-backs, and the two community JSONs — `COMMUNITIES_JSON` is now a dict comprehension over `BACKBONE_STEMS`, which the parser cannot resolve, so `Full_RetweetedOnce_author_communities.json` moved from parsed to declared). `validate` clean.
 
 ### 10.2 What the parser cannot see — and how it is covered
 
 The parser only resolves literal paths and simple `folder / 'name'` expressions whose variables are bound in the same notebook. It is blind to:
 
-1. paths assembled **inside a user-defined function** (the `export_network()` helper of `02b`, the `block_folder / f'…_{block_id}.json'` merges of `03/01`);
+1. paths assembled **inside a user-defined function** (the `export_network()` helper of `02`, the `block_folder / f'…_{block_id}.json'` merges of `03/01`);
 2. files written by **`src/` workflows** (`run_modularity_workflow` writes `<input stem>_<method>.gml`), so every community-annotated GML — old and new — was invisible as a *write*;
 3. **registry dictionaries** resolved at run time (`NETWORKS[NETWORK]` in the visualisation notebooks), so those notebooks showed only the demo network as input;
 4. a path held in a variable assigned in one cell and opened in another, and f-strings with run-time values (`top_retweets_by_topic_{K}.csv`).
@@ -628,7 +631,7 @@ Rather than widen the parser, the script now accepts **hand-declared edges** (`m
 jq '[.edges[] | select(.manual)] | length' docs/pipeline_graph.json
 ```
 
-Notebook ids may now carry a letter suffix (`02b`, `01b`) in provenance tags, so the corrected copies are validated like any other notebook.
+Notebook ids may now carry a letter suffix (`02`, `01b`) in provenance tags, so the corrected copies are validated like any other notebook.
 
 ### 10.3 Hand-off table for the network stage
 
@@ -636,14 +639,14 @@ Each row was checked twice: against the notebook source (§§4–5, §9) and aga
 
 | Producer | File (in `Data Sets/Networks/`) | Consumer(s) | Edge source |
 |---|---|---|---|
-| `02/02` cell 44 | `full_network_dict.pkl` | `02/02` cell 51, `02b` | parsed |
+| `02/02` cell 44 | `full_network_dict.pkl` | `02/02` cell 51, `02` | parsed |
 | `02/02` cell 53 | `Full_Network.gml` | `04/01` (all three strategies) | parsed |
-| `02b` | `Full_Network_Influence.gml`, `Full_Network_InfoFlow.gml` | `01b` (optional inspection, strategy 2), `02b-viz` registry | declared |
-| `02b` | `Full_RetweetedOnce_Influence.gml` | `01b` (backbone check; undirected methods; directed Leiden), `02b-viz` registry | declared |
-| `02b` | `Full_RetweetedOnce_InfoFlow.gml` | `01b` (Infomap) | declared |
+| `02` | `Full_Network_Influence.gml`, `Full_Network_InfoFlow.gml` | `01b` (optional inspection, strategy 2), `02b-viz` registry | declared |
+| `02` | `Full_RetweetedOnce_Influence.gml` | `01b` (backbone check; undirected methods; directed Leiden), `02b-viz` registry | declared |
+| `02` | `Full_RetweetedOnce_InfoFlow.gml` | `01b` (Infomap) | declared |
 | `01b` | `Full_RetweetedOnce_Influence_{label_propagation,louvain,leiden_fast,leiden_directed}.gml`, `Full_RetweetedOnce_InfoFlow_infomap.gml` | `01b` (AMI/ARI, JSON export), `02b-viz` | declared |
 | `01b` | `Full_RetweetedOnce_author_communities.json` | *(no consumer yet — the author set for downstream restriction)* | declared (parsed until 2026-10-09) |
-| `02b` | `Full_LWCC_Influence.gml`, `Full_LWCC_InfoFlow.gml` — *added 2026-10-09, not yet on Drive* | `01b` (backbone check; undirected methods + directed Leiden on Influence; Infomap on InfoFlow), `02b-viz` registry | declared |
+| `02` | `Full_LWCC_Influence.gml`, `Full_LWCC_InfoFlow.gml` — *added 2026-10-09, not yet on Drive* | `01b` (backbone check; undirected methods + directed Leiden on Influence; Infomap on InfoFlow), `02b-viz` registry | declared |
 | `01b` | `Full_LWCC_Influence_{label_propagation,louvain,leiden_fast,leiden_directed}.gml`, `Full_LWCC_InfoFlow_infomap.gml` — *not yet on Drive* | `01b` (AMI/ARI, JSON export), `02b-viz` | declared |
 | `01b` | `Full_LWCC_author_communities.json` — *not yet on Drive* | *(no consumer yet)* | declared |
 | `04/01` cell 18 | `Final_OutThreshold1.gml` — **superseded** | `04/01` community cells | parsed |
@@ -654,7 +657,7 @@ Each row was checked twice: against the notebook source (§§4–5, §9) and aga
 
 - **Alternative edges are bidirectional**, and the `upstream` / `downstream` walkers follow them, so a query on `01b` also lists `04/01` and its outputs (and vice versa). Read the notebook list of a query with the alternatives in mind, or inspect the JSON and drop `direction == "alternative"` edges.
 - The `BASE_PATH divergence` warning is expected: `03/01b` and `03/04c` run on the HPC path, every other notebook on Drive. The parser strips both prefixes, so artifacts still line up by relative path.
-- The parser records what the *code* can write, not what *exists* on Drive. A file can be in the graph and absent on disk (e.g. before `02b` finishes), or on disk and absent from the graph (first-generation files such as `AItrust_pruned_twits.json`, §6.3, whose producing cells no longer exist).
+- The parser records what the *code* can write, not what *exists* on Drive. A file can be in the graph and absent on disk (e.g. before `02` finishes), or on disk and absent from the graph (first-generation files such as `AItrust_pruned_twits.json`, §6.3, whose producing cells no longer exist).
 
 ### 10.5 Procedure after any notebook change
 
@@ -710,10 +713,10 @@ In this repository:
 
 | Step | Notebook / script | Status |
 |---|---|---|
-| Both networks + retweeted-once backbone | `02_Processing/02b` | done 2026-10-07 |
+| Both networks + retweeted-once backbone | `02_Processing/02` | done 2026-10-07 (as `02`); full re-run started 2026-10-09 |
 | Five partitions + community JSON on the backbone | `04_Network_Analysis/01b` | done 2026-10-07 |
 | Social-media maps | `04_Network_Analysis/02b` | run of 2026-10-08 failed before layout (cu13 cuGraph install); patched 2026-10-09; pending |
-| LWCC backbone in both directions | `02_Processing/02b` (extension of 2026-10-09) | pending |
+| LWCC backbone in both directions | `02_Processing/02` (extension of 2026-10-09) | re-run started 2026-10-09 |
 | Five partitions + community JSON on the LWCC backbone | `04_Network_Analysis/01b` | pending |
 | AI+Art sentiment file without the surplus block | `03/01b` cell 34 (delete the `art_full__twitter-roberta-base-sentiment-latest` blocks, re-merge) | open |
 
@@ -734,7 +737,7 @@ Figure 1 (timeline) needs nothing.
 
 ### 11.4 Two decisions the re-run forces
 
-- **Which population the blog is about.** On the retweeted-once backbone the matched set will be at most 202,710 authors and in practice fewer (only those with enough text for a topic profile). That is a study of *amplified* authors. If the intended subject is "the public reaction", a direction-neutral backbone with "retweeted ≥ 1" as a reported filter (§9.3) may fit the prose better. Decide before rebuilding the matched set, because every downstream number depends on it. Since 2026-10-09 both backbones are produced and clustered in the same `02b` / `01b` run (§9.3), so the decision can be made on the two partitions side by side rather than before clustering.
+- **Which population the blog is about.** On the retweeted-once backbone the matched set will be at most 202,710 authors and in practice fewer (only those with enough text for a topic profile). That is a study of *amplified* authors. If the intended subject is "the public reaction", a direction-neutral backbone with "retweeted ≥ 1" as a reported filter (§9.3) may fit the prose better. Decide before rebuilding the matched set, because every downstream number depends on it. Since 2026-10-09 both backbones are produced and clustered in the same `02` / `01b` run (§9.3), so the decision can be made on the two partitions side by side rather than before clustering.
 - **Whether the community labels carry over.** They were validated for specific memberships. A new partition on a different author set needs the c-TF-IDF and audit steps rerun; reusing the 21 names would be a claim without evidence.
 
 ## 12. File inventory — every artifact of the pipeline
