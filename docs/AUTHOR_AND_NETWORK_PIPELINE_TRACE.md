@@ -37,9 +37,9 @@ All numbers below are **copied from the outputs stored in the committed `.ipynb`
 | Retweet network, all nodes | `02/02` cell 52 | — | **3,379,040** | 7,768,720 edges, weight 9,638,407 |
 | Authors who were retweeted (dict outer keys) | `02/02` cell 51 | — | 374,368 | tqdm total of the outer loop |
 | Largest weakly connected component | `02/02` cell 52, `04/01` cell 13 | — | 3,264,499 | 96.61 % of nodes |
-| Total-strength 90 % pruning + LWCC | `04/01` cell 16 | — | 2,315,573 | not used downstream |
-| Out-strength ≥ 1 (made ≥ 1 retweet) | `04/01` cell 18 | — | 3,159,105 | before LWCC |
-| **Out-strength ≥ 1 + LWCC** (`Final_OutThreshold1.gml`) | `04/01` cell 18 | — | **1,984,599** | the set used for community detection |
+| Total-strength 90 % pruning + LWCC (`90TS_LWCC.gml`) | `04/01` cell 16 (gated in today's `04/01`) | — | 2,315,573 | reference only, not clustered |
+| Out-strength ≥ 1 (made ≥ 1 retweet) — **legacy** | deleted `04/01` cell 18 | — | 3,159,105 | before LWCC |
+| **Out-strength ≥ 1 + LWCC** (`Final_OutThreshold1.gml`) — **legacy** | deleted `04/01` cell 18 | — | **1,984,599** | wrong population (retweeters); the set behind every community result before 2026-10-07 and the blog draft (§5.2) |
 | Sentiment v4, AI corpus | `03/01b` cell 35 | 17,410,035 | — | emotion run short by 8,975 (see §6.2) |
 | Sentiment v4, AI+Art corpus | `03/01b` cell 34 | 3,583,101 | — | sentiment result file holds 4,057,340 lines (see §6.2) |
 | Tweet-level LDA / cleaning / top-K | `02/03`, `03/03` | 21,466,173 lines read | — | **old-generation corpus**, not the 17.41M one (see §6.3) |
@@ -264,19 +264,33 @@ Test branch (cells 26, 33, 34): 881 tweets → 153 retweeted authors → 446 nod
 
 Why 3,379,040 < 4,775,711: an author enters the graph only by retweeting or being retweeted *within the AI corpus*. 1,396,671 authors (29 %) wrote only originals, replies or quotes and have no edge.
 
-## 5. Where the author set shrinks to 1,984,599
+## 5. The author backbones
 
-Notebook: [04_Network_Analysis/01_network_analysis.ipynb](../notebooks/04_Network_Analysis/01_network_analysis.ipynb). This is outside the `02`/`03` folders but it is the step that produces the author set every later notebook is meant to be restricted to, so it belongs in this trace.
+Every later notebook is meant to be restricted to an author set cut from the retweet graph, so the cut belongs in this trace. Since 2026-10-09 the cuts are made in `02_Processing/02` (both backbones) and read by `04_Network_Analysis/01`; the pre-2026-10 `04/01` made its own cut, which is described in §5.1 because every community result stored before 2026-10-07 and the blog draft (§11) descend from it.
 
-All three strategies start from `Full_Network.gml`, drop self-loops (32,216 of them — authors retweeting themselves), prune, then keep the largest weakly connected component.
+### 5.0 The backbones in the current pipeline
 
-| Strategy | Cell | Rule | Nodes | Edges | Output |
+All start from the full influence graph (`Full_Network_Influence.gml`, 3,379,040 authors, 7,768,720 edges), drop the 32,216 self-loops, cut, and keep the largest weakly connected component. Each is written in both orientations (`*_Influence.gml`: retweeter → retweeted; `*_InfoFlow.gml`: the transpose), and `04/01` clusters both with five methods (`BACKBONE_STEMS`).
+
+| Backbone | Written by | Rule | Nodes | Edges | Weight kept | Files |
+|---|---|---|---:|---:|---:|---|
+| **LWCC** (direction-neutral) | `02`, full LWCC cell (helper `export_lwcc_both_directions`) | no degree cut; self-loops removed; giant component | 3,264,499 (expected; the pre-2026-10 strategy 1 gave exactly this) | 7,670,516 (expected) | ≈ 99.7 % (expected) | `Full_LWCC_{Influence,InfoFlow}.gml` — **not on Drive until the 2026-10-09 re-run finishes** |
+| **Retweeted once** | `02`, full pruning cell (helper `prune_retweeted_at_least_once`) | in-strength ≥ 1 on the influence graph = out-strength ≥ 1 on the flow graph (363,618 authors), then LWCC | **202,710** | 882,530 | 13.17 % (1,269,747 retweets) | `Full_RetweetedOnce_{Influence,InfoFlow}.gml` (on Drive since 2026-10-07) |
+| Total-strength 90 % (reference only) | `04/01`, gated by `RUN_STRATEGY_2` (`prune_network_by_deletion`) | delete lowest in+out strength nodes until 10 % of weight is lost, then LWCC | 2,315,573 | 6,721,590 | 90 % | `90TS_LWCC.gml` (exists on Drive; not clustered) |
+
+The two clustered backbones answer different questions. The LWCC keeps every retweeter and every edge, so community structure is informed by who amplifies whom; "retweeted at least once" can then be applied as an author filter on its community table. The retweeted-once backbone is exactly the amplified population, but it discards 87 % of the retweet volume because pure retweeters leave with their edges (§9.3). The `02` notebook asserts, for each backbone, that the two orientations hold the same author set and the same number of edges.
+
+### 5.1 Legacy: the out-strength backbone of 1,984,599 retweeters
+
+The pre-2026-10 `04_Network_Analysis/01_network_analysis.ipynb` (deleted 2026-10-09, in git history) read `Full_Network.gml` and cut three backbones of its own:
+
+| Strategy | Cell | Rule | Nodes | Edges | Output (all legacy files on Drive) |
 |---|---|---|---:|---:|---|
-| 1 — LWCC only | 13 | no pruning | 3,264,499 | 7,670,516 | `LWCC.gml` |
-| 2 — total-strength 90 % | 16 | delete lowest in+out strength nodes until 10 % of weight is lost (958,959 nodes removed), then LWCC | 2,315,573 | 6,721,590 | `90TS_LWCC.gml` |
-| 3 — out-strength ≥ 1 | 18 | keep nodes with out-strength ≥ 1 (3,159,105 of 3,379,040), then LWCC | **1,984,599** | 4,472,376 | `Final_OutThreshold1.gml` |
+| 1 — LWCC only | 13 | no pruning | 3,264,499 | 7,670,516 | `LWCC.gml` (same graph as today's `Full_LWCC_Influence.gml`) |
+| 2 — total-strength 90 % | 16 | delete lowest in+out strength nodes until 10 % of weight is lost (958,959 nodes removed), then LWCC | 2,315,573 | 6,721,590 | `90TS_LWCC.gml` (still produced by today's `04/01` when `RUN_STRATEGY_2` is on) |
+| 3 — out-strength ≥ 1 | 18 | keep nodes with out-strength ≥ 1 (3,159,105 of 3,379,040), then LWCC | **1,984,599** | 4,472,376 | `Final_OutThreshold1.gml` — **wrong population**, no longer produced |
 
-The rule of strategy 3 is in [src/network/network_pruning.py:226](../src/network/network_pruning.py#L226):
+Strategy 3 was the set used for community detection, the AMI table, `Final_OutThreshold1_author_communities.json` and the social-media maps until 2026-10-07, and it is the population behind the blog draft's 198,326 matched authors (§9.4, §11). Its rule is still in [src/network/network_pruning.py:226](../src/network/network_pruning.py#L226), now called by no notebook:
 
 ```python
 def prune_by_out_strength_threshold(g, threshold=1.0):
@@ -288,27 +302,27 @@ def prune_by_out_strength_threshold(g, threshold=1.0):
     pruned = pruned.components(mode="weak").giant()
 ```
 
-Given the edge direction of §4.1, **`out_strength >= 1` keeps authors who made at least one retweet (of someone else)**. It does *not* select authors who were retweeted. The threshold deletes the *node*, so an author who was retweeted (even heavily) but never retweeted anyone is removed outright, together with all edges pointing at them. Of the 3,159,105 retweeters, 1,984,599 sit in one connected component; the other 1,174,506 are in small islands and are dropped by the LWCC step. Weight kept: 60.46 % of the original.
+Given the edge direction of §4.1, **`out_strength >= 1` kept authors who made at least one retweet (of someone else)**. It did *not* select authors who were retweeted. The threshold deletes the *node*, so an author who was retweeted (even heavily) but never retweeted anyone was removed outright, together with all edges pointing at them. Of the 3,159,105 retweeters, 1,984,599 sat in one connected component; the other 1,174,506 were in small islands and were dropped by the LWCC step. Weight kept: 60.46 % of the original.
 
-If the intended population was "authors retweeted at least once" the equivalent filter is `mode="in"` on the same function; nothing else in the pipeline would need to change, but every community file and the JSON export below would have to be regenerated.
+The intended population, "authors retweeted at least once", is the in-strength condition on the same graph; that is what today's `02` implements (§5.0, second row).
 
-Two readings of the same graph help keep this straight. Under the **influence** reading (the graph as built), A → B means A retweeted B, in-strength is retweets received, and the current rule keeps nodes with ≥ 1 *outgoing* edge. Under the **information-flow** reading (the transpose), A → B means B retweeted A, and the same rule keeps nodes that *received* information from ≥ 1 source while dropping every pure source. "Retweeted at least once" is a source condition: in-strength in the influence graph, out-strength in the flow graph. Direction also matters for Infomap (`04/01`, directed methods), whose random walker follows edge direction and therefore walks against information flow on the graph as built; the directed Leiden quality function is invariant under transposition and the three undirected methods are unaffected.
+Two readings of the same graph keep this straight. Under the **influence** reading (the graph as built), A → B means A retweeted B, in-strength is retweets received, and the legacy rule kept nodes with ≥ 1 *outgoing* edge. Under the **information-flow** reading (the transpose), A → B means B retweeted A, and the same rule keeps nodes that *received* information from ≥ 1 source while dropping every pure source. "Retweeted at least once" is a source condition: in-strength in the influence graph, out-strength in the flow graph. Direction also matters for Infomap, whose random walker follows edge direction: the deleted `04/01` ran it on the influence orientation, i.e. against information flow, while today's `04/01` runs it on the `*_InfoFlow.gml` file. The directed Leiden quality function is invariant under transposition and the three undirected methods are unaffected.
 
-### 5.1 Does the pruning direction reach the sentiment or topic analyses?
+The deleted notebook's cell 27 (*Export community memberships as JSON*) read the `label` attribute (= author id) of each `Final_OutThreshold1_<method>.gml` and wrote `Final_OutThreshold1_author_communities.json` = `{author_id: {method: community}}`; its key count (expected 1,984,599) was never stored.
 
-Not yet. No notebook in `02` or `03` reads `Final_OutThreshold1.gml` or `Final_OutThreshold1_author_communities.json`. What each analysis actually restricted on:
+### 5.2 Does the backbone choice reach the sentiment or topic analyses?
+
+Not yet. No notebook in `02` or `03` reads any backbone file or community JSON. What each analysis actually restricted on:
 
 | Analysis | Author restriction intended | Author restriction actually applied |
 |---|---|---|
 | Sentiment v1 (`03/01`) | none | none — all 17,410,035 tweets |
 | Sentiment v4 (`03/01b`) | none | none — 17,410,035 AI and 3,583,101 AI+Art tweets |
-| Tweet-level LDA, topics in time, top-K per topic (`03/03`, `02/03`) | none | none — on the first-generation corpus (§6.3) |
-| Author-level LDA v1 / v2 (`03/04`, `03/04c`) | authors in the Strategy-1 LWCC (3,264,499; both retweeters and retweeted, no direction involved) | legacy low-id accounts only, because the loader matches GML `id` instead of `label` (§6.4) |
+| Tweet-level LDA, topics in time, top-K per topic (`03/03`; the deleted `02/03`) | none | none — on the first-generation corpus (§6.3) |
+| Author-level LDA v1 / v2 (`03/04`, `03/04c`) | authors in the LWCC (3,264,499; both retweeters and retweeted, no direction involved) | legacy low-id accounts only, because the loader matches GML `id` instead of `label` (§6.4) |
 | Classifiers (`05_Classifiers`) | none | none — they read the AI+Art tweet file directly |
 
-So the sentiment and tweet-topic results cover every author in the corpus, including the 1,396,671 who never retweeted or were retweeted, and the author-level LDA was designed against the undirected component, not the out-strength set. The choice between "everyone in the component", "authors who retweeted" and "authors who were retweeted" becomes consequential the first time a downstream notebook restricts to the 1,984,599-author set; the author-level LDA re-run (§8) is where that will happen.
-
-Cell 27 (*Export community memberships as JSON*) reads the `label` attribute (= author id) of each `Final_OutThreshold1_<method>.gml` and writes `Final_OutThreshold1_author_communities.json` = `{author_id: {method: community}}`. Its output is not stored in the committed notebook, so the exported key count (expected 1,984,599) is unverified here.
+So the sentiment and tweet-topic results cover every author in the corpus, including the 1,396,671 who never retweeted or were retweeted, and the author-level LDA was designed against the undirected component, not the retweeter set. The choice between "everyone in the component" (LWCC, 3,264,499) and "authors who were retweeted" (202,710) becomes consequential the first time a downstream notebook restricts to one of the `04/01` JSON exports; the author-level LDA re-run (§8) and the blog figures on the corrected backbone (§11.3) are where that will happen.
 
 ## 6. Consumers in `03_Analysis_and_Modeling` (and `02/03`)
 
@@ -478,7 +492,7 @@ Re-runs that would change results:
 - **The graph is right.** `Full_Network.gml` has edges retweeter → retweeted, as documented. In-strength is retweets received, out-strength is retweets made (§4.1).
 - **The pruning rule is the wrong side of the edge.** `prune_by_out_strength_threshold(threshold=1.0)` keeps authors who *made* ≥ 1 retweet. The intended population was authors who *were retweeted* ≥ 1 times (in-strength). The out-strength rule deletes every retweeted-only author outright (§5).
 - **Everything downstream of `Final_OutThreshold1.gml` is therefore a study of retweeters**, 1,984,599 of them, not of the amplified accounts. That file is the sole input of the five community partitions, the AMI/ARI comparison, the community JSON export, and the social-media maps.
-- **Nothing in the tweet-level analyses depends on it** (§5.1). Sentiment, emotion and tweet-topic results are computed on every tweet of the corpus.
+- **Nothing in the tweet-level analyses depends on it** (§5.2). Sentiment, emotion and tweet-topic results are computed on every tweet of the corpus.
 
 ### 9.2 Stage-by-stage impact
 
