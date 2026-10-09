@@ -1,0 +1,64 @@
+community_id,display_label,n_authors,sentiment,mean_score
+1,General ChatGPT Discussion,44718,positive,0.3169707381616734
+0,Anti-AI-Art Discourse,41574,positive,0.1543554900991288
+3,General ChatGPT Debate,17422,positive,0.1954841450320857
+8,AI-Art & NFT Posting,12679,positive,0.4767894532710395
+2,ChatGPT SEO/Content,10348,positive,0.3820437547931584
+12,"AI Tokens, Launchpads & AI",7502,positive,0.6055772026236064
+4,AI/Crypto Launchpads,7497,positive,0.7690541482769719
+9,AI-Blockchain Promotion,7256,positive,0.5648738165808831
+16,Data Science/ML Headlines,7132,positive,0.4239080165713734
+7,AI-Art Authenticity Disputes,5490,positive,0.1949213226401928
+10,ChatGPT & AI/Tech News,4542,positive,0.3441473452354244
+6,Mixed AI Art/ChatGPT,4098,positive,0.2380790880467934
+5,"NFTs, AI Tokens & AI",3607,positive,0.5654647268309935
+18,ChatGPT in Education,3281,positive,0.4175557305735275
+14,India-Linked ChatGPT/AI News,2834,positive,0.3247478742923456
+13,ChatGPT + Regional-Language Markers,2699,positive,0.2821155631267681
+15,AI-Art Criticism & Pop Culture,2005,positive,0.1976790898500173
+11,Anime AI Art/Stable Diffusion,1245,positive,0.3883361794323415
+17,Mixed ChatGPT Usage,1166,positive,0.2802356903281673
+24,Medical Imaging AI,1060,positive,0.4785907085663711
+28,Mixed AI/Creative Content,610,positive,0.4069944705077639
+1,General ChatGPT Discussion,44718,neutral,0.4507924808367282
+0,Anti-AI-Art Discourse,41574,neutral,0.345651335879133
+3,General ChatGPT Debate,17422,neutral,0.445194020937591
+8,AI-Art & NFT Posting,12679,neutral,0.3902491101994905
+2,ChatGPT SEO/Content,10348,neutral,0.461360377315278
+12,"AI Tokens, Launchpads & AI",7502,neutral,0.317501724122518
+4,AI/Crypto Launchpads,7497,neutral,0.2182720512471746
+9,AI-Blockchain Promotion,7256,neutral,0.3462213184717873
+16,Data Science/ML Headlines,7132,neutral,0.4753969194084129
+7,AI-Art Authenticity Disputes,5490,neutral,0.4073328272592678
+10,ChatGPT & AI/Tech News,4542,neutral,0.463193340441172
+6,Mixed AI Art/ChatGPT,4098,neutral,0.4467367496567473
+5,"NFTs, AI Tokens & AI",3607,neutral,0.3381722413231333
+18,ChatGPT in Education,3281,neutral,0.4397908895015303
+14,India-Linked ChatGPT/AI News,2834,neutral,0.4576721171076335
+13,ChatGPT + Regional-Language Markers,2699,neutral,0.4573824996499375
+15,AI-Art Criticism & Pop Culture,2005,neutral,0.3981960271221774
+11,Anime AI Art/Stable Diffusion,1245,neutral,0.3974443193919133
+17,Mixed ChatGPT Usage,1166,neutral,0.4475202096733027
+24,Medical Imaging AI,1060,neutral,0.4343540551038006
+28,Mixed AI/Creative Content,610,neutral,0.4260205042081418
+1,General ChatGPT Discussion,44718,negative,0.2322369666398935
+0,Anti-AI-Art Discourse,41574,negative,0.4999925216122647
+3,General ChatGPT Debate,17422,negative,0.3593218747098616
+8,AI-Art & NFT Posting,12679,negative,0.1329613275561699
+2,ChatGPT SEO/Content,10348,negative,0.1566039759246223
+12,"AI Tokens, Launchpads & AI",7502,negative,0.0769320260745379
+4,AI/Crypto Launchpads,7497,negative,0.0127098634981552
+9,AI-Blockchain Promotion,7256,negative,0.0889059089433718
+16,Data Science/ML Headlines,7132,negative,0.100696795339733
+7,AI-Art Authenticity Disputes,5490,negative,0.397746015773264
+10,ChatGPT & AI/Tech News,4542,negative,0.1926609226772796
+6,Mixed AI Art/ChatGPT,4098,negative,0.3151823836558173
+5,"NFTs, AI Tokens & AI",3607,negative,0.0963671375941868
+18,ChatGPT in Education,3281,negative,0.1426522715351789
+14,India-Linked ChatGPT/AI News,2834,negative,0.2175793314344155
+13,ChatGPT + Regional-Language Markers,2699,negative,0.2605005867471195
+15,AI-Art Criticism & Pop Culture,2005,negative,0.4041260659555291
+11,Anime AI Art/Stable Diffusion,1245,negative,0.2142204187748924
+17,Mixed ChatGPT Usage,1166,negative,0.2722424745690093
+24,Medical Imaging AI,1060,negative,0.0870544447808766
+28,Mixed AI/Creative Content,610,negative,0.1669801497373519

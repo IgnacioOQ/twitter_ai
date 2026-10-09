@@ -1,0 +1,204 @@
+{
+  "topic_order": [
+    "Marketing/Social",
+    "AI Art Discourse",
+    "AI Tools/Code",
+    "Bard/LLMs",
+    "Visual AI Art",
+    "Bot/Spam",
+    "Tech/Programming",
+    "News/Updates",
+    "NFT/Crypto",
+    "Web3/DeFi",
+    "General AI",
+    "Trading/Invest"
+  ],
+  "topic_colors": {
+    "Marketing/Social": "#e31a1c",
+    "AI Art Discourse": "#387db8",
+    "AI Tools/Code": "#4db04a",
+    "Bard/LLMs": "#994fa3",
+    "Visual AI Art": "#ff8000",
+    "Bot/Spam": "#ffff33",
+    "Tech/Programming": "#a65729",
+    "News/Updates": "#f782bf",
+    "NFT/Crypto": "#999999",
+    "Web3/DeFi": "#66c2a6",
+    "General AI": "#fc8c61",
+    "Trading/Invest": "#8ca1cc"
+  },
+  "community_colors_rgb": [
+    [
+      0.12,
+      0.47,
+      0.71
+    ],
+    [
+      1.0,
+      0.5,
+      0.05
+    ],
+    [
+      0.17,
+      0.63,
+      0.17
+    ],
+    [
+      0.84,
+      0.15,
+      0.16
+    ],
+    [
+      0.58,
+      0.4,
+      0.74
+    ],
+    [
+      0.55,
+      0.34,
+      0.29
+    ],
+    [
+      0.89,
+      0.47,
+      0.76
+    ],
+    [
+      0.5,
+      0.5,
+      0.5
+    ],
+    [
+      0.74,
+      0.74,
+      0.13
+    ],
+    [
+      0.09,
+      0.75,
+      0.81
+    ],
+    [
+      0.68,
+      0.78,
+      0.91
+    ],
+    [
+      1.0,
+      0.73,
+      0.47
+    ],
+    [
+      0.6,
+      0.87,
+      0.54
+    ],
+    [
+      1.0,
+      0.6,
+      0.59
+    ],
+    [
+      0.77,
+      0.69,
+      0.84
+    ],
+    [
+      0.77,
+      0.61,
+      0.58
+    ],
+    [
+      0.97,
+      0.71,
+      0.82
+    ],
+    [
+      0.78,
+      0.78,
+      0.78
+    ],
+    [
+      0.86,
+      0.86,
+      0.55
+    ],
+    [
+      0.62,
+      0.85,
+      0.9
+    ],
+    [
+      0.22,
+      0.23,
+      0.47
+    ],
+    [
+      0.39,
+      0.47,
+      0.22
+    ],
+    [
+      0.55,
+      0.43,
+      0.19
+    ],
+    [
+      0.52,
+      0.24,
+      0.22
+    ]
+  ],
+  "sentiment_colors": {
+    "positive": "#2ca25f",
+    "neutral": "#e3b505",
+    "negative": "#d73027",
+    "net_zero": "#e3b505"
+  },
+  "emotion_order": [
+    "anger",
+    "anticipation",
+    "disgust",
+    "fear",
+    "joy",
+    "love",
+    "optimism",
+    "pessimism",
+    "sadness",
+    "surprise",
+    "trust"
+  ],
+  "emotion_colors": {
+    "anger": "#0072b2",
+    "anticipation": "#e69f00",
+    "disgust": "#009e73",
+    "fear": "#cc79a7",
+    "joy": "#56b4e9",
+    "love": "#d55e00",
+    "optimism": "#f0e442",
+    "pessimism": "#332288",
+    "sadness": "#88ccee",
+    "surprise": "#aa4499",
+    "trust": "#44aa99"
+  },
+  "themes": {
+    "light": {
+      "background": "#ffffff",
+      "panel": "#f7f7f8",
+      "foreground": "#202124",
+      "muted": "#666b73",
+      "grid": "#d8dadd",
+      "accent": "#2468b4"
+    },
+    "dark": {
+      "background": "#121217",
+      "panel": "#1b1b23",
+      "foreground": "#f2f2f4",
+      "muted": "#b4b5bd",
+      "grid": "#3a3b45",
+      "accent": "#77aadd"
+    }
+  },
+  "source": "deployed visualizer palette, checked 2026-08-21",
+  "note": "Topic and community colours approximate the current WebGL RGB triples exactly at 8-bit display precision. Community colour is indexed by community_id modulo 24."
+}
