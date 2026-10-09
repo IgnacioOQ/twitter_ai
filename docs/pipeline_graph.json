@@ -29,13 +29,6 @@
       "bipartite": 0
     },
     {
-      "id": "02_Processing/02b_influence_and_flow_networks",
-      "kind": "notebook",
-      "stage": 2,
-      "path": "notebooks/02_Processing/02b_influence_and_flow_networks.ipynb",
-      "bipartite": 0
-    },
-    {
       "id": "02_Processing/03_cleaning_tweets",
       "kind": "notebook",
       "stage": 2,
@@ -333,25 +326,9 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.gml",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_dual_network_stats.json",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.gml",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.graphml",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.graphml",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_dual_network_stats.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -389,33 +366,9 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_dual_network_stats.json",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.graphml",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.graphml",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_dual_network_stats.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -429,17 +382,9 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_dual_network_stats.json",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_dual_network_stats.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_dual_network_stats.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_dual_network_stats.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1053,6 +998,14 @@
       "bipartite": 1
     },
     {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_label_propagation.gml",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_label_propagation.gml",
@@ -1622,229 +1575,107 @@
     },
     {
       "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.gml",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.graphml",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/full_network_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_basic_counts_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_timeline_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_author_corpus_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.graphml",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/dataset_statistics_summary.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02_sanity_check_and_network_generation",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "alternative",
-      "style": "alternative"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_pruning_stats.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_pruning_stats.json",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/test_network_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_basic_counts_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_timeline_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_author_corpus_dict.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_dual_network_stats.json",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/full_network_dict.pkl",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_basic_counts_dict.pkl",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_timeline_dict.pkl",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_author_corpus_dict.pkl",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_dual_network_stats.json",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/dataset_statistics_summary.json",
       "direction": "write"
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "alternative",
-      "style": "alternative"
-    },
-    {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network_Influence.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_Influence.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network_InfoFlow.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network_InfoFlow.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_RetweetedOnce_Influence.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_RetweetedOnce_InfoFlow.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_LWCC_Influence.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_LWCC_InfoFlow.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence.gml",
       "direction": "write",
       "manual": true
     },
     {
-      "src": "02_Processing/02b_influence_and_flow_networks",
+      "src": "02_Processing/02_sanity_check_and_network_generation",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow.gml",
       "direction": "write",
       "manual": true
@@ -2421,11 +2252,6 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict_test.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_author_dict_test.json",
       "dst": "02_Processing/01_api_data_to_dictionaries",
       "direction": "read"
@@ -2436,28 +2262,13 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_author_dict_test.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_author_dict.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_author_dict.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
       "direction": "read"
     },
     {
@@ -2482,11 +2293,6 @@
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test.json",
       "dst": "03_Analysis_and_Modeling/01_sentiment_analysis",
       "direction": "read"
     },
@@ -2502,11 +2308,6 @@
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
       "dst": "03_Analysis_and_Modeling/02_extract_examples",
       "direction": "read"
     },
@@ -2516,18 +2317,8 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_pruning_stats.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
       "direction": "read"
     },
     {
@@ -2541,18 +2332,8 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/test_network_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_basic_counts_dict.pkl",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_basic_counts_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
       "direction": "read"
     },
     {
@@ -2561,32 +2342,7 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_timeline_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_author_corpus_dict.pkl",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/test_author_corpus_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.gml",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.graphml",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_Network.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
     },
@@ -2596,18 +2352,8 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/full_network_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_timeline_dict.pkl",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_timeline_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
       "direction": "read"
     },
     {
@@ -2616,37 +2362,7 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_author_corpus_dict.pkl",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/full_network_stats.json",
-      "dst": "02_Processing/02b_influence_and_flow_networks",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
-      "dst": "04_Network_Analysis/01_network_analysis",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.graphml",
-      "dst": "02_Processing/02_sanity_check_and_network_generation",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
     },
@@ -2888,6 +2604,11 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/test_sentences_corpus.pkl",
       "dst": "03_Analysis_and_Modeling/06_topic_modeling_appendix",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_Network.gml",
+      "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read"
     },
     {

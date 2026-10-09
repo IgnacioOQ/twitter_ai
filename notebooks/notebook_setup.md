@@ -277,9 +277,9 @@ AI Public Trust/
 │   └── Networks/                              (networks_folder = BASE_PATH / 'Data Sets/Networks/')
 │       ├── test_network_dict.pkl              [written by 02_Processing/02]
 │       ├── full_network_dict.pkl              [written by 02_Processing/02]
-│       ├── Test_Network.json                  [written by 02_Processing/02]
-│       ├── Full_Network.json                  [written by 02_Processing/02]
-│       ├── Full_Network.gml                   [written by 02_Processing/02]  ← read by 04_Network_Analysis/01
+│       ├── Test_Network.json                  (legacy: pre-2026-10 version of 02_Processing/02)
+│       ├── Full_Network.json                  (legacy: pre-2026-10 version of 02_Processing/02)
+│       ├── Full_Network.gml                   (legacy: pre-2026-10 version of 02_Processing/02; identical to Full_Network_Influence.gml; read by 04_Network_Analysis/01)
 │       ├── LWCC.gml / .graphml                [written by 04_Network_Analysis/01 — pruning strategy 1]
 │       ├── 90TS_LWCC.gml / .graphml           [written by 04_Network_Analysis/01 — pruning strategy 2]
 │       ├── Final_OutThreshold1.gml / .graphml [written by 04_Network_Analysis/01 — pruning strategy 3]
@@ -288,15 +288,15 @@ AI Public Trust/
 │       │                                       leiden_directed, infomap]
 │       ├── Final_OutThreshold1_author_communities.json     [written by 04_Network_Analysis/01 —
 │       │                                            {author_id: {method: community}}; SUPERSEDED, see docs/AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9]
-│       ├── Full_Network_Influence.gml              [written by 02_Processing/02b]  edge retweeter → retweeted (identical to the original Full_Network file)
-│       ├── Full_Network_InfoFlow.gml               [written by 02_Processing/02b]  edge retweeted → retweeter (transpose)
-│       ├── Full_RetweetedOnce_Influence.gml        [written by 02_Processing/02b]  in-strength ≥ 1 backbone (authors retweeted ≥ 1x), LWCC
-│       ├── Full_RetweetedOnce_InfoFlow.gml         [written by 02_Processing/02b]  same authors, transposed; input for Infomap
+│       ├── Full_Network_Influence.gml              [written by 02_Processing/02]  edge retweeter → retweeted (identical to the original Full_Network file)
+│       ├── Full_Network_InfoFlow.gml               [written by 02_Processing/02]  edge retweeted → retweeter (transpose)
+│       ├── Full_RetweetedOnce_Influence.gml        [written by 02_Processing/02]  in-strength ≥ 1 backbone (authors retweeted ≥ 1x), LWCC
+│       ├── Full_RetweetedOnce_InfoFlow.gml         [written by 02_Processing/02]  same authors, transposed; input for Infomap
 │       ├── Full_RetweetedOnce_Influence_<method>.gml   [written by 04_Network_Analysis/01b]  label_propagation, louvain, leiden_fast, leiden_directed
 │       ├── Full_RetweetedOnce_InfoFlow_infomap.gml     [written by 04_Network_Analysis/01b]
 │       ├── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01b]  {author_id: {method: community}}
-│       ├── Full_LWCC_Influence.gml                 [written by 02_Processing/02b]  self-loops removed, largest weakly connected component (3,264,499 authors), edge retweeter → retweeted
-│       ├── Full_LWCC_InfoFlow.gml                  [written by 02_Processing/02b]  same authors, transposed; input for Infomap
+│       ├── Full_LWCC_Influence.gml                 [written by 02_Processing/02]  self-loops removed, largest weakly connected component (3,264,499 authors), edge retweeter → retweeted
+│       ├── Full_LWCC_InfoFlow.gml                  [written by 02_Processing/02]  same authors, transposed; input for Infomap
 │       ├── Full_LWCC_Influence_<method>.gml        [written by 04_Network_Analysis/01b]  label_propagation, louvain, leiden_fast, leiden_directed
 │       ├── Full_LWCC_InfoFlow_infomap.gml          [written by 04_Network_Analysis/01b]
 │       └── Full_LWCC_author_communities.json       [written by 04_Network_Analysis/01b]  {author_id: {method: community}}

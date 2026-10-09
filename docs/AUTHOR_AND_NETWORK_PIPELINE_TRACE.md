@@ -17,6 +17,8 @@ This document answers one question for every step of the pipeline: **how many tw
 > **Status 2026-10-08.** The corrected pipeline has been executed through community detection: `02b` (both networks + the retweeted-once backbone, 202,710 authors) and `01b` (five partitions + JSON export) ran on Colab without errors and their outputs are stored in the notebooks (§9.3). `02b-viz` is running. The original `04/01` / `04/02` outputs on Drive are superseded but not deleted. Still open: the author-level LDA fix (§6.4), the sentiment block drift (§6.2), the first-generation corpus in the tweet-topic notebooks (§6.3), and the blog draft, whose network-dependent sections are built on the retweeter backbone (§11).
 >
 > **Status 2026-10-09.** The `02b-viz` run of 2026-10-08 failed before layout (the cuGraph install cell assumed a cu12 RAPIDS image; Colab GPU runtimes now ship cu13 — fixed in both visualisation notebooks, §9.5). The corrected pipeline was then **extended to a second backbone**: `02b` also exports the direction-neutral LWCC in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`), `01b` clusters both backbones in one pass (`BACKBONE_STEMS`), and `02b-viz` lists `LWCC_*` registry keys (§8 "Corrected notebooks", §9.3, §10.3). **None of the LWCC outputs exist on Drive yet**; the three notebooks are queued for a re-run.
+>
+> **Rename 2026-10-09.** The original `02_Processing/02_sanity_check_and_network_generation.ipynb` was deleted and the corrected `02b_influence_and_flow_networks.ipynb` was renamed to that name (`git mv`, history preserved). Throughout this document `02b` means today's `02_sanity_check_and_network_generation.ipynb`, and `02/02` with a cell number means the deleted original, whose stored outputs are the source of §§1–4. `Full_Network.gml`, `.graphml`, `.gexf`, `.json` and `Test_Network.*` are now legacy files on Drive with no producing notebook; `Full_Network_Influence.gml` is the same graph.
 
 All numbers below are **copied from the outputs stored in the committed `.ipynb` files**. Nothing was re-run. Cell references use the form `cell N` = 0-based position in the notebook's cell list, together with the nearest markdown heading, so a cell can be found either way.
 
@@ -737,7 +739,7 @@ Figure 1 (timeline) needs nothing.
 
 ## 12. File inventory — every artifact of the pipeline
 
-*Added 2026-10-09.* Every file the notebooks read or write, derived from [docs/pipeline_graph.json](pipeline_graph.json) (169 artifacts after the 2026-10-09 rebuild: parsed edges plus the declared ones of `pipeline_overrides.yaml`). Location is the folder, relative to `BASE_PATH` = `My Drive/Colab Projects/AI Public Trust/` unless marked HPC or Colab-local; *written by* / *read by* are notebook ids (`stage/index`, `b` = corrected copy); templated names (`{…}`) are resolved at run time. Descriptions are from the notebooks and §§1–9 of this document. A file with no writer is produced outside the repository or by a cell that no longer exists; a file with no reader is a terminal output. To regenerate the producer/consumer columns after a notebook change, follow §10.5 and re-derive this table from the JSON.
+*Added 2026-10-09.* Every file the notebooks read or write, derived from [docs/pipeline_graph.json](pipeline_graph.json) (164 artifacts after the 2026-10-09 rebuild: parsed edges plus the declared ones of `pipeline_overrides.yaml`). Location is the folder, relative to `BASE_PATH` = `My Drive/Colab Projects/AI Public Trust/` unless marked HPC or Colab-local; *written by* / *read by* are notebook ids (`stage/index`, `b` = corrected copy); templated names (`{…}`) are resolved at run time. Descriptions are from the notebooks and §§1–9 of this document. A file with no writer is produced outside the repository or by a cell that no longer exists; a file with no reader is a terminal output. Legacy files that no notebook reads or writes any more (`Test_Network.*`, `Full_Network.graphml/.gexf/.json`, written by the pre-2026-10 `02/02`) still sit on Drive but are not listed. To regenerate the producer/consumer columns after a notebook change, follow §10.5 and re-derive this table from the JSON.
 
 ### 12.1 `Raw Data/`
 
@@ -751,17 +753,17 @@ Figure 1 (timeline) needs nothing.
 
 | File | Written by | Read by | What it is |
 |---|---|---|---|
-| `AItrust_author_dict.json` | `02/01` | `02/02`, `02/02b` | Stage-1 author dictionary: one author record per line, with duplicates (31,989,322 lines; §1). |
-| `AItrust_author_dict_test.json` | `02/01` | `02/01`, `02/02`, `02/02b` | Test-branch counterpart of the author dictionary. |
-| `AItrust_twits_dict.json` | `02/01` | `02/02`, `02/02b` | Stage-1 tweet dictionary: line-delimited JSON, one tweet record per line, flattened from the raw pages, **with duplicates** (36,560,405 lines; §1). |
-| `AItrust_twits_dict_test.json` | `02/01` | `02/01`, `02/02`, `02/02b` | Test-branch counterpart of the tweet dictionary, built from `testing.json`. |
+| `AItrust_author_dict.json` | `02/01` | `02/02` | Stage-1 author dictionary: one author record per line, with duplicates (31,989,322 lines; §1). |
+| `AItrust_author_dict_test.json` | `02/01` | `02/01`, `02/02` | Test-branch counterpart of the author dictionary. |
+| `AItrust_twits_dict.json` | `02/01` | `02/02` | Stage-1 tweet dictionary: line-delimited JSON, one tweet record per line, flattened from the raw pages, **with duplicates** (36,560,405 lines; §1). |
+| `AItrust_twits_dict_test.json` | `02/01` | `02/01`, `02/02` | Test-branch counterpart of the tweet dictionary, built from `testing.json`. |
 
 ### 12.3 `Data Sets/Cleaned Data/`
 
 | File | Written by | Read by | What it is |
 |---|---|---|---|
-| `AItrust_Art_pruned_twit_dict.json` | `02/02`, `02/02b` | — | **AI+Art corpus**: the 3,583,101 AI-corpus tweets that also match one of the 60 art keywords (§2). |
-| `AItrust_Art_pruned_twit_dict_test.json` | `02/02`, `02/02b` | `02/02`, `02/02b`, `03/02` | Test-branch AI+Art corpus (216 tweets). |
+| `AItrust_Art_pruned_twit_dict.json` | `02/02` | — | **AI+Art corpus**: the 3,583,101 AI-corpus tweets that also match one of the 60 art keywords (§2). |
+| `AItrust_Art_pruned_twit_dict_test.json` | `02/02` | `02/02`, `03/02` | Test-branch AI+Art corpus (216 tweets). |
 | `AItrust_pruned_twits.json` | — | `03/01` | First-generation AI corpus (22.4M-line generation, §6.3). No producing cell survives; read by sentiment v2. |
 | `AItrust_pruned_twits_classified_{MODEL_ALIAS}.json` | `03/01` | `03/01` | Sentiment v2 output per model alias on the first-generation corpus. |
 | `AItrust_pruned_twits_test.json` | — | `03/01` | First-generation test corpus; read by sentiment v2. |
@@ -773,23 +775,23 @@ Figure 1 (timeline) needs nothing.
 | `AItrust_pruned_twits_with_sentiment_and_topics_k5.jsonl.gz` | `03/03` | `03/03` | Compressed line-delimited version of the same, read back by `03/03`. |
 | `AItrust_pruned_twits_with_sentiment_cleaned.json` | `02/03` | — | The v1 sentiment file after the `02/03` text-cleaning pass. |
 | `AItrust_topics_k5_metadata.json` | `03/03` | — | Top terms and settings of the K = 5 tweet-topic model. |
-| `AItrust_twits_pruned_dict.json` | `02/02`, `02/02b` | `02/02`, `02/02b`, `03/01` | **AI corpus**: 17,410,035 tweets after dedup + AI keyword + English + date ≥ 2022-10-31, with `processed_text` added (§2). |
-| `AItrust_twits_pruned_dict_test.json` | `02/02`, `02/02b` | `02/02`, `02/02b`, `03/01`, `03/02` | Test-branch AI corpus (881 tweets). |
+| `AItrust_twits_pruned_dict.json` | `02/02` | `02/02`, `03/01` | **AI corpus**: 17,410,035 tweets after dedup + AI keyword + English + date ≥ 2022-10-31, with `processed_text` added (§2). |
+| `AItrust_twits_pruned_dict_test.json` | `02/02` | `02/02`, `03/01`, `03/02` | Test-branch AI corpus (881 tweets). |
 | `AItrust_twits_pruned_dict_test_with_sentiment.json` | `03/01` | — | Sentiment v1 test output (current file name). |
 | `Cleaned DataAItrust_pruned_twits.json` | — | `03/05` | **Path bug**: `03/05` joins `cleanedds_folder` and the file name without a separator, so this path can never resolve. Intended: `Cleaned Data/AItrust_pruned_twits.json`. |
 | `Cleaned DataAItrust_pruned_twits_test.json` | — | `03/05` | Same path bug, test file. |
-| `dataset_statistics_summary.json` | `02/02`, `02/02b` | — | Master summary of the dataset (timeframe, funnel, authors, typology, network topology); mirrored in the repository at `notebooks/02_Processing/dataset_statistics_summary.json`. |
-| `full_author_corpus_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | author id → list of that author's raw tweet texts, 4,775,711 authors (input for author-level text models; §3). |
-| `full_basic_counts_dict.pkl` | `02/02`, `02/02b` | — | Tweet-type counts of the AI corpus (original / retweeted / replied_to / quoted; §3). |
-| `full_dual_network_stats.json` | `02/02b` | — | `02b` statistics for the full network in both orientations (`raw`), the LWCC backbone (`lwcc`, since 2026-10-09) and the retweeted-once backbone (`pruned`), including the pruning funnel and top-N lists (§9.3). |
-| `full_network_stats.json` | `02/02` | `02/02`, `02/02b` | Topology statistics of the full retweet graph as written by `02/02` (nodes, edges, weight, components, top-10 lists; §4.2). |
-| `full_pruning_stats.json` | `02/02`, `02/02b` | — | Funnel counters of the full pruning pass (lines read, duplicates, drops per rule, kept counts, date range, tweet types; §2.2). |
-| `full_timeline_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | tweet id → `created_at` for every AI-corpus tweet (the daily-volume timeline; §3). |
-| `test_author_corpus_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | Test-branch author corpus dictionary. |
-| `test_basic_counts_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | Test-branch tweet-type counts. |
-| `test_dual_network_stats.json` | `02/02b` | — | Same for the test branch. |
-| `test_pruning_stats.json` | `02/02`, `02/02b` | `02/02`, `02/02b` | Same counters for the test branch. |
-| `test_timeline_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | Test-branch timeline dictionary. |
+| `dataset_statistics_summary.json` | `02/02` | — | Master summary of the dataset (timeframe, funnel, authors, typology, network topology); mirrored in the repository at `notebooks/02_Processing/dataset_statistics_summary.json`. |
+| `full_author_corpus_dict.pkl` | `02/02` | `02/02` | author id → list of that author's raw tweet texts, 4,775,711 authors (input for author-level text models; §3). |
+| `full_basic_counts_dict.pkl` | `02/02` | — | Tweet-type counts of the AI corpus (original / retweeted / replied_to / quoted; §3). |
+| `full_dual_network_stats.json` | `02/02` | — | `02` statistics for the full network in both orientations (`raw`), the LWCC backbone (`lwcc`, since 2026-10-09) and the retweeted-once backbone (`pruned`), including the pruning funnel and top-N lists (§9.3). |
+| `full_network_stats.json` | — | `02/02` | Topology statistics of the full retweet graph written by the pre-2026-10 `02/02` (nodes, edges, weight, components, top-10 lists; §4.2); read by the summary-report cell. |
+| `full_pruning_stats.json` | `02/02` | — | Funnel counters of the full pruning pass (lines read, duplicates, drops per rule, kept counts, date range, tweet types; §2.2). |
+| `full_timeline_dict.pkl` | `02/02` | `02/02` | tweet id → `created_at` for every AI-corpus tweet (the daily-volume timeline; §3). |
+| `test_author_corpus_dict.pkl` | `02/02` | `02/02` | Test-branch author corpus dictionary. |
+| `test_basic_counts_dict.pkl` | `02/02` | `02/02` | Test-branch tweet-type counts. |
+| `test_dual_network_stats.json` | `02/02` | — | Same for the test branch. |
+| `test_pruning_stats.json` | `02/02` | `02/02` | Same counters for the test branch. |
+| `test_timeline_dict.pkl` | `02/02` | `02/02` | Test-branch timeline dictionary. |
 | `top_retweets_by_topic_100.csv` | `02/03` | — | The 100 most-retweeted tweets per topic (`02/03`). |
 | `top_retweets_by_topic_{K}.csv` | `02/03` | — | Templated version of the same for other K. |
 | `{BLOCK_BASENAME}{block_idx}.json` | `03/03` | — | Per-block intermediate outputs of the tweet-topic inference (`03/03`; names resolved at run time). |
@@ -846,39 +848,34 @@ Figure 1 (timeline) needs nothing.
 | `Final_OutThreshold1_leiden_fast.gml` | `04/01` | `04/01`, `04/02` | Superseded retweeter backbone with the `community_leiden_fast` attribute (`04/01`). |
 | `Final_OutThreshold1_louvain.gml` | `04/01` | `04/01` | Superseded retweeter backbone with the `community_louvain` attribute (`04/01`). |
 | `Full_LWCC_author_communities.json` | `04/01b` | — | Same for the LWCC backbone (3.26M authors); pending. |
-| `Full_LWCC_Influence.gml` | `02/02b` | `04/01b` | **LWCC backbone**: self-loops removed, largest weakly connected component of the full graph — expected 3,264,499 authors, 7,670,516 edges (= strategy 1); influence orientation. Added 2026-10-09, **not yet on Drive**. |
+| `Full_LWCC_Influence.gml` | `02/02` | `04/01b` | **LWCC backbone**: self-loops removed, largest weakly connected component of the full graph — expected 3,264,499 authors, 7,670,516 edges (= strategy 1); influence orientation. Added 2026-10-09, **not yet on Drive**. |
 | `Full_LWCC_Influence_label_propagation.gml` | `04/01b` | `04/01b` | LWCC backbone with the `community_label_propagation` vertex attribute; `01b`, pending. |
 | `Full_LWCC_Influence_leiden_directed.gml` | `04/01b` | `04/01b` | LWCC backbone with the `community_leiden_directed` vertex attribute; `01b`, pending. |
 | `Full_LWCC_Influence_leiden_fast.gml` | `04/01b` | `04/01b` | LWCC backbone with the `community_leiden_fast` vertex attribute; `01b`, pending. |
 | `Full_LWCC_Influence_louvain.gml` | `04/01b` | `04/01b` | LWCC backbone with the `community_louvain` vertex attribute; `01b`, pending. |
-| `Full_LWCC_InfoFlow.gml` | `02/02b` | `04/01b` | Transpose of the LWCC backbone; the Infomap input. Not yet on Drive. |
+| `Full_LWCC_InfoFlow.gml` | `02/02` | `04/01b` | Transpose of the LWCC backbone; the Infomap input. Not yet on Drive. |
 | `Full_LWCC_InfoFlow_infomap.gml` | `04/01b` | `04/01b` | LWCC backbone, flow orientation, with the Infomap partition; `01b`, pending. |
-| `Full_Network.gml` | `02/02` | `02/02`, `04/01` | **Full retweet graph**, edge retweeter → retweeted, weight = retweets: 3,379,040 authors, 7,768,720 edges (§4). Node name = `str(author_id)` stored as GML `label`; GML `id` is a positional index. |
-| `Full_Network.graphml` | `02/02` | `02/02` | GraphML copy of the full graph (also written as `.gexf`, which the parser does not see). |
-| `Full_Network.json` | `02/02` | `02/02` | Node-link JSON copy of the full graph. |
-| `full_network_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | Nested counter `{retweeted_author: {retweeter: n}}` for the AI corpus: 374,368 retweeted authors, 9,638,407 retweets (§3). |
-| `Full_Network_Influence.gml` | `02/02b` | `04/01b` | `02b` full graph, influence orientation; identical to `Full_Network.gml` (3,379,040 / 7,768,720). |
-| `Full_Network_InfoFlow.gml` | `02/02b` | — | `02b` full graph, information-flow orientation (the transpose; same counts). |
+| `Full_Network.gml` | — | `04/01` | **Legacy** full retweet graph written by the pre-2026-10 version of `02/02`: edge retweeter → retweeted, weight = retweets, 3,379,040 authors, 7,768,720 edges (§4); identical to `Full_Network_Influence.gml`. Node name = `str(author_id)` stored as GML `label`; GML `id` is a positional index. |
+| `full_network_dict.pkl` | `02/02` | `02/02` | Nested counter `{retweeted_author: {retweeter: n}}` for the AI corpus: 374,368 retweeted authors, 9,638,407 retweets (§3). |
+| `Full_Network_Influence.gml` | `02/02` | `04/01b` | **Full retweet graph**, influence orientation (retweeter → retweeted); identical to the legacy `Full_Network.gml` (3,379,040 authors, 7,768,720 edges). |
+| `Full_Network_InfoFlow.gml` | `02/02` | — | `02` full graph, information-flow orientation (the transpose; same counts). |
 | `Full_RetweetedOnce_author_communities.json` | `04/01b` | — | `{author_id: {method: community_id}}` for the 202,710 backbone authors and all five methods (`01b`); the author set for downstream restriction. |
-| `Full_RetweetedOnce_Influence.gml` | `02/02b` | `04/01b` | **Retweeted-once backbone**: self-loops removed, in-strength ≥ 1 (363,618 authors), then LWCC — **202,710 authors, 882,530 edges, weight 1,269,747** (13.17 % of retweets); influence orientation (§9.3). |
+| `Full_RetweetedOnce_Influence.gml` | `02/02` | `04/01b` | **Retweeted-once backbone**: self-loops removed, in-strength ≥ 1 (363,618 authors), then LWCC — **202,710 authors, 882,530 edges, weight 1,269,747** (13.17 % of retweets); influence orientation (§9.3). |
 | `Full_RetweetedOnce_Influence_label_propagation.gml` | `04/01b` | `04/01b` | Retweeted-once backbone with the `community_label_propagation` vertex attribute (read back as `communitylabelpropagation`, float → int); `01b`, 2026-10-07. |
 | `Full_RetweetedOnce_Influence_leiden_directed.gml` | `04/01b` | `04/01b` | Retweeted-once backbone with the `community_leiden_directed` vertex attribute (read back as `communityleidendirected`, float → int); `01b`, 2026-10-07. |
 | `Full_RetweetedOnce_Influence_leiden_fast.gml` | `04/01b` | `04/01b`, `04/02b` | Retweeted-once backbone with the `community_leiden_fast` vertex attribute (read back as `communityleidenfast`, float → int); `01b`, 2026-10-07. |
 | `Full_RetweetedOnce_Influence_louvain.gml` | `04/01b` | `04/01b` | Retweeted-once backbone with the `community_louvain` vertex attribute (read back as `communitylouvain`, float → int); `01b`, 2026-10-07. |
-| `Full_RetweetedOnce_InfoFlow.gml` | `02/02b` | `04/01b` | Transpose of the retweeted-once backbone; the Infomap input. |
+| `Full_RetweetedOnce_InfoFlow.gml` | `02/02` | `04/01b` | Transpose of the retweeted-once backbone; the Infomap input. |
 | `Full_RetweetedOnce_InfoFlow_infomap.gml` | `04/01b` | `04/01b` | Retweeted-once backbone, flow orientation, with the Infomap partition (17,055 modules); `01b`, 2026-10-07. |
 | `LWCC.gml` | `04/01` | — | Strategy 1 of `04/01`: full graph, self-loops removed, giant component — 3,264,499 authors, 7,670,516 edges (igraph-written; §5). Same graph as `Full_LWCC_Influence.gml`. |
 | `LWCC.graphml` | `04/01` | — | GraphML copy of strategy 1. |
-| `Test_LWCC_Influence.gml` | `02/02b` | — | `02b` test LWCC backbone, influence orientation (added 2026-10-09). |
-| `Test_LWCC_InfoFlow.gml` | `02/02b` | — | Transpose of the test LWCC backbone. |
-| `Test_Network.gml` | `02/02` | `02/02` | Test retweet graph, edge retweeter → retweeted (`02/02`). |
-| `Test_Network.graphml` | `02/02` | `02/02` | GraphML copy of the test graph. |
-| `Test_Network.json` | `02/02` | `02/02` | Node-link JSON copy of the test graph. |
-| `test_network_dict.pkl` | `02/02`, `02/02b` | `02/02`, `02/02b` | Nested counter `{retweeted_author: {retweeter: n}}` for the test corpus (§3). |
-| `Test_Network_Influence.gml` | `02/02b` | — | `02b` test graph, influence orientation (retweeter → retweeted); identical to `Test_Network.gml`. |
-| `Test_Network_InfoFlow.gml` | `02/02b` | — | `02b` test graph, information-flow orientation (retweeted → retweeter): the transpose. |
-| `Test_RetweetedOnce_Influence.gml` | `02/02b` | — | `02b` test backbone: in-strength ≥ 1 then LWCC (3 nodes — the test data is too small to carry one). |
-| `Test_RetweetedOnce_InfoFlow.gml` | `02/02b` | — | Transpose of the test backbone. |
+| `Test_LWCC_Influence.gml` | `02/02` | — | `02` test LWCC backbone, influence orientation (added 2026-10-09). |
+| `Test_LWCC_InfoFlow.gml` | `02/02` | — | Transpose of the test LWCC backbone. |
+| `test_network_dict.pkl` | `02/02` | `02/02` | Nested counter `{retweeted_author: {retweeter: n}}` for the test corpus (§3). |
+| `Test_Network_Influence.gml` | `02/02` | — | Test graph, influence orientation (retweeter → retweeted); identical to the legacy `Test_Network.gml`. |
+| `Test_Network_InfoFlow.gml` | `02/02` | — | `02` test graph, information-flow orientation (retweeted → retweeter): the transpose. |
+| `Test_RetweetedOnce_Influence.gml` | `02/02` | — | `02` test backbone: in-strength ≥ 1 then LWCC (3 nodes — the test data is too small to carry one). |
+| `Test_RetweetedOnce_InfoFlow.gml` | `02/02` | — | Transpose of the test backbone. |
 
 ### 12.8 `Data Sets/Networks/viz_outputs_<NETWORK>/`
 
