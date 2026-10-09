@@ -590,7 +590,7 @@ To regenerate either figure the branch needs the external inputs restored under 
 
 ### 9.5 The network visualisation notebooks
 
-Two places:
+Three places:
 
 - The pre-2026-10 `04_Network_Analysis/02_network_visualization.ipynb` (deleted 2026-10-09; the rewrite now carries the name): loaded one of the `Final_OutThreshold1*.gml` files (configured `NETWORK = 'Final_leiden_fast'`), undirects, keeps the giant component (1,984,599 nodes), colours the 16 largest precomputed communities, lays out with GPU ForceAtlas2 (`classic`, `linlog`) and, since 2026-08-12, igraph DrL via `src/network/network_utils.py::compute_drl_layout`; writes `social_map_<recipe>_<light|dark>.png`, `positions_<recipe>.parquet`, `05_degree_ccdf.png`, `06_adjacency_blocks.png`, optionally `network_with_layout.graphml`, into `Networks/viz_outputs_Final_leiden_fast/`. Every rendered map is therefore a map of the retweeter backbone (§9.2).
 - [04_Network_Analysis/02_network_visualization.ipynb](../notebooks/04_Network_Analysis/02_network_visualization.ipynb) (named `02b_network_visualization_retweeted_once.ipynb` until 2026-10-09): the same pipeline with a registry of the `02` / `01` files — seven `RetweetedOnce_*` keys and, since 2026-10-09, seven `LWCC_*` keys; one network per run, output in `Networks/viz_outputs_<NETWORK>/`. Its 2026-10-08 run (`RetweetedOnce_leiden_fast`, A100) loaded and preprocessed the 202,710-node graph (undirected: 864,436 edges, one component, 1,089 Leiden-fast communities, top 16 = 91 % of nodes) and then failed at `import cudf`: the cuGraph install cell probed only `*-cu12` packages, and Colab GPU runtimes now ship RAPIDS cu13, so an unpinned cu12 wheel overwrote the preinstalled stack. Both visualisation notebooks now detect the CUDA suffix first and refuse an unpinned install (2026-10-09); the failed outputs were stripped from the committed copy. Still open: the trailing DrL cell imports `src.network.network_utils` although the notebook has no clone cell, so it cannot run on Colab.
@@ -615,6 +615,7 @@ python3 src/scripts/pipeline_graph.py downstream 02_Processing/02_sanity_check_a
 - `validate` initially flagged two **wrong provenance tags** in `notebooks/notebook_setup.md` / `README.md`, now corrected: `top_test_ai_tweets.csv` and `top_test_art_tweets.csv` are written by `03_Analysis_and_Modeling/02`, not `02_Processing/02`; `Full_Network.gml` is written by `02_Processing/02`, not `04_Network_Analysis/01` (which only reads it).
 - The three corrected notebooks (§9, "Corrected notebooks") are registered in [docs/pipeline_overrides.yaml](pipeline_overrides.yaml) as **alternatives** of their originals (dashed edges; both appeared in the graph until 2026-10-09, when all three corrected copies were renamed over their originals and the pairs were dropped), and the new network artifacts are listed in both directory listings with `[written by …/02b]` / `[…/01b]` tags.
 - **Rebuilt 2026-10-09** after the LWCC extension: **28 notebooks, 169 artifacts, 155 write edges, 132 read edges**; 53 declared edges (20 added: the `02` LWCC writes for the Test and Full branches, the `01` reads of all four backbone files and its five LWCC community writes and read-backs, and the two community JSONs — `COMMUNITIES_JSON` is now a dict comprehension over `BACKBONE_STEMS`, which the parser cannot resolve, so `Full_RetweetedOnce_author_communities.json` moved from parsed to declared). `validate` clean.
+- **Rebuilt 2026-10-09 (clean-up)** after the deletions and renames of `02_Processing/02`, `02_Processing/03`, `04_Network_Analysis/01` and `04_Network_Analysis/02`: **24 notebooks, 146 artifacts, 114 write edges, 101 read edges**; 45 declared edges, 2 alternative edges. The deleted notebooks' edges are gone, so `Full_Network.gml`, `LWCC.gml`, every `Final_OutThreshold1*` file, `viz_outputs_Final_leiden_fast/` and `02/03`'s outputs no longer appear in the graph; they remain on Drive as legacy files (status block, *Reading conventions*). `validate` clean.
 
 ### 10.2 What the parser cannot see — and how it is covered
 
@@ -631,16 +632,16 @@ Rather than widen the parser, the script now accepts **hand-declared edges** (`m
 jq '[.edges[] | select(.manual)] | length' docs/pipeline_graph.json
 ```
 
-Notebook ids may now carry a letter suffix (`02`, `01`) in provenance tags, so the corrected copies are validated like any other notebook.
+Notebook ids may carry a letter suffix in provenance tags (the former `02b`, `01b`), so corrected copies were validated like any other notebook while they coexisted with their originals.
 
 ### 10.3 Hand-off table for the network stage
 
-Each row was checked twice: against the notebook source (§§4–5, §9) and against the rebuilt graph (`upstream` / `downstream` queries).
+Each row was checked twice: against the notebook source (§§4–5, §9) and against the rebuilt graph (`upstream` / `downstream` queries). Rows marked *legacy* describe files that the deleted originals wrote; they are kept so the stored numbers in §§5 and 9 stay traceable.
 
 | Producer | File (in `Data Sets/Networks/`) | Consumer(s) | Edge source |
 |---|---|---|---|
-| `02/02` cell 44 | `full_network_dict.pkl` | `02/02` cell 51, `02` | parsed |
-| `02/02` cell 53 | `Full_Network.gml` | `04/01` (all three strategies) | parsed |
+| `02/02` cell 44 (same cell in today's `02`, gated by `generate_data`) | `full_network_dict.pkl` | `02` (network build) | parsed |
+| `02/02` cell 53 (deleted original) | `Full_Network.gml` — **legacy** | read only by the deleted `04/01`; `Full_Network_Influence.gml` is the same graph | no edge since 2026-10-09 |
 | `02` | `Full_Network_Influence.gml`, `Full_Network_InfoFlow.gml` | `01` (optional inspection, strategy 2), `04/02` registry | declared |
 | `02` | `Full_RetweetedOnce_Influence.gml` | `01` (backbone check; undirected methods; directed Leiden), `04/02` registry | declared |
 | `02` | `Full_RetweetedOnce_InfoFlow.gml` | `01` (Infomap) | declared |
@@ -649,9 +650,9 @@ Each row was checked twice: against the notebook source (§§4–5, §9) and aga
 | `02` | `Full_LWCC_Influence.gml`, `Full_LWCC_InfoFlow.gml` — *added 2026-10-09, not yet on Drive* | `01` (backbone check; undirected methods + directed Leiden on Influence; Infomap on InfoFlow), `04/02` registry | declared |
 | `01` | `Full_LWCC_Influence_{label_propagation,louvain,leiden_fast,leiden_directed}.gml`, `Full_LWCC_InfoFlow_infomap.gml` — *not yet on Drive* | `01` (AMI/ARI, JSON export), `04/02` | declared |
 | `01` | `Full_LWCC_author_communities.json` — *not yet on Drive* | *(no consumer yet)* | declared |
-| `04/01` cell 18 | `Final_OutThreshold1.gml` — **superseded** | `04/01` community cells | parsed |
-| `04/01` cells 21, 23 | `Final_OutThreshold1_<method>.gml` — **superseded** | `04/01` AMI + export, `04/02` | declared |
-| `04/01` cell 27 | `Final_OutThreshold1_author_communities.json` — **superseded** | *(none in repo; §9.4 for the blog branch)* | parsed |
+| `04/01` cell 18 (deleted original) | `Final_OutThreshold1.gml` — **legacy** | the deleted `04/01` community cells | no edge since 2026-10-09 |
+| `04/01` cells 21, 23 (deleted original) | `Final_OutThreshold1_<method>.gml` — **legacy** | the deleted `04/01` AMI + export and the deleted `04/02`; still selectable in today's `04/02` registry under `Final_*` keys | no edge since 2026-10-09 |
+| `04/01` cell 27 (deleted original) | `Final_OutThreshold1_author_communities.json` — **legacy** | *(none in repo; §9.4 for the blog branch)* | no edge since 2026-10-09 |
 
 ### 10.4 Caveats when reading the graph
 
