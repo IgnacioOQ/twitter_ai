@@ -6,14 +6,9 @@
 alternatives:
   - ["03_Analysis_and_Modeling/01_sentiment_analysis",
      "03_Analysis_and_Modeling/01_sentiment_analysis_v2"]
-  # 2026-10-07: corrected copies of the network-analysis stage (see
-  # docs/AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9). The *b notebook is the one
-  # to run; the original is kept for provenance of the stored results.
-  # (02_Processing/02b was renamed over the original 02 on 2026-10-09.)
-  - ["04_Network_Analysis/01_network_analysis",
-     "04_Network_Analysis/01b_network_analysis_retweeted_once"]
-  - ["04_Network_Analysis/02_network_visualization",
-     "04_Network_Analysis/02b_network_visualization_retweeted_once"]
+  # 2026-10-09: the corrected network-stage copies were renamed over their
+  # originals (02_Processing/02, 04_Network_Analysis/01 and /02), so no
+  # alternative pairs remain for them.
 
 # Artifact paths to collapse into a single glob node.
 # Use shell-style wildcards (`*`). Any artifact path that matches one of these
@@ -62,51 +57,51 @@ manual_edges:
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow.gml'
     direction: write
     note: 'written by export_network() helper; path assembled inside the function'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_label_propagation.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_louvain.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_directed.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_infomap.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_label_propagation.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_louvain.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_directed.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow_infomap.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[method]'
-  - notebook: '04_Network_Analysis/02b_network_visualization_retweeted_once'
+  - notebook: '04_Network_Analysis/02_network_visualization'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence_leiden_fast.gml'
     direction: read
     note: 'default NETWORK key of the registry; any registry entry can be selected'
-  # 2026-10-09: LWCC backbone in both directions (02) and its clustering (01b).
+  # 2026-10-09: LWCC backbone in both directions (02) and its clustering (01).
   - notebook: '02_Processing/02_sanity_check_and_network_generation'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Test_LWCC_Influence.gml'
     direction: write
@@ -123,94 +118,70 @@ manual_edges:
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow.gml'
     direction: write
     note: 'written by export_lwcc_both_directions() -> export_network(); path assembled inside the function'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_Influence.gml'
     direction: read
     note: 'backbone check and community-detection input via BACKBONE_FILES[stem] / METHOD_INPUT[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_InfoFlow.gml'
     direction: read
     note: 'backbone check and community-detection input via BACKBONE_FILES[stem] / METHOD_INPUT[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence.gml'
     direction: read
     note: 'backbone check and community-detection input via BACKBONE_FILES[stem] / METHOD_INPUT[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow.gml'
     direction: read
     note: 'backbone check and community-detection input via BACKBONE_FILES[stem] / METHOD_INPUT[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_label_propagation.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_louvain.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_fast.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_directed.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_infomap.gml'
     direction: write
     note: 'written by src.network.network_modularity.run_modularity_workflow (<input stem>_<method>.gml)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_label_propagation.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_louvain.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_fast.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_Influence_leiden_directed.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_InfoFlow_infomap.gml'
     direction: read
     note: 'read back for AMI/ARI and the JSON export via COMMUNITY_FILES[stem][method]'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_RetweetedOnce_author_communities.json'
     direction: write
     note: 'COMMUNITIES_JSON[stem], one file per backbone in BACKBONE_STEMS (dict comprehension, not resolvable by the parser)'
-  - notebook: '04_Network_Analysis/01b_network_analysis_retweeted_once'
+  - notebook: '04_Network_Analysis/01_network_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Full_LWCC_author_communities.json'
     direction: write
     note: 'COMMUNITIES_JSON[stem], one file per backbone in BACKBONE_STEMS (dict comprehension, not resolvable by the parser)'
-  - notebook: '04_Network_Analysis/01_network_analysis'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_label_propagation.gml'
-    direction: write
-    note: 'written by run_modularity_workflow; SUPERSEDED retweeter backbone (see AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9)'
-  - notebook: '04_Network_Analysis/01_network_analysis'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_louvain.gml'
-    direction: write
-    note: 'written by run_modularity_workflow; SUPERSEDED retweeter backbone (see AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9)'
-  - notebook: '04_Network_Analysis/01_network_analysis'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_leiden_fast.gml'
-    direction: write
-    note: 'written by run_modularity_workflow; SUPERSEDED retweeter backbone (see AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9)'
-  - notebook: '04_Network_Analysis/01_network_analysis'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_leiden_directed.gml'
-    direction: write
-    note: 'written by run_modularity_workflow; SUPERSEDED retweeter backbone (see AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9)'
-  - notebook: '04_Network_Analysis/01_network_analysis'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_infomap.gml'
-    direction: write
-    note: 'written by run_modularity_workflow; SUPERSEDED retweeter backbone (see AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9)'
-  - notebook: '04_Network_Analysis/02_network_visualization'
-    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/Final_OutThreshold1_leiden_fast.gml'
-    direction: read
-    note: 'default NETWORK key of the registry'
   - notebook: '03_Analysis_and_Modeling/01_sentiment_analysis'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test_with_sentiment.json'
     direction: write
