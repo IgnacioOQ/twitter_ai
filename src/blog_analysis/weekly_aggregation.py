@@ -188,6 +188,9 @@ def aggregate_topics(
     log("Loading frozen topic model and vectorizer")
     with FROZEN_MODEL.open('rb') as handle: model = pickle.load(handle)
     with FROZEN_VECTORIZER.open('rb') as handle: vectorizer = pickle.load(handle)
+    # Small inference batches do not benefit from the training worker count:
+    # dispatching the large frozen topic matrix costs more than inference itself.
+    model.set_params(n_jobs=1)
 
 
     author_week_texts: dict[tuple[str, str], list[str]] = defaultdict(list)
@@ -231,6 +234,8 @@ def aggregate_topics(
 
     items = list(author_week_texts.items())
     for start in range(0, len(items), 256):
+        if start % 25_600 == 0:
+            log(f"  Scoring author-weeks {start:,} / {len(items):,}")
         batch = items[start:start+256]
         matrix = vectorizer.transform([' '.join(texts) for _,texts in batch])
         usable_rows = np.asarray(matrix.getnnz(axis=1)).ravel() > 0
