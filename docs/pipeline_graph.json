@@ -778,14 +778,6 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/test_sentences_corpus.pkl",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/test_sentences_corpus.pkl",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/3_backbones/90TS_LWCC.gml",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/3_backbones/90TS_LWCC.gml",
@@ -1843,6 +1835,11 @@
       "direction": "read"
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test.json",
+      "dst": "03_Analysis_and_Modeling/06_topic_modeling_appendix",
+      "direction": "read"
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
@@ -2071,11 +2068,6 @@
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/bow_test_corpus.pkl",
-      "dst": "03_Analysis_and_Modeling/06_topic_modeling_appendix",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/test_sentences_corpus.pkl",
       "dst": "03_Analysis_and_Modeling/06_topic_modeling_appendix",
       "direction": "read"
     },
