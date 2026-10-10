@@ -14,6 +14,7 @@ from gensim.corpora import Dictionary
 from .common import configuration, exact_id, sha256, unique_object
 from .topic_model import (ModelSettings, METHOD_VERSION, make_vectorizer, make_lda,
                           top_terms, diversity, collapse_ratio, coherence_cv)
+from .topic_quality import assess_topic_fit, require_topic_review_passed
 
 
 def rank_grid(frame):
@@ -79,6 +80,11 @@ def fit(config):
     x = vec.fit_transform([docs[aid] for aid in ids])
     model = make_lda(settings, k, alpha, eta).fit(x)
     theta = model.transform(x).astype(np.float32)
+    selected_rows = grid[(grid.representation == rep) & (grid.K == k) &
+                         np.isclose(grid.alpha, alpha) & np.isclose(grid.eta, eta)]
+    selected_share = float(selected_rows.iloc[0].largest_topic_share) if len(selected_rows) else None
+    quality = assess_topic_fit(theta, selection_largest_share=selected_share,
+                               zero_feature_authors=np.count_nonzero(np.diff(x.indptr) == 0))
     frame = pd.DataFrame(theta, columns=[f'topic_{i}' for i in range(int(k))])
     frame.insert(0, 'n_tweets', [counts[aid] for aid in ids])
     frame.insert(0, 'author_id', ids)
@@ -104,11 +110,14 @@ def fit(config):
     metadata = {'method_version': METHOD_VERSION, 'backbone': config['backbone'],
         'includes_retweets': True, 'smoke_test': config['smoke'], 'representation': rep,
         'K': int(k), 'alpha': float(alpha), 'eta': float(eta), 'n_authors':len(ids),
+        'topic_quality': quality,
         'settings': settings.to_dict(), 'documents': prepared,
         'versions': {'sklearn':sklearn.__version__, 'gensim':gensim.__version__, 'numpy':np.__version__},
         'model_sha256':sha256(output/'lda_model.pkl'), 'vectorizer_sha256':sha256(output/'vectorizer.pkl'),
         'author_topics_sha256':sha256(output/'author_topics.csv')}
     (output/'model.json').write_text(json.dumps(metadata, indent=2), encoding='utf-8')
+    # Preserve the fit for diagnosis, but a failed review gate must stop dependent jobs.
+    require_topic_review_passed(metadata)
     print(f'Final {config["backbone"]}: {len(ids):,} authors, {k} topics', flush=True)
 
 

@@ -70,6 +70,11 @@ def main(argv=None):
     if args.topic_labels: inputs.append(args.topic_labels)
     missing = [str(p) for p in inputs if not p.is_file()]
     if missing: parser.error('Missing inputs:\n' + '\n'.join(missing))
+    if args.stage not in ['prepare', 'topics', 'affect']:
+        model_metadata = network/'topics/model.json'
+        if model_metadata.is_file():
+            from .topic_quality import require_topic_review_passed
+            require_topic_review_passed(json.loads(model_metadata.read_text(encoding='utf-8')))
     config = dict(data_root=str(data), network=str(network), backbone=args.backbone,
                   graph=str(graph.resolve()), communities=str(community.resolve()),
                   tweets=str(tweets.resolve()), sentiment=str(sentiment.resolve()), emotions=str(emotions.resolve()),
