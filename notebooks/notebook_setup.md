@@ -271,7 +271,6 @@ AI Public Trust/
 │   │   ├── AItrust_pruned_twits_with_sentiment_cleaned.json     (legacy: written by 02_Processing/03, deleted 2026-10-09)
 │   │   ├── AItrust_topics_k5_metadata.json                      [written by 03_Analysis/03]
 │   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.json     [written by 03_Analysis/03]
-│   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.jsonl.gz [written by 03_Analysis/03]
 │   │   └── top_retweets_by_topic_100.csv                        (legacy: written by 02_Processing/03, deleted 2026-10-09)
 │   │
 │   └── Networks/                              (networks_folder = BASE_PATH / 'Data Sets/Networks/'; one subfolder per stage since 2026-10-10,
