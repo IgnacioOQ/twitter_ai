@@ -1,18 +1,30 @@
-"""Join a selected backbone to independent author content profiles by exact ID."""
+"""Join backbone-specific topics and all-post affect profiles by exact ID."""
 from pathlib import Path
 import json
 import numpy as np
 from .common import (configuration, communities, read_profiles, topic_columns, scores,
-                     EMOTIONS, SENTIMENTS)
+                     EMOTIONS, SENTIMENTS, sha256)
 
 
 def main():
     config = configuration()
-    root = Path(config['profiles'])
+    root = Path(config['network'])
     network = communities(config['communities'], config['community_algorithm'])
-    sentiment = read_profiles(root / 'ai_general_author_sentiment.csv')
-    emotion = read_profiles(root / 'ai_general_author_emotions.csv')
-    topics = read_profiles(root / 'ai_general_author_topics.csv')
+    sentiment = read_profiles(root / 'affect/author_sentiment.csv')
+    emotion = read_profiles(root / 'affect/author_emotions.csv')
+    topics = read_profiles(root / 'topics/author_topics.csv')
+    if not set(topics.author_id) <= set(network.author_id):
+        raise ValueError('Topic authors are outside the selected network')
+    if set(topics.author_id) != set(sentiment.author_id) or set(topics.author_id) != set(emotion.author_id):
+        raise ValueError('Affect coverage must equal topic-eligible authors')
+    model_info = json.loads((root/'topics/model.json').read_text(encoding='utf-8'))
+    coverage = json.loads((root/'affect/coverage.json').read_text(encoding='utf-8'))
+    topic_hash = sha256(root/'topics/author_topics.csv')
+    if model_info['backbone'] != config['backbone'] or model_info['author_topics_sha256'] != topic_hash or coverage['author_topics_sha256'] != topic_hash:
+        raise ValueError('Topics and affect files belong to different model runs')
+    for kind in ['sentiment','emotions']:
+        if coverage[kind]['profile_sha256'] != sha256(root/f'affect/author_{kind}.csv'):
+            raise ValueError('Affect profiles have changed since validation')
     columns = topic_columns(topics)
     scores(sentiment, SENTIMENTS, probabilities=True)
     scores(emotion, EMOTIONS)

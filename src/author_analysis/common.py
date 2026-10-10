@@ -93,3 +93,25 @@ def topic_labels(path, count):
     if frame.topic_id.duplicated().any() or set(frame.topic_id) != set(range(count)):
         raise ValueError('Topic labels must contain each model topic exactly once')
     return dict(zip(frame.topic_id, frame.label))
+
+
+def sha256(path):
+    import hashlib
+    value = hashlib.sha256()
+    with Path(path).open('rb') as handle:
+        for block in iter(lambda: handle.read(8 * 1024 * 1024), b''):
+            value.update(block)
+    return value.hexdigest()
+
+
+def read_posts(path):
+    with Path(path).open(encoding='utf-8') as handle:
+        for number, line in enumerate(handle, 1):
+            if not line.strip(): continue
+            try:
+                record = json.loads(line)
+                record['id'] = exact_id(record['id'])
+                record['author_id'] = exact_id(record['author_id'])
+            except (ValueError, KeyError, TypeError) as exc:
+                raise ValueError(f'Invalid post at line {number} of {path}') from exc
+            yield record

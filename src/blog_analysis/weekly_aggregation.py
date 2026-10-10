@@ -19,17 +19,18 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from gensim.corpora import Dictionary
-from gensim.models import LdaModel
-from sklearn.feature_extraction import text as sklearn_text
+import pickle
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.author_analysis.common import exact_id, read_posts, sha256
+from src.author_analysis.topic_model import clean_tweet_text, METHOD_VERSION
 
 
 # Input paths are supplied by CLI in main(); declarations keep helper functions typed.
-GENERAL_ELIGIBLE: Path
+CANONICAL_POSTS: Path
 SENTIMENT_CLASSIFIED: Path
 EMOTION_CLASSIFIED: Path
 FROZEN_MODEL: Path
-FROZEN_DICT: Path
+FROZEN_VECTORIZER: Path
 SENTIMENT_KEY = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 EMOTION_KEY = "cardiffnlp/twitter-roberta-base-emotion-multilabel-latest"
 SENTIMENTS = ["positive", "neutral", "negative"]
@@ -47,19 +48,6 @@ EMOTIONS = [
     "trust",
 ]
 TOPIC_LABELS = {}
-
-CUSTOM_STOPWORDS = {
-    "ai", "artificial", "intelligence", "chatgpt", "gpt", "openai",
-    "google", "microsoft", "machine", "learning", "ml", "neural",
-    "network", "model", "data", "algorithm", "robot", "automation",
-    "tech", "technology", "http", "https", "www", "com", "co", "amp",
-    "rt", "like", "just", "know", "think", "want", "need", "got",
-    "going", "would", "could", "really", "actually", "basically",
-    "probably", "maybe", "also", "one", "two", "three", "first",
-    "second", "new", "good", "great", "people", "time", "way", "thing",
-    "things", "lot", "much", "many",
-}
-ALL_STOPWORDS = set(sklearn_text.ENGLISH_STOP_WORDS).union(CUSTOM_STOPWORDS)
 
 
 def log(message: str) -> None:
@@ -83,15 +71,7 @@ def week_start_for(dt: datetime) -> str:
 
 
 def read_jsonl(path: Path):
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                yield json.loads(line)
-            except json.JSONDecodeError:
-                continue
+    yield from read_posts(path)
 
 
 def update_bounds(bounds: list[datetime | None], dt: datetime) -> None:
@@ -129,7 +109,7 @@ def aggregate_classified(
         if post_type in excluded_types:
             skipped_retweets += 1
             continue
-        author_id = str(record.get("author_id", ""))
+        author_id = exact_id(record.get("author_id"))
         if author_id not in matched_ids:
             continue
         dt = parse_utc(str(record.get("created_at", "")))
@@ -200,23 +180,13 @@ def aggregate_classified(
     }
 
 
-def clean_and_tokenize(text: str) -> list[str]:
-    text = text.lower()
-    text = re.sub(r"http\S+|www\.\S+", "", text)
-    text = re.sub(r"@\w+", "", text)
-    text = re.sub(r"#", "", text)
-    text = re.sub(r"[^a-z\s]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return [w for w in text.split() if w not in ALL_STOPWORDS and len(w) > 2]
-
-
 def aggregate_topics(
     matched_ids: set[str], output_wide: Path, output_long: Path
 ) -> dict:
     """Apply the existing frozen model to author-week documents."""
-    log("Loading frozen topic model and dictionary")
-    model = LdaModel.load(str(FROZEN_MODEL))
-    dictionary = Dictionary.load(str(FROZEN_DICT))
+    log("Loading frozen topic model and vectorizer")
+    with FROZEN_MODEL.open('rb') as handle: model = pickle.load(handle)
+    with FROZEN_VECTORIZER.open('rb') as handle: vectorizer = pickle.load(handle)
 
 
     author_week_texts: dict[tuple[str, str], list[str]] = defaultdict(list)
@@ -225,8 +195,8 @@ def aggregate_topics(
     bounds: list[datetime | None] = [None, None]
     type_counts: Counter[str] = Counter()
 
-    log(f"Scanning existing eligible posts: {GENERAL_ELIGIBLE}")
-    for record in read_jsonl(GENERAL_ELIGIBLE):
+    log(f"Scanning existing eligible posts: {CANONICAL_POSTS}")
+    for record in read_jsonl(CANONICAL_POSTS):
         total += 1
         if total % 1_000_000 == 0:
             log(
@@ -234,13 +204,13 @@ def aggregate_topics(
                 f"{len(author_week_texts):,} author-weeks"
             )
         type_counts[str(record.get("type", ""))] += 1
-        author_id = str(record.get("author_id", ""))
+        author_id = exact_id(record.get("author_id"))
         if author_id not in matched_ids:
             continue
         dt = parse_utc(str(record.get("created_at", "")))
         if dt is None:
             continue
-        processed_text = str(record.get("processed_text") or "").strip()
+        processed_text = clean_tweet_text(record.get("text", ""))
         if not processed_text:
             continue
         week = week_start_for(dt)
@@ -250,7 +220,7 @@ def aggregate_topics(
 
     log(f"Inferring fixed topic distributions for {len(author_week_texts):,} author-weeks")
     weekly_topic_sums: dict[str, np.ndarray] = defaultdict(
-        lambda: np.zeros(model.num_topics, dtype=float)
+        lambda: np.zeros(model.n_components, dtype=float)
     )
     weekly_active: Counter[str] = Counter()
     weekly_usable: Counter[str] = Counter()
@@ -258,38 +228,27 @@ def aggregate_topics(
     weekly_oov: Counter[str] = Counter()
     weekly_posts: Counter[str] = Counter()
 
-    for index, ((week, _author_id), texts) in enumerate(author_week_texts.items(), 1):
-        weekly_active[week] += 1
-        weekly_posts[week] += len(texts)
-        tokens = clean_and_tokenize(" ".join(texts))
-        if not tokens:
-            weekly_empty[week] += 1
-            continue
-        bow = dictionary.doc2bow(tokens)
-        if not bow:
-            weekly_oov[week] += 1
-            continue
-        topic_probs = np.zeros(model.num_topics, dtype=float)
-        for topic_id, probability in model.get_document_topics(
-            bow, minimum_probability=0
-        ):
-            topic_probs[int(topic_id)] = float(probability)
-        total_prob = topic_probs.sum()
-        if total_prob <= 0:
-            weekly_oov[week] += 1
-            continue
-        if abs(total_prob - 1.0) > 0.01:
-            topic_probs /= total_prob
-        weekly_topic_sums[week] += topic_probs
-        weekly_usable[week] += 1
-        if index % 100_000 == 0:
-            log(f"  inferred {index:,}/{len(author_week_texts):,} author-weeks")
+    items = list(author_week_texts.items())
+    for start in range(0, len(items), 256):
+        batch = items[start:start+256]
+        matrix = vectorizer.transform([' '.join(texts) for _,texts in batch])
+        usable_rows = np.asarray(matrix.getnnz(axis=1)).ravel() > 0
+        probabilities = model.transform(matrix[usable_rows]) if usable_rows.any() else []
+        probability_iter = iter(probabilities)
+        for ((week, _), texts), usable in zip(batch, usable_rows):
+            weekly_active[week] += 1
+            weekly_posts[week] += len(texts)
+            if not usable:
+                weekly_oov[week] += 1
+                continue
+            weekly_topic_sums[week] += next(probability_iter)
+            weekly_usable[week] += 1
 
     wide_rows = []
     long_rows = []
     for week in sorted(weekly_active):
         usable = weekly_usable[week]
-        means = weekly_topic_sums[week] / usable if usable else np.zeros(model.num_topics)
+        means = weekly_topic_sums[week] / usable if usable else np.zeros(model.n_components)
         week_end = datetime.fromisoformat(week).date() + timedelta(days=6)
         row = {
             "week_start": week,
@@ -302,7 +261,7 @@ def aggregate_topics(
             "n_out_of_vocabulary_documents": weekly_oov[week],
             "n_source_posts": weekly_posts[week],
         }
-        for topic_id in range(model.num_topics):
+        for topic_id in range(model.n_components):
             row[f"topic_{topic_id}_mean"] = means[topic_id]
             long_rows.append(
                 {
@@ -324,7 +283,7 @@ def aggregate_topics(
     pd.DataFrame(long_rows).to_csv(output_long, index=False)
 
     return {
-        "source": str(GENERAL_ELIGIBLE),
+        "source": str(CANONICAL_POSTS),
         "rows_scanned": total,
         "matched_nonempty_posts": matched_nonempty,
         "author_week_combinations": len(author_week_texts),
@@ -333,37 +292,46 @@ def aggregate_topics(
         "observed_max_utc": bounds[1].isoformat() if bounds[1] else None,
         "source_type_counts": dict(type_counts),
         "frozen_model": str(FROZEN_MODEL),
-        "frozen_dictionary": str(FROZEN_DICT),
+        "frozen_vectorizer": str(FROZEN_VECTORIZER),
         "output_wide": str(output_wide),
         "output_long": str(output_long),
     }
 
 
 def main() -> None:
-    global GENERAL_ELIGIBLE, SENTIMENT_CLASSIFIED, EMOTION_CLASSIFIED
-    global FROZEN_MODEL, FROZEN_DICT
+    global CANONICAL_POSTS, SENTIMENT_CLASSIFIED, EMOTION_CLASSIFIED
+    global FROZEN_MODEL, FROZEN_VECTORIZER
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--matched-authors", type=Path, required=True,
                         help="JSON list of IDs or CSV with an author_id column")
-    parser.add_argument("--eligible-posts", type=Path, required=True)
+    parser.add_argument("--posts", type=Path, required=True, help="Canonical General AI corpus, including retweets")
     parser.add_argument("--sentiment-classified", type=Path, required=True)
     parser.add_argument("--emotion-classified", type=Path, required=True)
-    parser.add_argument("--frozen-model", type=Path, required=True)
-    parser.add_argument("--frozen-dictionary", type=Path, required=True)
+    parser.add_argument("--model-dir", type=Path, required=True)
+    parser.add_argument("--backbone", choices=["RetweetedOnce","LWCC"], required=True)
     parser.add_argument("--out-dir", type=Path, required=True)
-    parser.add_argument(
-        "--exclude-types", nargs="*", default=["retweet", "retweeted"],
-        help="Exact source type strings to exclude; both pure-retweet spellings are excluded by default.",
-    )
     args = parser.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
-    GENERAL_ELIGIBLE = args.eligible_posts
+    CANONICAL_POSTS = args.posts
     SENTIMENT_CLASSIFIED = args.sentiment_classified
     EMOTION_CLASSIFIED = args.emotion_classified
-    FROZEN_MODEL = args.frozen_model
-    FROZEN_DICT = args.frozen_dictionary
+    FROZEN_MODEL = args.model_dir / 'lda_model.pkl'
+    FROZEN_VECTORIZER = args.model_dir / 'vectorizer.pkl'
+    model_info = json.loads((args.model_dir / 'model.json').read_text(encoding='utf-8'))
+    if model_info['method_version'] != METHOD_VERSION or model_info['backbone'] != args.backbone:
+        raise ValueError('Model belongs to another backbone or method')
+    if model_info['model_sha256'] != sha256(FROZEN_MODEL) or model_info['vectorizer_sha256'] != sha256(FROZEN_VECTORIZER):
+        raise ValueError('Model bundle files have changed')
+
+    coverage = json.loads((args.model_dir.parent/'affect/coverage.json').read_text(encoding='utf-8'))
+    if coverage['author_topics_sha256'] != model_info['author_topics_sha256']:
+        raise ValueError('Affect coverage belongs to another model run')
+    for path, expected in [(CANONICAL_POSTS,model_info['documents']['tweets_sha256']),
+                           (SENTIMENT_CLASSIFIED,coverage['sentiment']['source_sha256']),
+                           (EMOTION_CLASSIFIED,coverage['emotions']['source_sha256'])]:
+        if sha256(path) != expected: raise ValueError(f'Input differs from validated model/affect run: {path}')
 
     log(f"Loading matched author IDs from {args.matched_authors}")
     if args.matched_authors.suffix.lower() == ".csv":
@@ -375,10 +343,14 @@ def main() -> None:
             matched_ids_list = json.load(handle)
     if not isinstance(matched_ids_list, list):
         raise RuntimeError("Matched-author input must resolve to a list of IDs")
-    matched_ids = set(map(str, matched_ids_list))
+    matched_ids = set(map(exact_id, matched_ids_list))
     if not matched_ids or len(matched_ids) != len(matched_ids_list):
         raise ValueError("Matched IDs must be non-empty and unique")
-    excluded_types = set(args.exclude_types)
+    excluded_types = set()
+    if model_info['author_topics_sha256'] != sha256(args.model_dir/'author_topics.csv'):
+        raise ValueError('Author topic table has changed since model fitting')
+    model_authors = set(pd.read_csv(args.model_dir/'author_topics.csv',dtype={'author_id':str}).author_id)
+    if not matched_ids <= model_authors: raise ValueError('Matched IDs are outside fitted model population')
 
     metadata = {
         "method": {
@@ -390,11 +362,13 @@ def main() -> None:
             ),
             "topics": (
                 "eligible post text concatenated within author-week and scored with the "
-                "existing frozen model and dictionary; no model fitting"
+                "existing frozen model and vectorizer; no model fitting"
             ),
             "excluded_exact_type_strings": sorted(excluded_types),
         },
         "matched_authors": len(matched_ids),
+        "backbone": args.backbone,
+        "model_sha256": model_info["model_sha256"],
     }
 
     metadata["sentiment"] = aggregate_classified(

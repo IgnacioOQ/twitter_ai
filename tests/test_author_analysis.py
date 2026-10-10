@@ -10,7 +10,7 @@ import unittest
 import igraph as ig
 import numpy as np
 import pandas as pd
-from src.author_analysis.common import EMOTIONS, exact_id, scores as validate_scores
+from src.author_analysis.common import EMOTIONS, exact_id, scores as validate_scores, sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,6 +25,18 @@ class WorkflowTests(unittest.TestCase):
         temporal.COLLECTION_END = pd.Timestamp('2023-01-09T00:00:00Z')
         self.assertTrue(temporal.prepare_weekly(frame).plotted.iloc[0])
 
+    def test_constant_scores_have_undefined_standardized_effect(self):
+        from unittest.mock import patch
+        import importlib
+        with patch.dict(os.environ, {'TWITTER_AI_ANALYSIS_CONFIG':json.dumps({
+                'community_algorithm':'leiden_directed','network':str(self.root)})}):
+            module=importlib.import_module('src.author_analysis.compare_communities')
+        frame=pd.DataFrame({'group':[0,0,1,1], 'value':[.2]*4})
+        self.assertTrue(np.isnan(module.calculate_omega_squared(frame,'group','value')))
+        result=module.standardized_difference(np.array([[.2]]),np.array([.2]),np.array([0.]))
+        self.assertTrue(np.isnan(result).all())
+        self.assertIsNone(module.finite_json({'value':float('nan')})['value'])
+
     def test_probability_rounding_tolerance(self):
         frame = pd.DataFrame({'positive':[.3], 'neutral':[.4], 'negative':[.2997]})
         validate_scores(frame,list(frame),probabilities=True)
@@ -38,8 +50,6 @@ class WorkflowTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.data = self.root / 'data'
         self.output = self.root / 'output'
-        self.profiles = self.output / 'content'
-        self.profiles.mkdir(parents=True)
 
     def stage(self, name, backbone=None, *extra, success=True):
         command = [sys.executable, '-m', 'src.author_analysis.run', name,
@@ -56,14 +66,23 @@ class WorkflowTests(unittest.TestCase):
         sentiment = rng.dirichlet([1, 2, 3], len(ids))
         emotions = rng.random((len(ids), len(EMOTIONS)))
         topics = rng.dirichlet(np.ones(12), len(ids))
-        for name, values, columns in [('sentiment', sentiment, ['positive','neutral','negative']),
-                                      ('emotions', emotions, EMOTIONS),
-                                      ('topics', topics, [f'topic_{i}' for i in range(12)])]:
-            frame = pd.DataFrame(values, columns=columns)
-            frame['author_id'] = ids
-            if name != 'topics': frame['n_tweets'] = 3
-            frame.to_csv(self.profiles / f'ai_general_author_{name}.csv', index=False)
         for backbone, subset in [('RetweetedOnce', ids), ('LWCC', ids[:24])]:
+            self.profiles = self.output / 'networks' / backbone
+            (self.profiles/'topics').mkdir(parents=True)
+            (self.profiles/'affect').mkdir()
+            for name, values, columns in [('sentiment',sentiment,['positive','neutral','negative']),
+                                         ('emotions',emotions,EMOTIONS),
+                                         ('topics',topics,[f'topic_{i}' for i in range(12)])]:
+                frame=pd.DataFrame(values[:len(subset)],columns=columns)
+                frame['author_id']=subset
+                frame['n_tweets']=3
+                path=self.profiles/('topics/author_topics.csv' if name=='topics' else f'affect/author_{name}.csv')
+                frame.to_csv(path,index=False)
+            binding={'backbone':backbone,'author_topics_sha256':sha256(self.profiles/'topics/author_topics.csv')}
+            (self.profiles/'topics/model.json').write_text(json.dumps(binding))
+            binding.update({kind:{'profile_sha256':sha256(self.profiles/f'affect/author_{kind}.csv')}
+                            for kind in ['sentiment','emotions']})
+            (self.profiles/'affect/coverage.json').write_text(json.dumps(binding))
             directory = self.data / 'Data Sets/Networks/4_communities' / backbone
             directory.mkdir(parents=True)
             (directory / f'Full_{backbone}_author_communities.json').write_text(json.dumps({
@@ -110,7 +129,7 @@ class WorkflowTests(unittest.TestCase):
 
     def test_rejects_duplicate_and_float_ids(self):
         self.fixture()
-        path = self.profiles / 'ai_general_author_topics.csv'
+        path = self.output / 'networks/LWCC/topics/author_topics.csv'
         frame = pd.read_csv(path, dtype={'author_id':str})
         pd.concat([frame, frame.iloc[:1]]).to_csv(path, index=False)
         self.assertIn('Duplicate author IDs', self.stage('match','LWCC',success=False).stderr)
@@ -120,6 +139,14 @@ class WorkflowTests(unittest.TestCase):
         community = self.data / 'Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json'
         community.write_text('{"003":{"leiden_directed":0},"003":{"leiden_directed":1}}')
         self.assertIn('Duplicate JSON key', self.stage('match','LWCC',success=False).stderr)
+
+    def test_rejects_model_from_other_backbone(self):
+        self.fixture()
+        path=self.output/'networks/LWCC/topics/model.json'
+        info=json.loads(path.read_text())
+        info['backbone']='RetweetedOnce'
+        path.write_text(json.dumps(info))
+        self.assertIn('different model runs',self.stage('match','LWCC',success=False).stderr)
 
     def test_preflight_no_writes_and_requires_backbone(self):
         self.fixture()
@@ -137,39 +164,53 @@ class WorkflowTests(unittest.TestCase):
         for i in range(32):
             for j, kind in enumerate(['original','quoted','replied_to','retweeted','retweet']):
                 rows.append(dict(id=str(1000+i*10+j), author_id=str(90071992547409930+i),
-                                 type=kind, created_at='2023-01-01T00:00:00Z', processed_text=words[i%4],
+                                 type=kind, created_at='2023-01-01T00:00:00Z', text=words[i%4], processed_text=words[i%4],
                                  classifications={
                     'cardiffnlp/twitter-roberta-base-emotion-multilabel-latest':{'scores':dict.fromkeys(EMOTIONS,.2)},
                     'cardiffnlp/twitter-roberta-base-sentiment-latest':{'scores':{'positive':.3,'neutral':.4,'negative':.3}}}))
         for model in ['emotion-multilabel-latest','sentiment-latest']:
             (cleaned / f'ai_full_classified_twitter-roberta-base-{model}.json').write_text(
                 '\n'.join(map(json.dumps,rows)),encoding='utf-8')
-        self.stage('prepare')
-        scores = pd.read_csv(self.profiles / 'ai_general_author_sentiment.csv', dtype={'author_id':str})
-        self.assertEqual(len(scores),32)
-        self.assertTrue((scores.n_tweets==3).all())
-        self.stage('topics', None, '--topics','4')
-        topics = pd.read_csv(self.profiles / 'ai_general_author_topics.csv', dtype={'author_id':str})
-        self.assertEqual(set(scores.author_id),set(topics.author_id))
-        np.testing.assert_allclose(topics.filter(regex='^topic_').sum(axis=1),1,atol=1e-5)
-        self.assertTrue((self.profiles / 'models/selected_lda_model.model').is_file())
+        canonical = cleaned / 'AItrust_twits_pruned_dict.json'
+        canonical.write_text('\n'.join(map(json.dumps, rows)),encoding='utf-8')
+        settings = self.root/'settings.json'
+        settings.write_text(json.dumps({'k_grid':[4],'alpha_grid':[.1],'eta_grid':[.1],
+            'representations':['tfidf_unigram'],'max_iter':3,'grid_sample_authors':32,'coherence_docs':32}))
+        for backbone, n in [('RetweetedOnce',32),('LWCC',24)]:
+            folder=self.data/'Data Sets/Networks/4_communities'/backbone
+            folder.mkdir(parents=True)
+            (folder/f'Full_{backbone}_author_communities.json').write_text(json.dumps({
+                str(90071992547409930+i):{'leiden_directed':i%4} for i in range(n)}))
+            for stage in ['prepare','topics','affect','match']:
+                self.stage(stage,backbone,'--model-config',str(settings))
+            topics=pd.read_csv(self.output/f'networks/{backbone}/topics/author_topics.csv',dtype={'author_id':str})
+            self.assertEqual(len(topics),n)
+            self.assertTrue((topics.n_tweets==5).all())
+            np.testing.assert_allclose(topics.filter(regex='^topic_').sum(axis=1),1,atol=1e-5)
+        self.profiles=self.output/'networks/RetweetedOnce'
+        scores=pd.read_csv(self.profiles/'affect/author_sentiment.csv',dtype={'author_id':str})
+        self.assertTrue((scores.n_tweets==5).all())
+        self.assertTrue((self.profiles/'topics/lda_model.pkl').is_file())
         ids = self.root / 'ids.json'
         ids.write_text(json.dumps(scores.author_id.tolist()))
         result = subprocess.run([sys.executable,'src/blog_analysis/weekly_aggregation.py',
-            '--matched-authors',str(ids),'--eligible-posts',str(self.profiles/'ai_general_eligible_tweets.json'),
+            '--matched-authors',str(ids),'--posts',str(canonical),
             '--sentiment-classified',str(cleaned/'ai_full_classified_twitter-roberta-base-sentiment-latest.json'),
             '--emotion-classified',str(cleaned/'ai_full_classified_twitter-roberta-base-emotion-multilabel-latest.json'),
-            '--frozen-model',str(self.profiles/'models/selected_lda_model.model'),
-            '--frozen-dictionary',str(self.profiles/'models/selected_dictionary.dict'),
+            '--model-dir',str(self.profiles/'topics'),'--backbone','RetweetedOnce',
             '--out-dir',str(self.root/'weekly')],cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         weekly=pd.read_csv(self.root/'weekly/weekly_sentiment.csv')
-        self.assertEqual(int(weekly.n_scored_posts.sum()),96)
+        self.assertEqual(int(weekly.n_scored_posts.sum()),160)
         result = subprocess.run([sys.executable,'src/blog_analysis/render_temporal_figures.py',
             '--weekly-dir',str(self.root/'weekly'),'--output-root',str(self.root/'weekly_figures'),
             '--collection-end','2023-02-27T12:00:00Z'],
             cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        # Incomplete classifications must fail instead of quietly dropping posts/authors.
+        emotion=cleaned/'ai_full_classified_twitter-roberta-base-emotion-multilabel-latest.json'
+        emotion.write_text('\n'.join(map(json.dumps,rows[:-1])),encoding='utf-8')
+        self.assertIn('missing 1 canonical posts',self.stage('affect','RetweetedOnce',success=False).stderr)
 
     @unittest.skipUnless(os.environ.get('SFDP_RUNNER'), 'Set SFDP_RUNNER to a compiled Graphviz helper')
     def test_native_3d_build_and_validate(self):
