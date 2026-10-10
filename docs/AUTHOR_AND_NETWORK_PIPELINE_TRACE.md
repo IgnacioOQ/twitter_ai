@@ -20,7 +20,7 @@ This document answers one question for every step of the pipeline: **how many tw
 > - `04_Network_Analysis/` holds two notebooks: `01_network_analysis` clusters both backbones with five methods **on their information-flow files** (`<stem>_InfoFlow.gml`, since 2026-10-09; the 2026-10-07 run used the influence orientation for four of the five methods) and exports one community JSON per backbone — its full run **completed on 2026-10-09 (18:42 CEST) without errors**, so all ten partitions and both JSONs are on Drive (§9.3); `02_network_visualization` renders either backbone on a GPU runtime (its 2026-10-08 run failed on the cu13 RAPIDS image; fixed, not yet re-run; §9.5). Both are the October rewrites (`01`, `02b`), renamed over their originals on 2026-10-09; the originals and the one-off `patch_notebook.py` are deleted (git history).
 > - The blog-figure package is on `main` under `src/blog_analysis/` (§11). The code that built its inputs — the 198,326 matched authors with community, topic, sentiment and emotion — is in no repository we can reach (§9.4); the published figures descend from the superseded retweeter backbone.
 > - **2026-10-10 — `Data Sets/Networks/` reorganised by stage.** One subfolder per pipeline stage, each written by one notebook: `1_retweet_dicts/`, `2_full_graphs/`, `3_backbones/`, `4_communities/<RetweetedOnce|LWCC>/`, `5_visualizations/<NETWORK>/`, `test/` (§12.7). The folder variables are one block, repeated in the Setup cell of `02/02`, `04/01` and `04/02`; file names are unchanged. The flat folder — current outputs and every legacy file — was emptied on 2026-10-10 and the network stage is being re-run `02` (with `generate_data = True`: `full_network_dict.pkl` lived there) → `04/01` → `04/02`; until those runs finish, the stage folders are partly empty. The folder is shared read-only at [Drive: Data Sets/Networks/](https://drive.google.com/drive/folders/1PlVu_Li9nSI7IDLLfURp09s_1bAGXpMq?usp=sharing) — the public listing shows file names, dates and sizes and is how a session can check what is on Drive. The numbers in this document come from the runs before the reorganisation. `03/04` and `03/04c` now read `3_backbones/Full_LWCC_InfoFlow.gml` (same graph as the legacy LWCC file).
-> - **2026-10-10 — `03_Analysis_and_Modeling` clean-up (in progress, branch `analysis-03-cleanup`).** Plan: delete the superseded notebooks; fix `01b`'s block resume (§6.2); fix `04c`'s author filter and sentiment join (§6.4); point `03`, `05`, `06` at the current corpus (§6.3, §6.5). Done so far: **B1** — `01_sentiment_analysis_v2` (2025 corpus, never run; `01b` covers its models) and `04_lda_author_topics` (every section is in `04c`) deleted; both remain in git history. Drive `Cleaned Data/` was pruned the same day (§12.3).
+> - **2026-10-10 — `03_Analysis_and_Modeling` clean-up (in progress, branch `analysis-03-cleanup`).** Plan: delete the superseded notebooks; fix `01b`'s block resume (§6.2); fix `04c`'s author filter and sentiment join (§6.4); point `03`, `05`, `06` at the current corpus (§6.3, §6.5). Done so far: **B1** — `01_sentiment_analysis_v2` (2025 corpus, never run; `01b` covers its models) and `04_lda_author_topics` (every section is in `04c`) deleted; both remain in git history. **B2** — `01b` renamed `01b_sentiment_emotion_hpc` and its full-run section rewritten with verified blocks and a verifier for existing outputs (§6.2.2); the stored AI+Art sentiment and AI emotion files are known bad and the other two unverified until 8a runs on the cluster. Drive `Cleaned Data/` was pruned the same day (§12.3).
 > - Still open: the author-level LDA loader bug (§6.4), the sentiment block drift (§6.2), the first-generation corpus in `03/03` (§6.3), the viz re-render, and the blog figures on the corrected backbone (§11.3).
 >
 > **Reading conventions.** `02/02`, `04/01` and `04/02` without a cell number mean today's notebooks (`02_sanity_check_and_network_generation`, `01_network_analysis`, `02_network_visualization`); passages dated before 2026-10-09 call the same notebooks `02b`, `01` and `04/02`, and this document now writes `02`, `01` and `04/02` for them. A reference **with a cell number**, such as `02/02 cell 44` or `04/01 cell 18`, points into the **deleted original** of that notebook, whose stored outputs are the source of every number in §§1–5; the current `02` reproduces the corpus cells unchanged under the same headings, while the current `01` and `04/02` share only the method with their originals. `02/03` is the deleted cleaning notebook. `Full_Network.gml`, `.graphml`, `.gexf`, `.json`, `Test_Network.*`, `LWCC.gml/.graphml`, every `Final_OutThreshold1*` file, `viz_outputs_Final_leiden_fast/`, `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` are legacy files with no producing notebook (the `Networks/` ones were deleted in the 2026-10-10 reorganisation); `Full_Network_Influence.gml` is the same graph as `Full_Network.gml`.
@@ -42,8 +42,8 @@ All numbers below are **copied from the outputs stored in the committed `.ipynb`
 | Total-strength 90 % pruning + LWCC (`90TS_LWCC.gml`) | `04/01` cell 16 (gated in today's `04/01`) | — | 2,315,573 | reference only, not clustered |
 | Out-strength ≥ 1 (made ≥ 1 retweet) — **legacy** | deleted `04/01` cell 18 | — | 3,159,105 | before LWCC |
 | **Out-strength ≥ 1 + LWCC** (`Final_OutThreshold1.gml`) — **legacy** | deleted `04/01` cell 18 | — | **1,984,599** | wrong population (retweeters); the set behind every community result before 2026-10-07 and the blog draft (§5.2) |
-| Sentiment v4, AI corpus | `03/01b` cell 35 | 17,410,035 | — | emotion run short by 8,975 (see §6.2) |
-| Sentiment v4, AI+Art corpus | `03/01b` cell 34 | 3,583,101 | — | sentiment result file holds 4,057,340 lines (see §6.2) |
+| Sentiment v4, AI corpus | `03/01b` (old Section 8) | 17,410,035 | — | emotion file short by 8,975 and misaligned (§6.2.1) |
+| Sentiment v4, AI+Art corpus | `03/01b` (old Section 8) | 3,583,101 | — | sentiment file holds 4,057,340 lines of AI-corpus content (§6.2.1) |
 | Tweet-level LDA / cleaning / top-K | `02/03`, `03/03` | 21,466,173 lines read | — | **old-generation corpus**, not the 17.41M one (see §6.3) |
 | Author-level LDA v1 (notebook deleted 2026-10-10) | `03/04` cell 14 | 1,000,000 read → 4,558 kept | 1,704 | LCC filter matches the wrong field (see §6.4) |
 | Author-level LDA v2 | `03/04c` cell 30 | 17,410,035 read → 65,615 kept | 8,000 → 3,682 (≥ 3 tweets) | same bug |
@@ -341,9 +341,9 @@ total_tweets = count_lines(input_path)           # → 17410035
 
 Stored output: `📊 Total tweets: 17410035`; ten blocks of 1,741,003 lines (last 1,741,008) all reported complete; merged to `.../Cleaned Data v2/AItrust_pruned_twits_with_sentiment.json`. Note the **`Cleaned Data v2`** folder: this run wrote next to, not over, the older file of the same name in `Cleaned Data/` (see §6.3).
 
-### 6.2 `01b_sentiment_emotion_v4_hpc.ipynb` (v4, HPC, 10 models)
+### 6.2 `01b_sentiment_emotion_hpc.ipynb` (HPC, 10 models; `01b_sentiment_emotion_v4_hpc.ipynb` until 2026-10-10)
 
-Datasets registered in cell 14/34/35 (`cleanedds_folder` = `/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data`):
+Datasets (`cleanedds_folder` = `/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data`):
 
 | Key | File | Tweets |
 |---|---|---:|
@@ -352,7 +352,11 @@ Datasets registered in cell 14/34/35 (`cleanedds_folder` = `/projects/Computatio
 | `ai_full` | `AItrust_twits_pruned_dict.json` | 17,410,035 |
 | `art_full` | `AItrust_Art_pruned_twit_dict.json` | 3,583,101 |
 
-Full runs (cells 34 and 35) use the same block scheme as v1 (`total = sum(1 for _ in f)`, 10 blocks, skip a block whose output already exists). Cell 36 then counts the lines of the merged result files:
+The ten models run on the two test sets in one pass each (Section 4, `classify_file`). Two models — `twitter-roberta-base-sentiment-latest` and `twitter-roberta-base-emotion-multilabel-latest` — run on both full corpora (Section 8): four jobs, each split into blocks so a killed GPU session can resume.
+
+#### 6.2.1 The stored full run (before 2026-10-10) is not trustworthy
+
+The merged result files, as counted by the stored Section 9 output:
 
 | Result file | Lines | Expected | Δ |
 |---|---:|---:|---:|
@@ -361,14 +365,40 @@ Full runs (cells 34 and 35) use the same block scheme as v1 (`total = sum(1 for 
 | `art_full × twitter-roberta-base-emotion-multilabel-latest` | 3,583,101 | 3,583,101 | 0 |
 | `art_full × twitter-roberta-base-sentiment-latest` | **4,057,340** | 3,583,101 | **+474,239** |
 
-Both deltas are explained by the stored block log of cell 35: block 0 of the AI emotion run was accepted with 1,732,028 lines instead of 1,741,003 (exactly 8,975 short, the skip rule only requires ≥ 95 %), and the art sentiment file contains 474,239 surplus lines, consistent with a block having been appended twice during a resumed run. Every percentage reported for "AI+Art sentiment (full)" in cell 39 is computed on the 4,057,340-line file, so it double-counts part of the corpus.
+**Mechanism.** Three defects of the old Section 8 combine:
 
-Full-corpus label distributions from cell 39 (for the record):
+1. **Resume trusted line counts.** An existing block file was reused when it held **≥ 95 %** of the expected lines — no upper bound, no check that it held the right tweets. A block from another run (other corpus, other block layout, other input version) passes.
+2. **AI+Art blocks had no dataset in their folder name.** The AI+Art cell wrote to `Blocks/<model alias>/`; the AI cell to `Blocks/ai_full__<model alias>/` (the prefix was evidently added later, and only there). Any earlier run that used `Blocks/<model alias>/` left blocks the AI+Art run then accepted.
+3. **Empty-text tweets jumped their batch.** A tweet whose preprocessed text was empty was written immediately, while the tweets before it were still waiting in the batch buffer, so output order differed from input order even without any resume.
+
+The old merge only opened files in `w` mode and concatenated whole blocks — nothing was ever appended twice, so this section's earlier explanation ("a block appended twice") was wrong.
+
+**Evidence in the stored outputs.**
+
+- *AI+Art sentiment.* The run's log shows all ten blocks *skipped* ("Block i done. Skipping."): every block pre-existed. Its sanity check prints as lines 1–3 the very same tweets as lines 1–3 of the **AI** sentiment file (`Hey you need perfect scores and completely AI proof content…`, `RT @lallamapic…`, `RT @lexfridman…`), and the first of them contains none of the 60 art keywords. The file holds AI-corpus content and is 474,239 lines too long. **Its label distribution (cell "9a") must not be used.**
+- *AI emotion.* Block 0 was accepted at 1,732,028 of 1,741,003 lines, and block 9 was re-run after being found at 802,664 lines. The file's first line is a different tweet from the first line of the AI sentiment file, i.e. block 0 came from another run. The file is 8,975 tweets short **and** misaligned.
+- *AI+Art emotion.* Its line count is right, but its blocks also sat in an un-prefixed folder and were all skipped; correct count does not prove correct content.
+- *AI sentiment.* No anomaly visible in counts or first lines; unverified.
+
+Full-corpus label distributions stored in the old run (for the record only; the AI+Art row is on the corrupt file):
 
 | Model × corpus | n | negative | neutral | positive |
 |---|---:|---:|---:|---:|
 | sentiment-latest × AI General | 17,410,035 | 21.2 % | 47.9 % | 30.8 % |
-| sentiment-latest × AI+Art | 4,057,340 (see above) | 31.4 % | 42.1 % | 26.5 % |
+| sentiment-latest × AI+Art | 4,057,340 (corrupt) | 31.4 % | 42.1 % | 26.5 % |
+
+#### 6.2.2 The fix (2026-10-10, branch `analysis-03-cleanup`)
+
+- **One order-preserving writer**, `classify_lines()` (Section 2), used by both the test pass and the full runs: empty-text tweets wait in the same queue, so output order = input order.
+- **Block folders** `Blocks/<dataset>__<model alias>__<N>blocks/` — never shared across datasets, models or block layouts.
+- **A block is reused only if its tweet ids equal the input slice exactly** (`block_is_valid`: same count, same order). Otherwise it is recomputed and checked again.
+- **Merge to `<output>.tmp`, verify, then rename.**
+- **8a — verify existing outputs (CPU)**: `verify_classified_output()` compares every output with its input tweet by tweet and reports `aligned` (same ids, same order), `same ids` (same set, different order — still fine for joins by tweet id) or `FAIL` (count differs, unknown or duplicated ids, tweets without this model's result). The status table is `FULL_STATUS`.
+- **8b — (re)run (GPU)**: `RERUN = 'failed'` re-runs only the jobs 8a failed; `'all'` re-runs everything.
+- **8c — legacy block folders**: lists the old `Blocks/<model alias>/` and `Blocks/ai_full__<model alias>/` folders; deletes them only with `DELETE_LEGACY_BLOCK_DIRS = True`.
+- **Section 9 loads only outputs that passed** 8a/8b.
+
+Tested locally with a stub in place of the model on a synthetic 103-tweet corpus with 12 empty-text tweets: a fresh run is `aligned`; a second run reuses all blocks; a block with one line removed is the only one recomputed; a rotated file is reported `same ids`, a padded file `FAIL`; output order equals input order in both the test and the full path. Not yet run on the HPC data — **the 8a verdicts for the four stored outputs are the next step** (owed: run 8a on the cluster, then 8b for every job that fails, then 8c with the flag on).
 
 ### 6.3 `02/03_cleaning_tweets.ipynb` (deleted 2026-10-09) and `03/03_lda_tweet_topics.ipynb` — the old-generation corpus
 
@@ -456,7 +486,7 @@ Minimal fix: in `load_lcc_node_ids_lightweight` replace `line.startswith("id ")`
 What exists:
 
 1. **1,440,802 authors** with ≥ 1 art-keyword tweet in the AI corpus — `02/02` cell 20, `unique_authors_art`. Nested inside the 4,775,711.
-2. **3,583,101 AI+Art tweets** with v4 sentiment and emotion labels — `03/01b` (with the 4,057,340-line caveat for the sentiment file).
+2. **3,583,101 AI+Art tweets** with v4 sentiment and emotion labels — `03/01b`; the stored sentiment file is corrupt (4,057,340 lines of AI-corpus content, §6.2.1) and must be regenerated with the fixed Section 8.
 3. The test-branch counterpart: 198 authors / 216 tweets.
 
 What does not exist anywhere in `02`–`04`:
@@ -476,8 +506,9 @@ Re-runs that would change results:
 | Item | Notebook | Why |
 |---|---|---|
 | Author-level LDA | `03/04c` (`03/04` deleted 2026-10-10) | LCC filter matches GML indices, not author ids (§6.4) — all stored results are on the wrong author set |
-| AI+Art sentiment (full) | `03/01b` cell 34 | result file has 474,239 surplus lines; delete `art_full__twitter-roberta-base-sentiment-latest` blocks and re-merge (§6.2) |
-| AI emotion-multilabel (full) | `03/01b` cell 35 | block 0 short by 8,975 lines; lower the skip rule from 95 % to 100 % or delete block 0 (§6.2) |
+| AI+Art sentiment (full) | `03/01b` 8a → 8b | stored file is AI-corpus content, 474,239 lines too long (§6.2.1); regenerate with the verified block runner (§6.2.2) |
+| AI emotion-multilabel (full) | `03/01b` 8a → 8b | block 0 from another run: 8,975 short and misaligned (§6.2.1); regenerate (§6.2.2) |
+| AI sentiment, AI+Art emotion (full) | `03/01b` 8a | unverified; 8a decides whether 8b re-runs them (§6.2.2) |
 | Tweet-level LDA, topics-in-time, top-K per topic | `03/03` (and the deleted `02/03`) | computed on the first-generation 22.4M-line corpus (§6.3); must be re-run on `Cleaned Data v2/AItrust_pruned_twits_with_sentiment.json` to be comparable with everything else |
 | Pruned network + communities + JSON export | `04/01` | the intended population is "retweeted ≥ 1"; the rule implemented is "retweeted someone ≥ 1" (§5, §9). **Done 2026-10-07** via `02` + `01` (§9.3); `04/01` outputs are superseded, not deleted. **Extended 2026-10-09**: `02` / `01` also produce and cluster the direction-neutral LWCC backbone (`Full_LWCC_*`); both run 2026-10-09, `01` on the information-flow files of both backbones (§9.3) |
 | Network visualisations (ForceAtlas2, DrL, adjacency blocks) | `04/02` | rendered on `Final_OutThreshold1_leiden_fast.gml`, i.e. the retweeter backbone (§9.2). **2026-10-08 run failed** before layout (cuGraph install on the new cu13 Colab image; patched 2026-10-09, §9.5). To be re-run on `Full_RetweetedOnce_InfoFlow_leiden_fast.gml` and on `Full_LWCC_InfoFlow_leiden_fast.gml`, one network per run |
@@ -666,6 +697,7 @@ python3 src/scripts/pipeline_graph.py downstream 02_Processing/02_sanity_check_a
 - **Rebuilt 2026-10-09 (clean-up)** after the deletions and renames of `02_Processing/02`, `02_Processing/03`, `04_Network_Analysis/01` and `04_Network_Analysis/02`: **24 notebooks, 146 artifacts, 114 write edges, 101 read edges**; 45 declared edges, 2 alternative edges. The deleted notebooks' edges are gone, so `Full_Network.gml`, `LWCC.gml`, every `Final_OutThreshold1*` file, `viz_outputs_Final_leiden_fast/` and `02/03`'s outputs no longer appear in the graph; they remain on Drive as legacy files (status block, *Reading conventions*). `validate` clean.
 - **Rebuilt 2026-10-10** after the stage-folder reorganisation of `Data Sets/Networks/` (§12.7): **24 notebooks, 146 artifacts, 114 write edges, 99 read edges**. The 37 declared network paths in `pipeline_overrides.yaml` were remapped to the stage folders; the parser resolves the new `<stage>_folder / 'name'` paths of `02`, `04/01` and `04/02` on its own, and `03/04c` now reads `3_backbones/Full_LWCC_InfoFlow.gml` on the HPC path.
 - **Rebuilt 2026-10-10 (03 clean-up, B1)** after deleting `03/01_sentiment_analysis_v2` and `03/04_lda_author_topics`: **22 notebooks, 133 artifacts, 110 write edges, 88 read edges**. The 13 artifacts only those two touched left the graph (the first-generation `AItrust_pruned_twits{,_test}.json`, the sentiment-v2 outputs, the v1 author-LDA grid/models under `LDA/author_level/`, the Colab-local sentiment copy) and their §12 rows were removed. `validate` clean.
+- **Rebuilt 2026-10-10 (B2)** after renaming `01b` and rewriting its Section 8: **22 notebooks, 133 artifacts, 110 write edges, 88 read edges**. The full-output and block paths are now built inside `output_path_for()` / `block_dir_for()`, so six declared edges were added to `pipeline_overrides.yaml` (writes and read-backs of `{ai,art}_full_classified_{alias}.json` and `Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json`). `validate` clean.
 
 ### 10.2 What the parser cannot see — and how it is covered
 
@@ -770,7 +802,7 @@ In this repository:
 | LWCC backbone in both directions | `02_Processing/02` (extension of 2026-10-09) | done 2026-10-09 |
 | Five partitions + community JSON on the LWCC backbone | `04_Network_Analysis/01` | done 2026-10-09 (§9.3) |
 | Whole network stage again, into the stage folders of §12.7, after `Data Sets/Networks/` was emptied (2026-10-10) | `02_Processing/02` (`generate_data = True`) → `04_Network_Analysis/01` → `04_Network_Analysis/02` | in progress (started 2026-10-10) |
-| AI+Art sentiment file without the surplus block | `03/01b` cell 34 (delete the `art_full__twitter-roberta-base-sentiment-latest` blocks, re-merge) | open |
+| Verified full sentiment/emotion outputs | `03/01b` 8a (CPU) → 8b (GPU) → 8c (legacy blocks) on the cluster | code fixed 2026-10-10 (§6.2.2); runs open |
 
 Outside this repository (the blog branch's scripts consume files that are produced elsewhere — `data_sets/blog_analysis/matched_authors.json`, the K = 12 gensim model, the `matrices/` and `tables/` folders; see §9.4):
 
@@ -955,14 +987,14 @@ Figure 1 (timeline) needs nothing.
 
 | File | Written by | Read by | What it is |
 |---|---|---|---|
-| `Cleaned Data/ai_full_classified_{alias}.json` | `03/01b` | `03/01b` | v4 merged per-model output for the AI corpus. |
+| `Cleaned Data/ai_full_classified_{alias}.json` | `03/01b` | `03/01b` | Merged per-model output for the AI corpus (8b); verified against the input by 8a (§6.2.2). Stored emotion file bad (§6.2.1). |
 | `Cleaned Data/AI_pruned_tweets_with_topic_weights_v2.json` | `03/04c` | `03/04c` | Author-LDA v2: tweets with topic weights (`03/04c`; on the wrong author set, §6.4). |
-| `Cleaned Data/ai_test_classified_{model_alias}.json` | `03/01b` | `03/01b` | v4 test output per model, AI corpus. |
+| `Cleaned Data/ai_test_classified_{model_alias}.json` | `03/01b` | `03/01b` | Test output per model, AI corpus (one pass; copies on Drive under `Cleaned Data/Sentiment Analysis/`). |
 | `Cleaned Data/AItrust_twits_pruned_dict.json` | — | `03/04c` | HPC copy of the AI corpus (17,410,035 tweets), read by author-LDA v2. |
-| `Cleaned Data/art_full_classified_{alias}.json` | `03/01b` | `03/01b` | v4 merged per-model output for the AI+Art corpus (the sentiment file holds 474,239 surplus lines, §6.2). |
-| `Cleaned Data/art_test_classified_{model_alias}.json` | `03/01b` | `03/01b` | v4 test output per model, AI+Art corpus. |
+| `Cleaned Data/art_full_classified_{alias}.json` | `03/01b` | `03/01b` | Merged per-model output for the AI+Art corpus (8b); verified by 8a. Stored sentiment file is AI-corpus content (§6.2.1). |
+| `Cleaned Data/art_test_classified_{model_alias}.json` | `03/01b` | `03/01b` | Test output per model, AI+Art corpus (one pass; copies on Drive under `Cleaned Data/Sentiment Analysis/`). |
 | `Cleaned Data/author_sentiment_mean.pkl` | `03/04c` | — | Author-level mean sentiment computed in `03/04c`. |
-| `Cleaned Data/Blocks/ai_full__{model_name.split('/')[-1]}/block_{bid}.json` | `03/01b` | `03/01b` | Sentiment/emotion v4: per-model, per-block inference outputs over the AI corpus (`03/01b`, 10 models; block 0 of the emotion model is short by 8,975 lines, §6.2). |
+| `Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json` | `03/01b` | `03/01b` | Per-job, per-block outputs of the full runs (8b), reused only when their ids equal the input slice (§6.2.2). The pre-2026-10-10 folders `Blocks/<alias>/` and `Blocks/ai_full__<alias>/` are legacy (8c). |
 | `Networks/3_backbones/Full_LWCC_InfoFlow.gml` | — | `03/04c` | HPC copy of `02`'s LWCC backbone, to be copied over from Drive (until 2026-10-10 `03/04c` read the legacy `LWCC.gml`, the same graph); `03/04c` filters authors on its GML `id` field instead of `label` (§6.4). |
 
 ### 12.11 `HPC: /projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/`

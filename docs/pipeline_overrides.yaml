@@ -200,3 +200,30 @@ manual_edges:
     artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/lda_k5_topics_metadata.json'
     direction: write
     note: 'FULL_META_JSON, section 9'
+  # 2026-10-10: 01b full runs rewritten (B2 of the 03 clean-up). Output and block
+  # paths are now built inside output_path_for() / block_dir_for(), which the parser
+  # cannot resolve. HPC paths, as 01b runs on the cluster.
+  - notebook: '03_Analysis_and_Modeling/01b_sentiment_emotion_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json'
+    direction: write
+    note: '8b: classify_full_blocked() -> output_path_for(ds_key, model); merged via .tmp after verification'
+  - notebook: '03_Analysis_and_Modeling/01b_sentiment_emotion_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json'
+    direction: write
+    note: '8b: classify_full_blocked() -> output_path_for(ds_key, model); merged via .tmp after verification'
+  - notebook: '03_Analysis_and_Modeling/01b_sentiment_emotion_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json'
+    direction: read
+    note: '8a: verify_classified_output() re-reads every full output against its input; section 9 loads the verified ones'
+  - notebook: '03_Analysis_and_Modeling/01b_sentiment_emotion_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json'
+    direction: read
+    note: '8a: verify_classified_output() re-reads every full output against its input; section 9 loads the verified ones'
+  - notebook: '03_Analysis_and_Modeling/01b_sentiment_emotion_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json'
+    direction: write
+    note: '8b: per-block output; block_dir_for(ds_key, model, num_blocks)'
+  - notebook: '03_Analysis_and_Modeling/01b_sentiment_emotion_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json'
+    direction: read
+    note: '8b: block_is_valid() re-reads a block before reusing it; the merge concatenates the blocks'

@@ -36,10 +36,10 @@
       "bipartite": 0
     },
     {
-      "id": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "id": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "kind": "notebook",
       "stage": 3,
-      "path": "notebooks/03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc.ipynb",
+      "path": "notebooks/03_Analysis_and_Modeling/01b_sentiment_emotion_hpc.ipynb",
       "bipartite": 0
     },
     {
@@ -382,7 +382,7 @@
       "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_test_classified_{model_alias}.json",
       "kind": "artifact",
       "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_test_classified_{model_alias}.json",
-      "glob": false,
+      "glob": true,
       "templated": true,
       "bipartite": 1
     },
@@ -406,14 +406,6 @@
       "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
       "kind": "artifact",
       "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
-      "glob": true,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/ai_full__{model_name.split('/')[-1]}/block_{bid}.json",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/ai_full__{model_name.split('/')[-1]}/block_{bid}.json",
       "glob": true,
       "templated": true,
       "bipartite": 1
@@ -1217,6 +1209,14 @@
       "glob": false,
       "templated": false,
       "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
     }
   ],
   "edges": [
@@ -1415,39 +1415,42 @@
       "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_test_classified_{model_alias}.json",
       "direction": "write"
     },
     {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_test_classified_{model_alias}.json",
       "direction": "write"
     },
     {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Sentiment/validation_{ds_key}_{model_alias}.csv",
       "direction": "write"
     },
     {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Sentiment/model_summary_test.csv",
       "direction": "write"
     },
     {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/ai_full__{model_name.split('/')[-1]}/block_{bid}.json",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json",
-      "direction": "write"
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json",
+      "direction": "write",
+      "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/02_extract_examples",
@@ -1937,33 +1940,30 @@
     },
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_test_classified_{model_alias}.json",
-      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read"
     },
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_test_classified_{model_alias}.json",
-      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read"
     },
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Sentiment/validation_{ds_key}_{model_alias}.csv",
-      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
+      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read"
     },
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
-      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/ai_full__{model_name.split('/')[-1]}/block_{bid}.json",
-      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
-      "direction": "read"
+      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
+      "direction": "read",
+      "manual": true
     },
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json",
-      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_v4_hpc",
-      "direction": "read"
+      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
+      "direction": "read",
+      "manual": true
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_and_topics_k5.jsonl.gz",
@@ -2250,6 +2250,12 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/LWCC/Full_LWCC_InfoFlow_infomap.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json",
+      "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read",
       "manual": true
     }
