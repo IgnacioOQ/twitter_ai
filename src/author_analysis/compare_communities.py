@@ -25,6 +25,17 @@ N_TOPICS = 0
 TOPIC_LABELS = {}
 
 
+def standardized_difference(means, overall, deviations):
+    return np.divide(means-overall, deviations, out=np.full_like(means,np.nan,dtype=float),
+                     where=deviations > 8*np.finfo(float).eps)
+
+
+def finite_json(value):
+    if isinstance(value,dict): return {key:finite_json(item) for key,item in value.items()}
+    if isinstance(value,float) and not np.isfinite(value): return None
+    return value
+
+
 def load_data():
     global N_TOPICS, TOPIC_LABELS
     df = validate_ids(pd.read_parquet(CONFIG['matched']))
@@ -64,6 +75,9 @@ def calculate_omega_squared(df, group_col, value_col):
     # MS_within
     ms_within = ss_within / (n_total - k) if n_total > k else 0
 
+    if df[value_col].nunique() < 2 or n_total <= k:
+        return np.nan  # No estimable variance or residual degrees of freedom.
+
     # Omega-squared
     omega_sq = (ss_between - (k - 1) * ms_within) / (ss_total + ms_within)
     omega_sq = max(0, omega_sq)  # Floor at 0
@@ -79,7 +93,7 @@ def calculate_eta_squared(df, group_col, value_col):
     ss_between = sum(len(g) * (g.mean() - grand_mean)**2 for _, g in groups)
     ss_total = ((df[value_col] - grand_mean)**2).sum()
 
-    return ss_between / ss_total if ss_total > 0 else 0
+    return ss_between / ss_total if df[value_col].nunique() > 1 and ss_total > 0 else np.nan
 
 
 def calculate_cramers_v_corrected(df, group_col, category_col):
@@ -306,11 +320,11 @@ def create_sentiment_heatmaps(df, top_comms, output_path):
     sent_means.to_csv(output_path / "sentiment_means.csv")
 
     # --- Standardized Differences ---
-    sent_std = (sent_means.values - overall_means.values) / overall_stds.values
+    sent_std = standardized_difference(sent_means.values, overall_means.values, overall_stds.values)
     sent_std_df = pd.DataFrame(sent_std, index=row_labels, columns=sent_cols)
 
-    vmax = np.abs(sent_std).max()
-    vmax = min(vmax, 3)  # Cap for readability
+    finite = np.abs(sent_std[np.isfinite(sent_std)])
+    vmax = min(float(finite.max()), 3) if finite.size and finite.max() > 0 else 1  # Cap for readability
 
     fig, ax = plt.subplots(figsize=(8, 10))
     cmap = plt.cm.RdBu_r
@@ -353,11 +367,11 @@ def create_emotion_heatmap(df, top_comms, output_path):
     emo_means = emo_means.loc[top_comms]
 
     # Standardized differences
-    emo_std = (emo_means.values - overall_means.values) / overall_stds.values
+    emo_std = standardized_difference(emo_means.values, overall_means.values, overall_stds.values)
     emo_std_df = pd.DataFrame(emo_std, index=row_labels, columns=EMOTIONS)
 
-    vmax = np.abs(emo_std).max()
-    vmax = min(vmax, 2)  # Cap for readability
+    finite = np.abs(emo_std[np.isfinite(emo_std)])
+    vmax = min(float(finite.max()), 2) if finite.size and finite.max() > 0 else 1  # Cap for readability
 
     fig, ax = plt.subplots(figsize=(14, 10))
     cmap = plt.cm.RdBu_r
@@ -458,7 +472,7 @@ def save_association_summary(results_21, results_15, output_path):
     }
 
     with open(output_path / "association_summary.json", 'w') as f:
-        json.dump(summary, f, indent=2)
+        json.dump(finite_json(summary), f, indent=2, allow_nan=False)
 
     # Detailed topic omega-squared
     topic_df = pd.DataFrame({

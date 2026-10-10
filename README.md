@@ -145,6 +145,13 @@ The bracketed tags (`[02/02]`, `[03/03]`, ...) indicate which notebook *stage/in
 2. Set `RUNNING_LOCALLY = True` in Cell 1 of the notebook.
 3. Create a Python 3.10 venv and install dependencies as needed (typical stack: `pandas`, `numpy`, `scikit-learn`, `igraph`, `leidenalg`, `powerlaw`, `networkx`, `transformers`, `sentence-transformers`, `lightgbm`, `tqdm`, `matplotlib`, `seaborn`).
 
+## Author-content workflow
+
+The authoritative author workflow is [src/author_analysis](src/author_analysis/README.md).
+Its notebook and command-line entry points call the same implementation: all post types,
+network-defined author populations, and separate topic models for LWCC and RetweetedOnce.
+The same fitted bundles feed sentiment/emotion summaries, weekly analysis and the network viewer.
+
 ## Conventions
 
 - **Notebook setup:** every notebook follows the five-cell pattern in [notebooks/notebook_setup.md](notebooks/notebook_setup.md). Wildcard imports from third-party libraries are forbidden; `from src.*` wildcards are acceptable.
