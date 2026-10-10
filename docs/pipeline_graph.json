@@ -71,6 +71,13 @@
       "bipartite": 0
     },
     {
+      "id": "03_Analysis_and_Modeling/05b_embedding_datamap_template",
+      "kind": "notebook",
+      "stage": 3,
+      "path": "notebooks/03_Analysis_and_Modeling/05b_embedding_datamap_template.ipynb",
+      "bipartite": 0
+    },
+    {
       "id": "03_Analysis_and_Modeling/06_topic_modeling_appendix",
       "kind": "notebook",
       "stage": 3,
@@ -758,22 +765,6 @@
       "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/sentence_transformer_reduced_embeddings.npy",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/sentence_transformer_reduced_embeddings.npy",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned DataAItrust_pruned_twits_test.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned DataAItrust_pruned_twits_test.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned DataAItrust_pruned_twits.json",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned DataAItrust_pruned_twits.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1847,6 +1838,11 @@
       "direction": "read"
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict_test.json",
+      "dst": "03_Analysis_and_Modeling/05_embedding_mapping",
+      "direction": "read"
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_Art_pruned_twit_dict_test.json",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
@@ -1869,6 +1865,11 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
       "dst": "03_Analysis_and_Modeling/01_sentiment_analysis",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
+      "dst": "03_Analysis_and_Modeling/05_embedding_mapping",
       "direction": "read"
     },
     {
@@ -2065,16 +2066,6 @@
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/sentence_transformer_reduced_embeddings.npy",
-      "dst": "03_Analysis_and_Modeling/05_embedding_mapping",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned DataAItrust_pruned_twits_test.json",
-      "dst": "03_Analysis_and_Modeling/05_embedding_mapping",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned DataAItrust_pruned_twits.json",
       "dst": "03_Analysis_and_Modeling/05_embedding_mapping",
       "direction": "read"
     },
