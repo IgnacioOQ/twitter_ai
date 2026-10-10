@@ -19,6 +19,7 @@ def run_modularity_workflow(
     input_filename,
     method="leiden_fast",
     resolution=1.0,
+    output_folder_path=None,
 ):
     """
     Run a complete modularity / community-detection workflow on an igraph graph
@@ -29,7 +30,8 @@ def run_modularity_workflow(
     1. Load the GML file from *networks_folder_path / input_filename*.
     2. Run community detection using the specified *method* and *resolution*.
     3. Assign community IDs to vertices as attribute ``community_<method>``.
-    4. Save the annotated graph as a new GML file.
+    4. Save the annotated graph as a new GML file in *output_folder_path*
+       (default: the input folder).
     5. Print summary statistics (number of communities, modularity, sizes).
 
     Parameters
@@ -52,6 +54,9 @@ def run_modularity_workflow(
     resolution : float
         Resolution parameter (used by Leiden and Louvain methods; ignored by
         label propagation and Infomap).
+    output_folder_path : str or pathlib.Path, optional
+        Folder for the annotated ``<input stem>_<method>.gml``; created if
+        missing. Defaults to *networks_folder_path*.
 
     Returns
     -------
@@ -149,7 +154,9 @@ def run_modularity_workflow(
     # ── 4. Save ───────────────────────────────────────────────────────────
     stem = Path(input_filename).stem
     out_filename = f"{stem}_{method}.gml"
-    out_path = base / out_filename
+    out_folder = Path(output_folder_path) if output_folder_path is not None else base
+    out_folder.mkdir(parents=True, exist_ok=True)
+    out_path = out_folder / out_filename
 
     try:
         g.write_gml(str(out_path))

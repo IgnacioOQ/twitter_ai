@@ -220,7 +220,7 @@ The giant component covering 96.6% of authors indicates a single, densely interc
   - `Cleaned Data/AItrust_twits_pruned_dict.json` (AI corpus), `Cleaned Data/AItrust_Art_pruned_twit_dict.json` (AI+Art corpus);
   - `Cleaned Data/full_pruning_stats.json`, `full_basic_counts_dict.pkl`, `full_timeline_dict.pkl`, `full_author_corpus_dict.pkl`, `full_network_stats.json`;
   - `Cleaned Data/dataset_statistics_summary.json` — master summary (mirrored into this repo at [notebooks/02_Processing/](../notebooks/02_Processing/dataset_statistics_summary.json));
-  - `Networks/full_network_dict.pkl`, `Networks/Full_Network.{gml,graphml,gexf,json}`;
+  - `Networks/1_retweet_dicts/full_network_dict.pkl`, `Networks/2_full_graphs/Full_Network_{Influence,InfoFlow}.gml` (stage folders since 2026-10-10; the flat `Networks/Full_Network.{gml,graphml,gexf,json}` of the pre-2026-10 notebook are legacy);
   - `_test`-suffixed counterparts of all of the above from the test-dataset branch.
 - **Caveats worth stating in the blog post:**
   - The raw-side funnel percentages are relative to *records scanned*, which double-count tweets (duplicates from expansions and overlapping windows); relative to *unique* tweets, retention is 17.41M / 25.64M ≈ 67.9%.

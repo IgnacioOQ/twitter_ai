@@ -7,7 +7,7 @@ label: [dataset, network, authors, provenance, audit]
 volatility: evolving
 scope: project-specific
 repository: [twitter_ai]
-last_checked: '2026-10-09'
+last_checked: '2026-10-10'
 ---
 
 # Author & Network Pipeline Trace
@@ -17,11 +17,12 @@ This document answers one question for every step of the pipeline: **how many tw
 > **Status 2026-10-09.** Shape of the pipeline after today's clean-up:
 >
 > - `02_Processing/` holds two notebooks: `01_api_data_to_dictionaries` and `02_sanity_check_and_network_generation`. The latter is the October 2026 rewrite of the network section (called `02b` until it was renamed over the original on 2026-10-09). It writes the full retweet graph in both orientations and two backbones — retweeted-once (202,710 authors) and LWCC (3,264,499 expected) — The full re-run **completed on 2026-10-09 (10:45 EDT) without errors**; its outputs are stored in the notebook, and `Full_LWCC_{Influence,InfoFlow}.gml` are now on Drive (3,264,499 authors, 7,670,516 edges, 98.14 % of the retweet weight). The pre-2026-10 original and `03_cleaning_tweets` were deleted (git history keeps both).
-> - `04_Network_Analysis/` holds two notebooks: `01_network_analysis` clusters both backbones with five methods **on their information-flow files** (`<stem>_InfoFlow.gml`, since 2026-10-09; the 2026-10-07 run used the influence orientation for four of the five methods) and exports one community JSON per backbone (pending the re-run); `02_network_visualization` renders either backbone on a GPU runtime (its 2026-10-08 run failed on the cu13 RAPIDS image; fixed, not yet re-run; §9.5). Both are the October rewrites (`01`, `02b`), renamed over their originals on 2026-10-09; the originals and the one-off `patch_notebook.py` are deleted (git history).
+> - `04_Network_Analysis/` holds two notebooks: `01_network_analysis` clusters both backbones with five methods **on their information-flow files** (`<stem>_InfoFlow.gml`, since 2026-10-09; the 2026-10-07 run used the influence orientation for four of the five methods) and exports one community JSON per backbone — its full run **completed on 2026-10-09 (18:42 CEST) without errors**, so all ten partitions and both JSONs are on Drive (§9.3); `02_network_visualization` renders either backbone on a GPU runtime (its 2026-10-08 run failed on the cu13 RAPIDS image; fixed, not yet re-run; §9.5). Both are the October rewrites (`01`, `02b`), renamed over their originals on 2026-10-09; the originals and the one-off `patch_notebook.py` are deleted (git history).
 > - The blog-figure package is on `main` under `src/blog_analysis/` (§11). The code that built its inputs — the 198,326 matched authors with community, topic, sentiment and emotion — is in no repository we can reach (§9.4); the published figures descend from the superseded retweeter backbone.
+> - **2026-10-10 — `Data Sets/Networks/` reorganised by stage.** One subfolder per pipeline stage, each written by one notebook: `1_retweet_dicts/`, `2_full_graphs/`, `3_backbones/`, `4_communities/<RetweetedOnce|LWCC>/`, `5_visualizations/<NETWORK>/`, `test/` (§12.7). The folder variables are one block, repeated in the Setup cell of `02/02`, `04/01` and `04/02`; file names are unchanged. The flat folder — current outputs and every legacy file — was emptied on 2026-10-10 and the network stage is being re-run `02` (with `generate_data = True`: `full_network_dict.pkl` lived there) → `04/01` → `04/02`; until those runs finish, the stage folders are partly empty. The folder is shared read-only at [Drive: Data Sets/Networks/](https://drive.google.com/drive/folders/1PlVu_Li9nSI7IDLLfURp09s_1bAGXpMq?usp=sharing) — the public listing shows file names, dates and sizes and is how a session can check what is on Drive. The numbers in this document come from the runs before the reorganisation. `03/04` and `03/04c` now read `3_backbones/Full_LWCC_InfoFlow.gml` (same graph as the legacy LWCC file).
 > - Still open: the author-level LDA loader bug (§6.4), the sentiment block drift (§6.2), the first-generation corpus in `03/03` (§6.3), the viz re-render, and the blog figures on the corrected backbone (§11.3).
 >
-> **Reading conventions.** `02/02`, `04/01` and `04/02` without a cell number mean today's notebooks (`02_sanity_check_and_network_generation`, `01_network_analysis`, `02_network_visualization`); passages dated before 2026-10-09 call the same notebooks `02b`, `01` and `04/02`, and this document now writes `02`, `01` and `04/02` for them. A reference **with a cell number**, such as `02/02 cell 44` or `04/01 cell 18`, points into the **deleted original** of that notebook, whose stored outputs are the source of every number in §§1–5; the current `02` reproduces the corpus cells unchanged under the same headings, while the current `01` and `04/02` share only the method with their originals. `02/03` is the deleted cleaning notebook. `Full_Network.gml`, `.graphml`, `.gexf`, `.json`, `Test_Network.*`, `LWCC.gml/.graphml`, every `Final_OutThreshold1*` file, `viz_outputs_Final_leiden_fast/`, `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` are legacy files on Drive with no producing notebook; `Full_Network_Influence.gml` is the same graph as `Full_Network.gml`.
+> **Reading conventions.** `02/02`, `04/01` and `04/02` without a cell number mean today's notebooks (`02_sanity_check_and_network_generation`, `01_network_analysis`, `02_network_visualization`); passages dated before 2026-10-09 call the same notebooks `02b`, `01` and `04/02`, and this document now writes `02`, `01` and `04/02` for them. A reference **with a cell number**, such as `02/02 cell 44` or `04/01 cell 18`, points into the **deleted original** of that notebook, whose stored outputs are the source of every number in §§1–5; the current `02` reproduces the corpus cells unchanged under the same headings, while the current `01` and `04/02` share only the method with their originals. `02/03` is the deleted cleaning notebook. `Full_Network.gml`, `.graphml`, `.gexf`, `.json`, `Test_Network.*`, `LWCC.gml/.graphml`, every `Final_OutThreshold1*` file, `viz_outputs_Final_leiden_fast/`, `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` are legacy files with no producing notebook (the `Networks/` ones were deleted in the 2026-10-10 reorganisation); `Full_Network_Influence.gml` is the same graph as `Full_Network.gml`.
 
 All numbers below are **copied from the outputs stored in the committed `.ipynb` files**. Nothing was re-run. Cell references use the form `cell N` = 0-based position in the notebook's cell list, together with the nearest markdown heading, so a cell can be found either way.
 
@@ -270,13 +271,13 @@ Every later notebook is meant to be restricted to an author set cut from the ret
 
 ### 5.0 The backbones in the current pipeline
 
-All start from the full influence graph (`Full_Network_Influence.gml`, 3,379,040 authors, 7,768,720 edges), drop the 32,216 self-loops, cut, and keep the largest weakly connected component. Each is written in both orientations (`*_Influence.gml`: retweeter → retweeted; `*_InfoFlow.gml`: the transpose, edge retweeted → retweeter). **The information-flow file is the canonical one:** `04/01` clusters both backbones on it with five methods (`BACKBONE_STEMS`, outputs `<stem>_InfoFlow_<method>.gml`) and `04/02` renders it; the influence files are written for reference and read by nothing.
+All start from the full influence graph (`Full_Network_Influence.gml`, 3,379,040 authors, 7,768,720 edges), drop the 32,216 self-loops, cut, and keep the largest weakly connected component. Each is written in both orientations (`*_Influence.gml`: retweeter → retweeted; `*_InfoFlow.gml`: the transpose, edge retweeted → retweeter). **The information-flow file is the canonical one:** `04/01` clusters both backbones on it with five methods (`BACKBONE_STEMS`, outputs `4_communities/<backbone>/<stem>_InfoFlow_<method>.gml`) and `04/02` renders it; the influence files are written for reference and read by nothing.
 
 | Backbone | Written by | Rule | Nodes | Edges | Weight kept | Files |
 |---|---|---|---:|---:|---:|---|
-| **LWCC** (direction-neutral) | `02`, full LWCC cell (helper `export_lwcc_both_directions`) | no degree cut; self-loops removed; giant component | **3,264,499** | 7,670,516 | 98.14 % (9,458,703 retweets) | `Full_LWCC_{Influence,InfoFlow}.gml` (on Drive since 2026-10-09; identical to the pre-2026-10 strategy 1) |
-| **Retweeted once** | `02`, full pruning cell (helper `prune_retweeted_at_least_once`) | in-strength ≥ 1 on the influence graph = out-strength ≥ 1 on the flow graph (363,618 authors), then LWCC | **202,710** | 882,530 | 13.17 % (1,269,747 retweets) | `Full_RetweetedOnce_{Influence,InfoFlow}.gml` (on Drive since 2026-10-07) |
-| Total-strength 90 % (reference only) | `04/01`, gated by `RUN_STRATEGY_2` (`prune_network_by_deletion`) | delete lowest in+out strength nodes until 10 % of weight is lost, then LWCC | 2,315,573 | 6,721,590 | 90 % | `90TS_LWCC.gml` (exists on Drive; not clustered) |
+| **LWCC** (direction-neutral) | `02`, full LWCC cell (helper `export_lwcc_both_directions`) | no degree cut; self-loops removed; giant component | **3,264,499** | 7,670,516 | 98.14 % (9,458,703 retweets) | `3_backbones/Full_LWCC_{Influence,InfoFlow}.gml` (identical to the pre-2026-10 strategy 1) |
+| **Retweeted once** | `02`, full pruning cell (helper `prune_retweeted_at_least_once`) | in-strength ≥ 1 on the influence graph = out-strength ≥ 1 on the flow graph (363,618 authors), then LWCC | **202,710** | 882,530 | 13.17 % (1,269,747 retweets) | `3_backbones/Full_RetweetedOnce_{Influence,InfoFlow}.gml` |
+| Total-strength 90 % (reference only) | `04/01`, gated by `RUN_STRATEGY_2` (`prune_network_by_deletion`) | delete lowest in+out strength nodes until 10 % of weight is lost, then LWCC | 2,315,573 | 6,721,590 | 90 % | `3_backbones/90TS_LWCC.gml` (only when the flag is on; not clustered) |
 
 The two clustered backbones answer different questions. The LWCC keeps every retweeter and every edge, so community structure is informed by who amplifies whom; "retweeted at least once" can then be applied as an author filter on its community table. The retweeted-once backbone is exactly the amplified population, but it discards 87 % of the retweet volume because pure retweeters leave with their edges (§9.3). The `02` notebook asserts, for each backbone, that the two orientations hold the same author set and the same number of edges.
 
@@ -284,7 +285,7 @@ The two clustered backbones answer different questions. The LWCC keeps every ret
 
 The pre-2026-10 `04_Network_Analysis/01_network_analysis.ipynb` (deleted 2026-10-09, in git history) read `Full_Network.gml` and cut three backbones of its own:
 
-| Strategy | Cell | Rule | Nodes | Edges | Output (all legacy files on Drive) |
+| Strategy | Cell | Rule | Nodes | Edges | Output (legacy files, removed with the 2026-10-10 reorganisation) |
 |---|---|---|---:|---:|---|
 | 1 — LWCC only | 13 | no pruning | 3,264,499 | 7,670,516 | `LWCC.gml` (same graph as today's `Full_LWCC_Influence.gml`) |
 | 2 — total-strength 90 % | 16 | delete lowest in+out strength nodes until 10 % of weight is lost (958,959 nodes removed), then LWCC | 2,315,573 | 6,721,590 | `90TS_LWCC.gml` (still produced by today's `04/01` when `RUN_STRATEGY_2` is on) |
@@ -475,13 +476,13 @@ Re-runs that would change results:
 | AI+Art sentiment (full) | `03/01b` cell 34 | result file has 474,239 surplus lines; delete `art_full__twitter-roberta-base-sentiment-latest` blocks and re-merge (§6.2) |
 | AI emotion-multilabel (full) | `03/01b` cell 35 | block 0 short by 8,975 lines; lower the skip rule from 95 % to 100 % or delete block 0 (§6.2) |
 | Tweet-level LDA, topics-in-time, top-K per topic | `03/03` (and the deleted `02/03`) | computed on the first-generation 22.4M-line corpus (§6.3); must be re-run on `Cleaned Data v2/AItrust_pruned_twits_with_sentiment.json` to be comparable with everything else |
-| Pruned network + communities + JSON export | `04/01` | the intended population is "retweeted ≥ 1"; the rule implemented is "retweeted someone ≥ 1" (§5, §9). **Done 2026-10-07** via `02` + `01` (§9.3); `04/01` outputs are superseded, not deleted. **Extended 2026-10-09**: `02` / `01` also produce and cluster the direction-neutral LWCC backbone (`Full_LWCC_*`), not yet run |
-| Network visualisations (ForceAtlas2, DrL, adjacency blocks) | `04/02` | rendered on `Final_OutThreshold1_leiden_fast.gml`, i.e. the retweeter backbone (§9.2). **2026-10-08 run failed** before layout (cuGraph install on the new cu13 Colab image; patched 2026-10-09, §9.5). To be re-run on `Full_RetweetedOnce_Influence_leiden_fast.gml` and on `Full_LWCC_Influence_leiden_fast.gml`, one network per run |
+| Pruned network + communities + JSON export | `04/01` | the intended population is "retweeted ≥ 1"; the rule implemented is "retweeted someone ≥ 1" (§5, §9). **Done 2026-10-07** via `02` + `01` (§9.3); `04/01` outputs are superseded, not deleted. **Extended 2026-10-09**: `02` / `01` also produce and cluster the direction-neutral LWCC backbone (`Full_LWCC_*`); both run 2026-10-09, `01` on the information-flow files of both backbones (§9.3) |
+| Network visualisations (ForceAtlas2, DrL, adjacency blocks) | `04/02` | rendered on `Final_OutThreshold1_leiden_fast.gml`, i.e. the retweeter backbone (§9.2). **2026-10-08 run failed** before layout (cuGraph install on the new cu13 Colab image; patched 2026-10-09, §9.5). To be re-run on `Full_RetweetedOnce_InfoFlow_leiden_fast.gml` and on `Full_LWCC_InfoFlow_leiden_fast.gml`, one network per run |
 | Community-based blog figures 7–11 (and weekly figures 2, 3, 5 if the matched set is network-derived) | branch `add-blog-figures-and-community-analysis` | only if the 198,326 matched authors / their `leiden_directed` labels descend from `Final_OutThreshold1` — to be verified (§9.4) |
 
 **Corrected notebooks (added 2026-10-07; all three renamed over their originals on 2026-10-09).** Three copies implemented the fix without touching the originals: [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb) (named `02b_influence_and_flow_networks.ipynb` until the rename) builds the influence and information-flow networks and the in-strength ≥ 1 backbone (`Full_RetweetedOnce_{Influence,InfoFlow}.gml`); [04_Network_Analysis/01_network_analysis.ipynb](../notebooks/04_Network_Analysis/01_network_analysis.ipynb) (named `01b_network_analysis_retweeted_once.ipynb` until the rename) runs the five community methods on it (Infomap on the flow file), aligns AMI/ARI by author id and exports `Full_RetweetedOnce_author_communities.json`; [04_Network_Analysis/02_network_visualization.ipynb](../notebooks/04_Network_Analysis/02_network_visualization.ipynb) (named `02b_network_visualization_retweeted_once.ipynb` until the rename) renders the maps from those files (registry default `RetweetedOnce_leiden_fast`).
 
-**Extended 2026-10-09 — a second, direction-neutral backbone.** `02` additionally exports the largest weakly connected component of the full network, self-loops removed, in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`; helpers `largest_weakly_connected_component` and `export_lwcc_both_directions`, which cuts the information-flow copy from the transpose on the same author set and asserts equal node sets and edge counts; stats under `lwcc` in `full_dual_network_stats.json`). `01` loops over `BACKBONE_STEMS = ['Full_RetweetedOnce', 'Full_LWCC']` for the backbone check, the five methods, AMI/ARI and the export, writing `Full_LWCC_Influence_<method>.gml`, `Full_LWCC_InfoFlow_infomap.gml` and `Full_LWCC_author_communities.json`; its own Strategy-1 recompute cell was removed as redundant, and a `SKIP_EXISTING_COMMUNITY_FILES` flag makes the multi-hour run resumable. `04/02` lists seven `LWCC_*` registry keys next to the `RetweetedOnce_*` ones. Until the three notebooks are re-run, no `Full_LWCC_*` file exists on Drive.
+**Extended 2026-10-09 — a second, direction-neutral backbone.** `02` additionally exports the largest weakly connected component of the full network, self-loops removed, in both orientations (`Full_LWCC_{Influence,InfoFlow}.gml`; helpers `largest_weakly_connected_component` and `export_lwcc_both_directions`, which cuts the information-flow copy from the transpose on the same author set and asserts equal node sets and edge counts; stats under `lwcc` in `full_dual_network_stats.json`). `01` loops over `BACKBONE_STEMS = ['Full_RetweetedOnce', 'Full_LWCC']` for the backbone check, the five methods, AMI/ARI and the export, writing `Full_LWCC_InfoFlow_<method>.gml` (all five methods on the flow file since the same day) and `Full_LWCC_author_communities.json`; its own Strategy-1 recompute cell was removed as redundant, and a `SKIP_EXISTING_COMMUNITY_FILES` flag makes the multi-hour run resumable. `04/02` lists seven `LWCC_*` registry keys next to the `RetweetedOnce_*` ones. The `Full_LWCC_*` backbones are on Drive since the `02` run of 2026-10-09, their five partitions and community JSON since the `01` run of the same evening (§9.3).
 
 ## 9. Impact of the pruning-direction error across the study
 
@@ -502,12 +503,12 @@ Re-runs that would change results:
 | Retweet graph, topology, top-10 lists | `02/02` cells 44–55 | no (it produces the input) | **unaffected** — direction is correct | nothing |
 | Pruning strategies 1 and 2 (`LWCC.gml`, `90TS_LWCC.gml`) | `04/01` cells 13, 16 | no | **direction-neutral** (LWCC ignores direction; total strength = in + out) | nothing — strategy 1 is since 2026-10-09 also written by `02` as `Full_LWCC_{Influence,InfoFlow}.gml` so that `01` can cluster it |
 | Pruning strategy 3 (`Final_OutThreshold1.gml`) | `04/01` cell 18 | — | **wrong population** (retweeters) | replace with an in-strength rule (`02` notebook) or a direction-neutral backbone (§9.3) — **done**: `Full_RetweetedOnce_*.gml`, 202,710 authors |
-| Community detection, five methods; modularity / codelength; AMI-ARI table | `04/01` cells 21–25 | yes | **valid only as a partition of retweeters**; Infomap additionally walks against information flow on this edge orientation | re-run `run_modularity_workflow` on the new backbone (≈ 10 min per method on 2M nodes); Infomap on the flow (transposed) file — **done** in `01` (§9.3 results table); **2026-10-09**: `01` also runs all five methods on `Full_LWCC_*` (pending) |
-| Community JSON export (`Final_OutThreshold1_author_communities.json`) | `04/01` cell 27 | yes | same | **done**: `Full_RetweetedOnce_author_communities.json` (`01`); pending: `Full_LWCC_author_communities.json` |
+| Community detection, five methods; modularity / codelength; AMI-ARI table | `04/01` cells 21–25 | yes | **valid only as a partition of retweeters**; Infomap additionally walks against information flow on this edge orientation | re-run `run_modularity_workflow` on the new backbone (≈ 10 min per method on 2M nodes); Infomap on the flow (transposed) file — **done** in `01` (§9.3 results table); **2026-10-09**: `01` re-runs all five methods on the information-flow file of both backbones — **done** (§9.3, second results block) |
+| Community JSON export (`Final_OutThreshold1_author_communities.json`) | `04/01` cell 27 | yes | same | **done**: `Full_RetweetedOnce_author_communities.json` and `Full_LWCC_author_communities.json` (`01`, 2026-10-09) |
 | Social-media maps (ForceAtlas2 classic / linlog, DrL), degree CCDF, community-blocked adjacency, `positions_*.parquet`, `network_with_layout.graphml` | `04/02` (`NETWORK = 'Final_leiden_fast'`; stored output: 1,984,599 nodes, 1,458 communities, top 16 cover 87 %) | yes | **maps of the retweeter backbone** | re-render (layout ≈ 15 min GPU budget per recipe) — the `04/02` run of 2026-10-08 **failed before layout** (cu13 cuGraph install; patched 2026-10-09, §9.5); pending for `RetweetedOnce_leiden_fast` and `LWCC_leiden_fast` |
 | Sentiment v1 / v4, per tweet | `03/01`, `03/01b` | no | **unaffected** | nothing — but any *per-community* aggregate of these scores inherits the partition |
 | Tweet-level LDA, topics in time, top-K per topic | `03/03`, `02/03` (deleted) | no | unaffected by direction; still on the first-generation corpus (§6.3) | re-run on the 2026 corpus for other reasons |
-| Author-level LDA v1 / v2 | `03/04`, `03/04c` | no — reads `LWCC.gml` (strategy 1) | unaffected by direction; broken by the GML `id`/`label` bug (§6.4) | fix loader, re-run |
+| Author-level LDA v1 / v2 | `03/04`, `03/04c` | no — reads the LWCC backbone (`LWCC.gml` until 2026-10-10, now `3_backbones/Full_LWCC_InfoFlow.gml`, same graph) | unaffected by direction; broken by the GML `id`/`label` bug (§6.4) | fix loader, re-run |
 | Topic–emotion mixing plan | `docs/TOPIC_EMOTION_MIXING_PLAN.md` | no — consumes `04c` θ | inherits §6.4 | after `04c` is re-run |
 | Classifiers | `05_Classifiers` | no | **unaffected** | nothing |
 | Blog analysis: 198,326 matched authors, 21 Leiden-directed communities, figures 1–11 | branch `origin/add-blog-figures-and-community-analysis` (commit `da01e80`, 2026-08-21, one commit ahead of `main`, unmerged) | **unknown** — inputs not committed | see §9.4 | verify provenance first |
@@ -522,8 +523,8 @@ The options, with their populations:
 
 | Backbone | Rule | Nodes | Direction-sensitive? | Comment |
 |---|---|---:|---|---|
-| A. Full LWCC (`LWCC.gml`) | self-loops removed, giant component | 3,264,499 | no | `LWCC.gml` exists; since 2026-10-09 `02` also writes it in both orientations as `Full_LWCC_{Influence,InfoFlow}.gml` and `01` clusters it (pending run) |
-| B. Total-strength 90 % (`90TS_LWCC.gml`) | drop lowest in+out nodes until 10 % of weight is lost, then LWCC | 2,315,573 | no | already exists; keeps both heavy retweeters and heavily retweeted |
+| A. Full LWCC (`LWCC.gml`) | self-loops removed, giant component | 3,264,499 | no | since 2026-10-09 `02` writes it in both orientations as `Full_LWCC_{Influence,InfoFlow}.gml` and `01` clusters it (run 2026-10-09); the legacy `LWCC.gml` was deleted in the 2026-10-10 reorganisation |
+| B. Total-strength 90 % (`90TS_LWCC.gml`) | drop lowest in+out nodes until 10 % of weight is lost, then LWCC | 2,315,573 | no | written by `01` only when `RUN_STRATEGY_2` is on; keeps both heavy retweeters and heavily retweeted |
 | C. Out-strength ≥ 1 (`Final_OutThreshold1.gml`) | made ≥ 1 retweet | 1,984,599 | yes — retweeters | current; wrong population |
 | D. In-strength ≥ 1 (`02`: `*_RetweetedOnce_*`) | received ≥ 1 retweet | ≤ 374,368 before LWCC | yes — retweeted | intended population, but a sparse subgraph |
 
@@ -548,7 +549,7 @@ Recommendation: D is small but connected (one component, 882,530 edges), which i
 
 **2026-10-09:** the fallback to A is wired in rather than hypothetical. `01` runs the five methods on both D and A in one pass (`BACKBONE_STEMS = ['Full_RetweetedOnce', 'Full_LWCC']`), so the two partitions can be compared side by side before the population decision of §11.4 is taken. Expected cost: each method on the 3.26M-node LWCC is 10–20 min, roughly 1.5–2 h for the five on both backbones; the AMI cell holds five 3.26M-entry membership dicts (~3 GB).
 
-**`01` results (Colab run completed 2026-10-07, CPU runtime, no errors; outputs stored in the notebook):**
+**`01` results (Colab run completed 2026-10-07, CPU runtime, no errors; superseded by the 2026-10-09 run below for the four methods that then ran on the influence file, the Infomap row still current):**
 
 Inside the backbone, 132,603 of the 202,710 authors still receive ≥ 1 retweet and 143,043 make ≥ 1; the other 70,107 receivers lost all their retweeters to the cut and remain only because they retweet other backbone authors. Degree Gini 0.74; the out-strength tail fits a power law with α = 2.50 (x_min = 59) but is not distinguishable from a lognormal (p = 0.59).
 
@@ -563,6 +564,34 @@ Inside the backbone, 132,603 of the 202,710 authors still receive ≥ 1 retweet 
 Agreement (aligned by author id, all 202,710 present in every partition): leiden_fast ↔ leiden_directed AMI 0.804 / ARI 0.846; louvain ↔ either Leiden AMI ≈ 0.75; label propagation ↔ modularity methods AMI ≈ 0.57; Infomap ↔ everything AMI ≈ 0.31 and ARI < 0.01. Infomap's 17,055 small modules on the flow orientation are a different kind of partition (random-walk traps on a sparse directed graph), not a noisier version of the modularity ones — the same pattern as on the old backbone, where it gave 36,122 communities and ARI 0.08. The two Leiden variants are the stable choice; the two largest Leiden-directed communities (47,906 and 46,415) happen to be close in size to the two largest validated communities of the blog analysis (44,718 and 41,574), but those were computed on the retweeter backbone (§9.4), so the resemblance says nothing about their membership.
 
 Export: `Full_RetweetedOnce_author_communities.json`, 202,710 authors × 5 methods.
+
+**`01` results on the information-flow files of both backbones (Colab run completed 2026-10-09, 18:42 CEST, CPU runtime, no errors; outputs stored in the notebook):**
+
+Backbone checks passed on both files (one weak component, unique author labels, directed, no self-loops). `Full_RetweetedOnce_InfoFlow.gml`: 202,710 authors, 882,530 edges, weight 1,269,747, 132,603 / 143,043 authors retweeted / retweeting inside the backbone — identical to 2026-10-07. `Full_LWCC_InfoFlow.gml`: 3,264,499 authors, 7,670,516 edges, weight 9,458,703; only 317,533 authors are retweeted inside it and 3,095,219 retweet, so 90 % of its authors have out-strength 0. `plot_report` now reads the flow orientation, where out-degree is distinct retweeters and out-strength is retweets received; its numbers therefore differ from the 2026-10-07 ones, which described retweets *made*: retweeted-once out-degree Gini 0.849, out-strength tail α = 1.87 (x_min = 4); LWCC α = 1.84 (x_min = 39, Gini skipped for size); a lognormal fits better than a power law on both (p < 0.001).
+
+| Method (input: `<stem>_InfoFlow.gml`) | Retweeted-once: communities | Q | Largest five | LWCC: communities | Q | Largest five |
+|---|---:|---:|---|---:|---:|---|
+| label_propagation (undirected collapse) | 4,364 | 0.683 | 91,490 · 53,187 · 7,704 · 4,267 · 3,007 | 36,500 | 0.670 | 842,069 · 772,998 · 38,155 · 35,155 · 33,631 |
+| louvain (same) | 974 | 0.743 | 47,789 · 47,062 · 19,348 · 17,650 · 12,795 | 2,299 | 0.763 | 619,251 · 400,258 · 303,337 · 278,129 · 180,860 |
+| leiden_fast (same) | 1,110 | 0.747 | 46,569 · 44,029 · 22,665 · 20,280 · 12,742 | 3,041 | 0.774 | 608,582 · 371,580 · 311,703 · 279,936 · 176,298 |
+| leiden_directed (directed) | 1,057 | 0.744 | 47,728 · 47,247 · 18,194 · 17,101 · 13,952 | 2,951 | 0.772 | 619,125 · 386,553 · 327,295 · 269,842 · 188,686 |
+| infomap (directed) | 17,055 * | 0.417 * | 2,790 · 2,352 · 844 · 838 · 771 * | 136,744 | 0.513 (codelength 13.530 bits) | 36,398 · 31,596 · 30,223 · 28,873 · 27,060 |
+
+\* Not recomputed: `Full_RetweetedOnce_InfoFlow_infomap.gml` already existed from the 2026-10-07 run, which computed it on this same file (same author set, edge count and weight), so `SKIP_EXISTING_COMMUNITY_FILES` reused it; the values are those of the 2026-10-07 table above.
+
+Agreement (aligned by author id; every author present in every partition on both backbones):
+
+| Pair | Retweeted-once AMI / ARI | LWCC AMI / ARI |
+|---|---|---|
+| leiden_fast ↔ leiden_directed | 0.792 / 0.824 | 0.844 / 0.884 |
+| louvain ↔ leiden_fast | 0.798 / 0.824 | 0.824 / 0.864 |
+| louvain ↔ leiden_directed | 0.774 / 0.832 | 0.798 / 0.831 |
+| label_propagation ↔ modularity methods | 0.565–0.572 / 0.46–0.48 | 0.546–0.558 / 0.46–0.48 |
+| infomap ↔ everything | 0.260–0.312 / < 0.01 | 0.423–0.524 / 0.011–0.024 |
+
+The 2026-10-07 pattern holds on both backbones: the three modularity methods agree closely, label propagation lands in the middle, and Infomap is a different kind of partition. On the LWCC, label propagation puts 1.6M of the 3.26M authors into two communities, and Infomap leaves singleton modules. Run time: 2 min 43 s for the backbone checks, 36 min for the undirected methods, 21 min for the directed ones, **51 min for the AMI/ARI cell** (the Infomap pairs on the LWCC dominate) and 47 s for the export — about 1 h 53 min in all.
+
+Export: `Full_RetweetedOnce_author_communities.json` (202,710 authors × 5 methods) and `Full_LWCC_author_communities.json` (3,264,499 authors × 5 methods).
 
 ### 9.4 The 198,326 matched authors and the two community figures
 
@@ -632,6 +661,7 @@ python3 src/scripts/pipeline_graph.py downstream 02_Processing/02_sanity_check_a
 - The three corrected notebooks (§9, "Corrected notebooks") are registered in [docs/pipeline_overrides.yaml](pipeline_overrides.yaml) as **alternatives** of their originals (dashed edges; both appeared in the graph until 2026-10-09, when all three corrected copies were renamed over their originals and the pairs were dropped), and the new network artifacts are listed in both directory listings with `[written by …/02b]` / `[…/01b]` tags.
 - **Rebuilt 2026-10-09** after the LWCC extension: **28 notebooks, 169 artifacts, 155 write edges, 132 read edges**; 53 declared edges (20 added: the `02` LWCC writes for the Test and Full branches, the `01` reads of all four backbone files and its five LWCC community writes and read-backs, and the two community JSONs — `COMMUNITIES_JSON` is now a dict comprehension over `BACKBONE_STEMS`, which the parser cannot resolve, so `Full_RetweetedOnce_author_communities.json` moved from parsed to declared). `validate` clean.
 - **Rebuilt 2026-10-09 (clean-up)** after the deletions and renames of `02_Processing/02`, `02_Processing/03`, `04_Network_Analysis/01` and `04_Network_Analysis/02`: **24 notebooks, 146 artifacts, 114 write edges, 101 read edges**; 45 declared edges, 2 alternative edges. The deleted notebooks' edges are gone, so `Full_Network.gml`, `LWCC.gml`, every `Final_OutThreshold1*` file, `viz_outputs_Final_leiden_fast/` and `02/03`'s outputs no longer appear in the graph; they remain on Drive as legacy files (status block, *Reading conventions*). `validate` clean.
+- **Rebuilt 2026-10-10** after the stage-folder reorganisation of `Data Sets/Networks/` (§12.7): **24 notebooks, 146 artifacts, 114 write edges, 99 read edges**. The 37 declared network paths in `pipeline_overrides.yaml` were remapped to the stage folders; the parser resolves the new `<stage>_folder / 'name'` paths of `02`, `04/01` and `04/02` on its own, and `03/04c` now reads `3_backbones/Full_LWCC_InfoFlow.gml` on the HPC path.
 
 ### 10.2 What the parser cannot see — and how it is covered
 
@@ -652,22 +682,22 @@ Notebook ids may carry a letter suffix in provenance tags (the former `02b`, `01
 
 ### 10.3 Hand-off table for the network stage
 
-Each row was checked twice: against the notebook source (§§4–5, §9) and against the rebuilt graph (`upstream` / `downstream` queries). Rows marked *legacy* describe files that the deleted originals wrote; they are kept so the stored numbers in §§5 and 9 stay traceable.
+Each row was checked twice: against the notebook source (§§4–5, §9) and against the rebuilt graph (`upstream` / `downstream` queries). Rows marked *legacy* describe files that the deleted originals wrote (flat in `Networks/` until the 2026-10-10 reorganisation, which deleted them); they are kept so the stored numbers in §§5 and 9 stay traceable. Current files carry their stage folder (§12.7).
 
 | Producer | File (in `Data Sets/Networks/`) | Consumer(s) | Edge source |
 |---|---|---|---|
-| `02/02` cell 44 (same cell in today's `02`, gated by `generate_data`) | `full_network_dict.pkl` | `02` (network build) | parsed |
+| `02/02` cell 44 (same cell in today's `02`, gated by `generate_data`) | `1_retweet_dicts/full_network_dict.pkl` | `02` (network build) | parsed |
 | `02/02` cell 53 (deleted original) | `Full_Network.gml` — **legacy** | read only by the deleted `04/01`; `Full_Network_Influence.gml` is the same graph | no edge since 2026-10-09 |
-| `02` | `Full_Network_Influence.gml`, `Full_Network_InfoFlow.gml` | `01` (optional inspection, strategy 2), `04/02` registry | declared |
-| `02` | `Full_RetweetedOnce_Influence.gml` | *(reference orientation; read by nothing since 2026-10-09)* | declared |
-| `02` | `Full_RetweetedOnce_InfoFlow.gml` | `01` (backbone check; all five methods), `04/02` registry | declared |
-| `01` | `Full_RetweetedOnce_InfoFlow_{label_propagation,louvain,leiden_fast,leiden_directed,infomap}.gml` (the 2026-10-07 `…_Influence_<method>.gml` files are legacy) | `01` (AMI/ARI, JSON export), `04/02` | declared |
-| `01` | `Full_RetweetedOnce_author_communities.json` | *(no consumer yet — the author set for downstream restriction)* | declared (parsed until 2026-10-09) |
-| `02` | `Full_LWCC_Influence.gml` (reference), `Full_LWCC_InfoFlow.gml` — *on Drive since 2026-10-09* | `01` (backbone check; all five methods on the InfoFlow file), `04/02` registry | declared |
-| `01` | `Full_LWCC_InfoFlow_{label_propagation,louvain,leiden_fast,leiden_directed,infomap}.gml` — *not yet on Drive* | `01` (AMI/ARI, JSON export), `04/02` | declared |
-| `01` | `Full_LWCC_author_communities.json` — *not yet on Drive* | *(no consumer yet)* | declared |
+| `02` | `2_full_graphs/Full_Network_Influence.gml` (reference), `2_full_graphs/Full_Network_InfoFlow.gml` | `01` (optional inspection and strategy 2, both on the InfoFlow file) | declared |
+| `02` | `3_backbones/Full_RetweetedOnce_Influence.gml` | *(reference orientation; read by nothing since 2026-10-09)* | declared |
+| `02` | `3_backbones/Full_RetweetedOnce_InfoFlow.gml` | `01` (backbone check; all five methods), `04/02` registry | declared |
+| `01` | `4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_{label_propagation,louvain,leiden_fast,leiden_directed,infomap}.gml` (the 2026-10-07 `…_Influence_<method>.gml` files are legacy) | `01` (AMI/ARI, JSON export), `04/02` | declared |
+| `01` | `4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json` | *(no consumer yet — the author set for downstream restriction)* | declared (parsed until 2026-10-09) |
+| `02` | `3_backbones/Full_LWCC_Influence.gml` (reference), `3_backbones/Full_LWCC_InfoFlow.gml` | `01` (backbone check; all five methods on the InfoFlow file), `04/02` registry; since 2026-10-10 also `03/04` and `03/04c` (author-level LDA, HPC copy) | declared (`03/04c`: parsed) |
+| `01` | `4_communities/LWCC/Full_LWCC_InfoFlow_{label_propagation,louvain,leiden_fast,leiden_directed,infomap}.gml` | `01` (AMI/ARI, JSON export), `04/02` | declared |
+| `01` | `4_communities/LWCC/Full_LWCC_author_communities.json` | *(no consumer yet)* | declared |
 | `04/01` cell 18 (deleted original) | `Final_OutThreshold1.gml` — **legacy** | the deleted `04/01` community cells | no edge since 2026-10-09 |
-| `04/01` cells 21, 23 (deleted original) | `Final_OutThreshold1_<method>.gml` — **legacy** | the deleted `04/01` AMI + export and the deleted `04/02`; still selectable in today's `04/02` registry under `Final_*` keys | no edge since 2026-10-09 |
+| `04/01` cells 21, 23 (deleted original) | `Final_OutThreshold1_<method>.gml` — **legacy** | the deleted `04/01` AMI + export and the deleted `04/02`; no longer in today's `04/02` registry (InfoFlow keys only since 2026-10-09) | no edge since 2026-10-09 |
 | `04/01` cell 27 (deleted original) | `Final_OutThreshold1_author_communities.json` — **legacy** | *(none in repo; §9.4 for the blog branch)* | no edge since 2026-10-09 |
 
 ### 10.4 Caveats when reading the graph
@@ -731,10 +761,11 @@ In this repository:
 | Step | Notebook / script | Status |
 |---|---|---|
 | Both networks + retweeted-once backbone | `02_Processing/02` | done 2026-10-07 (as `02b`); re-run 2026-10-09 with identical numbers |
-| Five partitions + community JSON on the backbone | `04_Network_Analysis/01` | done 2026-10-07 (as `01b`, influence orientation); to be re-run on the information-flow file |
+| Five partitions + community JSON on the backbone | `04_Network_Analysis/01` | done 2026-10-07 (as `01b`, influence orientation); re-run on the information-flow file 2026-10-09 (§9.3) |
 | Social-media maps | `04_Network_Analysis/02` | run of 2026-10-08 failed before layout (cu13 cuGraph install); patched 2026-10-09; pending |
 | LWCC backbone in both directions | `02_Processing/02` (extension of 2026-10-09) | done 2026-10-09 |
-| Five partitions + community JSON on the LWCC backbone | `04_Network_Analysis/01` | pending |
+| Five partitions + community JSON on the LWCC backbone | `04_Network_Analysis/01` | done 2026-10-09 (§9.3) |
+| Whole network stage again, into the stage folders of §12.7, after `Data Sets/Networks/` was emptied (2026-10-10) | `02_Processing/02` (`generate_data = True`) → `04_Network_Analysis/01` → `04_Network_Analysis/02` | in progress (started 2026-10-10) |
 | AI+Art sentiment file without the surplus block | `03/01b` cell 34 (delete the `art_full__twitter-roberta-base-sentiment-latest` blocks, re-merge) | open |
 
 Outside this repository (the blog branch's scripts consume files that are produced elsewhere — `data_sets/blog_analysis/matched_authors.json`, the K = 12 gensim model, the `matrices/` and `tables/` folders; see §9.4):
@@ -759,7 +790,7 @@ Figure 1 (timeline) needs nothing.
 
 ## 12. File inventory — every artifact of the pipeline
 
-*Added 2026-10-09.* Every file the notebooks read or write, derived from [docs/pipeline_graph.json](pipeline_graph.json) (146 artifacts after the 2026-10-09 rebuild: parsed edges plus the declared ones of `pipeline_overrides.yaml`). Location is the folder, relative to `BASE_PATH` = `My Drive/Colab Projects/AI Public Trust/` unless marked HPC or Colab-local; *written by* / *read by* are notebook ids (`stage/index`, `b` suffixes in older documents denote the corrected copies that were renamed over their originals on 2026-10-09); templated names (`{…}`) are resolved at run time. Descriptions are from the notebooks and §§1–9 of this document. A file with no writer is produced outside the repository or by a cell that no longer exists; a file with no reader is a terminal output. Legacy files that no notebook reads or writes any more (`Test_Network.*`, `Full_Network.graphml/.gexf/.json` from the pre-2026-10 `02/02`; `LWCC.gml/.graphml`, `Final_OutThreshold1*` and `viz_outputs_Final_leiden_fast/` from the pre-2026-10 `04/01` and `04/02`; `Full_RetweetedOnce_Influence_<method>.gml` from the 2026-10-07 run on the influence orientation; `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` from the deleted `02/03`) still sit on Drive but are not listed. To regenerate the producer/consumer columns after a notebook change, follow §10.5 and re-derive this table from the JSON.
+*Added 2026-10-09.* Every file the notebooks read or write, derived from [docs/pipeline_graph.json](pipeline_graph.json) (146 artifacts after the 2026-10-10 rebuild: parsed edges plus the declared ones of `pipeline_overrides.yaml`). Location is the folder, relative to `BASE_PATH` = `My Drive/Colab Projects/AI Public Trust/` unless marked HPC or Colab-local; *written by* / *read by* are notebook ids (`stage/index`, `b` suffixes in older documents denote the corrected copies that were renamed over their originals on 2026-10-09); templated names (`{…}`) are resolved at run time. Descriptions are from the notebooks and §§1–9 of this document. A file with no writer is produced outside the repository or by a cell that no longer exists; a file with no reader is a terminal output. Legacy files that no notebook reads or writes any more (`Test_Network.*`, `Full_Network.graphml/.gexf/.json` from the pre-2026-10 `02/02`; `LWCC.gml/.graphml`, `Final_OutThreshold1*` and `viz_outputs_Final_leiden_fast/` from the pre-2026-10 `04/01` and `04/02`; `Full_RetweetedOnce_Influence_<method>.gml` from the 2026-10-07 run on the influence orientation; `AItrust_pruned_twits_with_sentiment_cleaned.json` and `top_retweets_by_topic_*.csv` from the deleted `02/03`) still sit on Drive but are not listed. To regenerate the producer/consumer columns after a notebook change, follow §10.5 and re-derive this table from the JSON.
 
 ### 12.1 `Raw Data/`
 
@@ -852,38 +883,51 @@ Figure 1 (timeline) needs nothing.
 
 ### 12.7 `Data Sets/Networks/`
 
+*Reorganised 2026-10-10.* One subfolder per pipeline stage, each written by one notebook. The folder variables — `retweet_dicts_folder`, `full_graphs_folder`, `backbones_folder`, `communities_folder`, `visualizations_folder`, `test_networks_folder` — are one block, repeated verbatim in the Setup cell of `02/02`, `04/01` and `04/02`. File names are unchanged. The flat layout before that date also held the legacy files named in *Reading conventions*, `Full_RetweetedOnce_Influence_<method>.gml` (2026-10-07), `leiden_runs/` and the `viz_outputs_*/` folders; all of them were deleted with the reorganisation.
+
+**Live listing:** [Drive: Data Sets/Networks/](https://drive.google.com/drive/folders/1PlVu_Li9nSI7IDLLfURp09s_1bAGXpMq?usp=sharing) (shared link; the page lists file names, modification dates and sizes, so it can be fetched to check what exists before trusting this table).
+
+| Folder | Written by | Holds |
+|---|---|---|
+| `1_retweet_dicts/` | `02/02` | the AI-corpus retweet counter |
+| `2_full_graphs/` | `02/02` | the full retweet graph, both orientations |
+| `3_backbones/` | `02/02` (`90TS_LWCC` by `04/01`, optional) | the two analysed backbones, both orientations |
+| `4_communities/RetweetedOnce/`, `4_communities/LWCC/` | `04/01` | five annotated graphs and the community JSON per backbone |
+| `5_visualizations/<NETWORK>/` | `04/02` | maps and layouts per rendered network (§12.8) |
+| `test/` | `02/02` (test branch) | the test-corpus counter and every `Test_*` graph |
+
 | File | Written by | Read by | What it is |
 |---|---|---|---|
-| `90TS_LWCC.gml` | `04/01` | — | Strategy 2: drop lowest total-strength nodes until 10 % of weight is lost, then LWCC — 2,315,573 authors (§5). `01` keeps the recompute cell behind `RUN_STRATEGY_2`. |
-| `90TS_LWCC.graphml` | `04/01` | — | GraphML copy of strategy 2. |
-| `Full_LWCC_author_communities.json` | `04/01` | — | Same for the LWCC backbone (3.26M authors); pending. |
-| `Full_LWCC_Influence.gml` | `02/02` | — | **LWCC backbone**: self-loops removed, largest weakly connected component of the full graph — 3,264,499 authors, 7,670,516 edges, weight 9,458,703 (= the pre-2026-10 strategy 1); influence orientation, written for reference. Run 2026-10-09. |
-| `Full_LWCC_InfoFlow.gml` | `02/02` | `04/01` | Transpose of the LWCC backbone (edge retweeted → retweeter); the file `04/01` clusters and `04/02` renders. On Drive since 2026-10-09. |
-| `Full_LWCC_InfoFlow_infomap.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_infomap` vertex attribute; `01`, pending. |
-| `Full_LWCC_InfoFlow_label_propagation.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_label_propagation` vertex attribute; `01`, pending. |
-| `Full_LWCC_InfoFlow_leiden_directed.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_leiden_directed` vertex attribute; `01`, pending. |
-| `Full_LWCC_InfoFlow_leiden_fast.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_leiden_fast` vertex attribute; `01`, pending. |
-| `Full_LWCC_InfoFlow_louvain.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_louvain` vertex attribute; `01`, pending. |
-| `full_network_dict.pkl` | `02/02` | `02/02` | Nested counter `{retweeted_author: {retweeter: n}}` for the AI corpus: 374,368 retweeted authors, 9,638,407 retweets (§3). |
-| `Full_Network_Influence.gml` | `02/02` | — | **Full retweet graph**, influence orientation (retweeter → retweeted); identical to the legacy `Full_Network.gml` (3,379,040 authors, 7,768,720 edges). |
-| `Full_Network_InfoFlow.gml` | `02/02` | `04/01` | `02` full graph, information-flow orientation (the transpose; same counts). |
-| `Full_RetweetedOnce_author_communities.json` | `04/01` | — | `{author_id: {method: community_id}}` for the 202,710 backbone authors and all five methods (`01`); the author set for downstream restriction. |
-| `Full_RetweetedOnce_Influence.gml` | `02/02` | — | **Retweeted-once backbone**: self-loops removed, in-strength ≥ 1 (363,618 authors), then LWCC — **202,710 authors, 882,530 edges, weight 1,269,747** (13.17 % of retweets); influence orientation (§9.3). |
-| `Full_RetweetedOnce_InfoFlow.gml` | `02/02` | `04/01` | Transpose of the retweeted-once backbone (edge retweeted → retweeter); the file `04/01` clusters and `04/02` renders. |
-| `Full_RetweetedOnce_InfoFlow_infomap.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_infomap` vertex attribute (read back as `communityinfomap`, float → int); `01`, pending re-run (the Infomap file exists from 2026-10-07). |
-| `Full_RetweetedOnce_InfoFlow_label_propagation.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_label_propagation` vertex attribute (read back as `communitylabelpropagation`, float → int); `01`, pending re-run (the Infomap file exists from 2026-10-07). |
-| `Full_RetweetedOnce_InfoFlow_leiden_directed.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_leiden_directed` vertex attribute (read back as `communityleidendirected`, float → int); `01`, pending re-run (the Infomap file exists from 2026-10-07). |
-| `Full_RetweetedOnce_InfoFlow_leiden_fast.gml` | `04/01` | `04/01`, `04/02` | Retweeted-once backbone (flow orientation) with the `community_leiden_fast` vertex attribute (read back as `communityleidenfast`, float → int); `01`, pending re-run (the Infomap file exists from 2026-10-07). |
-| `Full_RetweetedOnce_InfoFlow_louvain.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_louvain` vertex attribute (read back as `communitylouvain`, float → int); `01`, pending re-run (the Infomap file exists from 2026-10-07). |
-| `Test_LWCC_Influence.gml` | `02/02` | — | `02` test LWCC backbone, influence orientation (added 2026-10-09). |
-| `Test_LWCC_InfoFlow.gml` | `02/02` | — | Transpose of the test LWCC backbone. |
-| `test_network_dict.pkl` | `02/02` | `02/02` | Nested counter `{retweeted_author: {retweeter: n}}` for the test corpus (§3). |
-| `Test_Network_Influence.gml` | `02/02` | — | Test graph, influence orientation (retweeter → retweeted); identical to the legacy `Test_Network.gml`. |
-| `Test_Network_InfoFlow.gml` | `02/02` | — | `02` test graph, information-flow orientation (retweeted → retweeter): the transpose. |
-| `Test_RetweetedOnce_Influence.gml` | `02/02` | — | `02` test backbone: in-strength ≥ 1 then LWCC (3 nodes — the test data is too small to carry one). |
-| `Test_RetweetedOnce_InfoFlow.gml` | `02/02` | — | Transpose of the test backbone. |
+| `1_retweet_dicts/full_network_dict.pkl` | `02/02` | `02/02` | Nested counter `{retweeted_author: {retweeter: n}}` for the AI corpus: 374,368 retweeted authors, 9,638,407 retweets (§3). |
+| `2_full_graphs/Full_Network_Influence.gml` | `02/02` | — | **Full retweet graph**, influence orientation (retweeter → retweeted); identical to the legacy `Full_Network.gml` (3,379,040 authors, 7,768,720 edges). |
+| `2_full_graphs/Full_Network_InfoFlow.gml` | `02/02` | `04/01` | `02` full graph, information-flow orientation (the transpose; same counts). |
+| `3_backbones/90TS_LWCC.gml` | `04/01` | — | Strategy 2: drop lowest total-strength nodes until 10 % of weight is lost, then LWCC — 2,315,573 authors (§5). Written by `01` only when `RUN_STRATEGY_2` is on. |
+| `3_backbones/90TS_LWCC.graphml` | `04/01` | — | GraphML copy of strategy 2. |
+| `3_backbones/Full_LWCC_Influence.gml` | `02/02` | — | **LWCC backbone**: self-loops removed, largest weakly connected component of the full graph — 3,264,499 authors, 7,670,516 edges, weight 9,458,703 (= the pre-2026-10 strategy 1); influence orientation, written for reference. |
+| `3_backbones/Full_LWCC_InfoFlow.gml` | `02/02` | `04/01`, `03/04` | Transpose of the LWCC backbone (edge retweeted → retweeter); the file `04/01` clusters and `04/02` renders. |
+| `3_backbones/Full_RetweetedOnce_Influence.gml` | `02/02` | — | **Retweeted-once backbone**: self-loops removed, in-strength ≥ 1 (363,618 authors), then LWCC — **202,710 authors, 882,530 edges, weight 1,269,747** (13.17 % of retweets); influence orientation (§9.3). |
+| `3_backbones/Full_RetweetedOnce_InfoFlow.gml` | `02/02` | `04/01` | Transpose of the retweeted-once backbone (edge retweeted → retweeter); the file `04/01` clusters and `04/02` renders. |
+| `4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json` | `04/01` | — | `{author_id: {method: community_id}}` for the 202,710 backbone authors and all five methods (`01`); the author set for downstream restriction. |
+| `4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_infomap.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_infomap` vertex attribute (read back as `communityinfomap`, float → int) (`01`). |
+| `4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_label_propagation.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_label_propagation` vertex attribute (read back as `communitylabelpropagation`, float → int) (`01`). |
+| `4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_leiden_directed.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_leiden_directed` vertex attribute (read back as `communityleidendirected`, float → int) (`01`). |
+| `4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_leiden_fast.gml` | `04/01` | `04/01`, `04/02` | Retweeted-once backbone (flow orientation) with the `community_leiden_fast` vertex attribute (read back as `communityleidenfast`, float → int) (`01`). |
+| `4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_louvain.gml` | `04/01` | `04/01` | Retweeted-once backbone (flow orientation) with the `community_louvain` vertex attribute (read back as `communitylouvain`, float → int) (`01`). |
+| `4_communities/LWCC/Full_LWCC_author_communities.json` | `04/01` | — | Same for the LWCC backbone (3,264,499 authors × 5 methods, `01`). |
+| `4_communities/LWCC/Full_LWCC_InfoFlow_infomap.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_infomap` vertex attribute (`01`). |
+| `4_communities/LWCC/Full_LWCC_InfoFlow_label_propagation.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_label_propagation` vertex attribute (`01`). |
+| `4_communities/LWCC/Full_LWCC_InfoFlow_leiden_directed.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_leiden_directed` vertex attribute (`01`). |
+| `4_communities/LWCC/Full_LWCC_InfoFlow_leiden_fast.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_leiden_fast` vertex attribute (`01`). |
+| `4_communities/LWCC/Full_LWCC_InfoFlow_louvain.gml` | `04/01` | `04/01` | LWCC backbone (flow orientation) with the `community_louvain` vertex attribute (`01`). |
+| `test/Test_LWCC_Influence.gml` | `02/02` | — | `02` test LWCC backbone, influence orientation (added 2026-10-09). |
+| `test/Test_LWCC_InfoFlow.gml` | `02/02` | — | Transpose of the test LWCC backbone. |
+| `test/test_network_dict.pkl` | `02/02` | `02/02` | Nested counter `{retweeted_author: {retweeter: n}}` for the test corpus (§3). |
+| `test/Test_Network_Influence.gml` | `02/02` | — | Test graph, influence orientation (retweeter → retweeted); identical to the legacy `Test_Network.gml`. |
+| `test/Test_Network_InfoFlow.gml` | `02/02` | — | `02` test graph, information-flow orientation (retweeted → retweeter): the transpose. |
+| `test/Test_RetweetedOnce_Influence.gml` | `02/02` | — | `02` test backbone: in-strength ≥ 1 then LWCC (3 nodes — the test data is too small to carry one). |
+| `test/Test_RetweetedOnce_InfoFlow.gml` | `02/02` | — | Transpose of the test backbone. |
 
-### 12.8 `Data Sets/Networks/viz_outputs_<NETWORK>/`
+### 12.8 `Data Sets/Networks/5_visualizations/<NETWORK>/`
 
 | File | Written by | Read by | What it is |
 |---|---|---|---|
@@ -927,7 +971,7 @@ Figure 1 (timeline) needs nothing.
 | `Cleaned Data/art_test_classified_{model_alias}.json` | `03/01b` | `03/01b` | v4 test output per model, AI+Art corpus. |
 | `Cleaned Data/author_sentiment_mean.pkl` | `03/04c` | — | Author-level mean sentiment computed in `03/04c`. |
 | `Cleaned Data/Blocks/ai_full__{model_name.split('/')[-1]}/block_{bid}.json` | `03/01b` | `03/01b` | Sentiment/emotion v4: per-model, per-block inference outputs over the AI corpus (`03/01b`, 10 models; block 0 of the emotion model is short by 8,975 lines, §6.2). |
-| `Networks/LWCC.gml` | — | `03/04c` | HPC copy of `LWCC.gml`; `03/04c` filters authors on its GML `id` field instead of `label` (§6.4). |
+| `Networks/3_backbones/Full_LWCC_InfoFlow.gml` | — | `03/04c` | HPC copy of `02`'s LWCC backbone, to be copied over from Drive (until 2026-10-10 `03/04c` read the legacy `LWCC.gml`, the same graph); `03/04c` filters authors on its GML `id` field instead of `label` (§6.4). |
 
 ### 12.11 `HPC: /projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/`
 

@@ -95,16 +95,15 @@ AI Public Trust/                                  (BASE_PATH)
 │   │       ├── top_test_ai_tweets.csv                                  [03/02]
 │   │       └── top_test_art_tweets.csv                                 [03/02]
 │   │
-│   ├── Networks/
-│   │   ├── {test,full}_network_dict.pkl                                [02/02]
-│   │   ├── {Test,Full}_Network.json, Full_Network.gml                  (legacy: pre-2026-10 `02/02`; the .gml equals Full_Network_Influence.gml)
-│   │   ├── Full_Network_{Influence,InfoFlow}.gml                        [02/02]
-│   │   ├── Full_RetweetedOnce_{Influence,InfoFlow}.gml                  [02/02]  ← authors retweeted ≥ 1x
-│   │   ├── Full_RetweetedOnce_InfoFlow_<method>.gml                     [04/01]
-│   │   ├── Full_RetweetedOnce_author_communities.json                   [04/01]
-│   │   ├── Full_LWCC_{Influence,InfoFlow}.gml                           [02/02]  ← LWCC, self-loops removed (direction-neutral)
-│   │   ├── Full_LWCC_InfoFlow_<method>.gml                              [04/01]
-│   │   └── Full_LWCC_author_communities.json                            [04/01]
+│   ├── Networks/                                                     (one subfolder per stage since 2026-10-10)
+│   │   ├── 1_retweet_dicts/full_network_dict.pkl                       [02/02]
+│   │   ├── 2_full_graphs/Full_Network_{Influence,InfoFlow}.gml         [02/02]
+│   │   ├── 3_backbones/Full_RetweetedOnce_{Influence,InfoFlow}.gml     [02/02]  ← authors retweeted ≥ 1x
+│   │   ├── 3_backbones/Full_LWCC_{Influence,InfoFlow}.gml              [02/02]  ← LWCC, self-loops removed (direction-neutral)
+│   │   ├── 4_communities/{RetweetedOnce,LWCC}/<stem>_InfoFlow_<method>.gml   [04/01]
+│   │   ├── 4_communities/{RetweetedOnce,LWCC}/<stem>_author_communities.json [04/01]
+│   │   ├── 5_visualizations/<NETWORK>/                                 [04/02]
+│   │   └── test/                                                       [02/02]  ← test_network_dict.pkl and every Test_* graph
 │   │
 │   └── Classifiers_Data/
 │       ├── HITL/

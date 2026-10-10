@@ -274,31 +274,30 @@ AI Public Trust/
 │   │   ├── AItrust_pruned_twits_with_sentiment_and_topics_k5.jsonl.gz [written by 03_Analysis/03]
 │   │   └── top_retweets_by_topic_100.csv                        (legacy: written by 02_Processing/03, deleted 2026-10-09)
 │   │
-│   └── Networks/                              (networks_folder = BASE_PATH / 'Data Sets/Networks/')
-│       ├── test_network_dict.pkl              [written by 02_Processing/02]
-│       ├── full_network_dict.pkl              [written by 02_Processing/02]
-│       ├── Test_Network.json                  (legacy: pre-2026-10 version of 02_Processing/02)
-│       ├── Full_Network.json                  (legacy: pre-2026-10 version of 02_Processing/02)
-│       ├── Full_Network.gml                   (legacy: pre-2026-10 version of 02_Processing/02; identical to Full_Network_Influence.gml; read only by the pre-2026-10 04_Network_Analysis/01)
-│       ├── LWCC.gml / .graphml                (legacy: pre-2026-10 04_Network_Analysis/01, strategy 1; same graph as Full_LWCC_Influence.gml)
-│       ├── 90TS_LWCC.gml / .graphml           [written by 04_Network_Analysis/01 — strategy 2, gated by RUN_STRATEGY_2]
-│       ├── Final_OutThreshold1.gml / .graphml (legacy: pre-2026-10 04_Network_Analysis/01, strategy 3 — retweeters)
-│       ├── Final_OutThreshold1_<method>.gml   (legacy: pre-2026-10 04_Network_Analysis/01 — community-annotated,
-│       │                                       method ∈ label_propagation, louvain, leiden_fast,
-│       │                                       leiden_directed, infomap)
-│       ├── Final_OutThreshold1_author_communities.json     (legacy: pre-2026-10 04_Network_Analysis/01 —
-│       │                                            {author_id: {method: community}}; SUPERSEDED, see docs/AUTHOR_AND_NETWORK_PIPELINE_TRACE.md §9)
-│       ├── Full_Network_Influence.gml              [written by 02_Processing/02]  edge retweeter → retweeted (identical to the original Full_Network file)
-│       ├── Full_Network_InfoFlow.gml               [written by 02_Processing/02]  edge retweeted → retweeter (transpose)
-│       ├── Full_RetweetedOnce_Influence.gml        [written by 02_Processing/02]  in-strength ≥ 1 backbone (authors retweeted ≥ 1x), LWCC; reference orientation, not read downstream
-│       ├── Full_RetweetedOnce_InfoFlow.gml         [written by 02_Processing/02]  same authors, transposed (edge retweeted → retweeter); the file 04_Network_Analysis/01 and /02 read
-│       ├── Full_RetweetedOnce_InfoFlow_<method>.gml    [written by 04_Network_Analysis/01]  label_propagation, louvain, leiden_fast, leiden_directed, infomap
-│       ├── Full_RetweetedOnce_Influence_<method>.gml   (legacy: 2026-10-07 run on the influence orientation; superseded by the _InfoFlow_ files)
-│       ├── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}
-│       ├── Full_LWCC_Influence.gml                 [written by 02_Processing/02]  self-loops removed, largest weakly connected component (3,264,499 authors), edge retweeter → retweeted
-│       ├── Full_LWCC_InfoFlow.gml                  [written by 02_Processing/02]  same authors, transposed; the file 04_Network_Analysis/01 and /02 read
-│       ├── Full_LWCC_InfoFlow_<method>.gml         [written by 04_Network_Analysis/01]  label_propagation, louvain, leiden_fast, leiden_directed, infomap
-│       └── Full_LWCC_author_communities.json       [written by 04_Network_Analysis/01]  {author_id: {method: community}}
+│   └── Networks/                              (networks_folder = BASE_PATH / 'Data Sets/Networks/'; one subfolder per stage since 2026-10-10,
+│       │                                       folder variables defined in the Setup cell of 02_Processing/02, 04_Network_Analysis/01 and /02)
+│       ├── 1_retweet_dicts/                   (retweet_dicts_folder)
+│       │   └── full_network_dict.pkl          [written by 02_Processing/02]  {retweeted_author: {retweeter: n}}
+│       ├── 2_full_graphs/                     (full_graphs_folder)
+│       │   ├── Full_Network_Influence.gml     [written by 02_Processing/02]  edge retweeter → retweeted
+│       │   └── Full_Network_InfoFlow.gml      [written by 02_Processing/02]  edge retweeted → retweeter (transpose)
+│       ├── 3_backbones/                       (backbones_folder)
+│       │   ├── Full_RetweetedOnce_Influence.gml   [written by 02_Processing/02]  authors retweeted ≥ 1x, LWCC; reference orientation
+│       │   ├── Full_RetweetedOnce_InfoFlow.gml    [written by 02_Processing/02]  same authors, transposed; read by 04_Network_Analysis/01 and /02
+│       │   ├── Full_LWCC_Influence.gml            [written by 02_Processing/02]  self-loops removed, largest weakly connected component; reference orientation
+│       │   ├── Full_LWCC_InfoFlow.gml             [written by 02_Processing/02]  same authors, transposed; read by 04_Network_Analysis/01, /02 and 03_Analysis/04, 04c
+│       │   └── 90TS_LWCC.gml / .graphml           [written by 04_Network_Analysis/01 — strategy 2, only when RUN_STRATEGY_2 is on]
+│       ├── 4_communities/                     (communities_folder)
+│       │   ├── RetweetedOnce/
+│       │   │   ├── Full_RetweetedOnce_InfoFlow_<method>.gml    [written by 04_Network_Analysis/01]  label_propagation, louvain, leiden_fast, leiden_directed, infomap
+│       │   │   └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}
+│       │   └── LWCC/
+│       │       ├── Full_LWCC_InfoFlow_<method>.gml             [written by 04_Network_Analysis/01]
+│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]
+│       ├── 5_visualizations/                  (visualizations_folder)
+│       │   └── <NETWORK>/                     [written by 04_Network_Analysis/02]  maps, positions_*.parquet, optional network_with_layout.graphml
+│       └── test/                              (test_networks_folder)
+│           └── test_network_dict.pkl, Test_Network_*, Test_LWCC_*, Test_RetweetedOnce_*   [written by 02_Processing/02, test branch]
 │
 ├── Literature/                                (literature_folder = BASE_PATH / 'Literature/')
 └── Models/
