@@ -284,7 +284,7 @@ AI Public Trust/
 │       │   ├── Full_RetweetedOnce_Influence.gml   [written by 02_Processing/02]  authors retweeted ≥ 1x, LWCC; reference orientation
 │       │   ├── Full_RetweetedOnce_InfoFlow.gml    [written by 02_Processing/02]  same authors, transposed; read by 04_Network_Analysis/01 and /02
 │       │   ├── Full_LWCC_Influence.gml            [written by 02_Processing/02]  self-loops removed, largest weakly connected component; reference orientation
-│       │   ├── Full_LWCC_InfoFlow.gml             [written by 02_Processing/02]  same authors, transposed; read by 04_Network_Analysis/01, /02 and 03_Analysis/04, 04c
+│       │   ├── Full_LWCC_InfoFlow.gml             [written by 02_Processing/02]  same authors, transposed; read by 04_Network_Analysis/01 and /02
 │       │   └── 90TS_LWCC.gml / .graphml           [written by 04_Network_Analysis/01 — strategy 2, only when RUN_STRATEGY_2 is on]
 │       ├── 4_communities/                     (communities_folder)
 │       │   ├── RetweetedOnce/
@@ -292,7 +292,7 @@ AI Public Trust/
 │       │   │   └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}
 │       │   └── LWCC/
 │       │       ├── Full_LWCC_InfoFlow_<method>.gml             [written by 04_Network_Analysis/01]
-│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]
+│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]  read by 03_Analysis/04c (author set; HPC copy)
 │       ├── 5_visualizations/                  (visualizations_folder)
 │       │   └── <NETWORK>/                     [written by 04_Network_Analysis/02]  maps, positions_*.parquet, optional network_with_layout.graphml
 │       └── test/                              (test_networks_folder)

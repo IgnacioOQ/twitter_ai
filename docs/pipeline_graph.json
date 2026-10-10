@@ -410,17 +410,17 @@
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json",
       "glob": true,
       "templated": true,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json",
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
       "glob": true,
       "templated": true,
       "bipartite": 1
@@ -626,9 +626,9 @@
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/3_backbones/Full_LWCC_InfoFlow.gml",
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/3_backbones/Full_LWCC_InfoFlow.gml",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1403,13 +1403,13 @@
     },
     {
       "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json",
       "direction": "write",
       "manual": true
     },
@@ -1940,16 +1940,21 @@
       "direction": "read"
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_{alias}.json",
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json",
       "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_{alias}.json",
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
       "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read",
       "manual": true
+    },
+    {
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
+      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
+      "direction": "read"
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/lda_grid_results.csv",
@@ -1967,17 +1972,12 @@
       "direction": "read"
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AI_pruned_tweets_with_topic_weights_v2.json",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/focused_grid_results.csv",
       "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
       "direction": "read"
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/3_backbones/Full_LWCC_InfoFlow.gml",
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
       "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
       "direction": "read"
     },

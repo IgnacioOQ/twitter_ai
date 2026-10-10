@@ -16,6 +16,10 @@ alternatives:
 glob_artifacts:
   - "MyDrive/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_checkpoint_*.pkl"
   - "MyDrive/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/checkpoint_*.pkl"
+  # 2026-10-10: 01b writes ai/art_full_classified_{alias}.json (f-string inside output_path_for);
+  # 04c reads ai_full_classified_{SENTIMENT_MODEL...}.json. Same files, one node each.
+  - "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json"
+  - "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json"
 
 # Optional friendly labels for cluttered artifact paths in the diagram only.
 # The JSON keeps the full Drive path; this just shortens what the picture shows.
