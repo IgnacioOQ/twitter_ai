@@ -289,10 +289,10 @@ AI Public Trust/
 │       ├── 4_communities/                     (communities_folder)
 │       │   ├── RetweetedOnce/
 │       │   │   ├── Full_RetweetedOnce_InfoFlow_<method>.gml    [written by 04_Network_Analysis/01]  label_propagation, louvain, leiden_fast, leiden_directed, infomap
-│       │   │   └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}
+│       │   │   └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}; read by 03_Analysis/04_lda_author_topics_hpc (HPC copy)
 │       │   └── LWCC/
 │       │       ├── Full_LWCC_InfoFlow_<method>.gml             [written by 04_Network_Analysis/01]
-│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]  read by 03_Analysis/04c (author set; HPC copy)
+│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]  read by 03_Analysis/04_lda_author_topics_hpc (author set; HPC copy)
 │       ├── 5_visualizations/                  (visualizations_folder)
 │       │   └── <NETWORK>/                     [written by 04_Network_Analysis/02]  maps, positions_*.parquet, optional network_with_layout.graphml
 │       └── test/                              (test_networks_folder)

@@ -57,10 +57,10 @@
       "bipartite": 0
     },
     {
-      "id": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
+      "id": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
       "kind": "notebook",
       "stage": 3,
-      "path": "notebooks/03_Analysis_and_Modeling/04c_lda_author_topics_v2.ipynb",
+      "path": "notebooks/03_Analysis_and_Modeling/04_lda_author_topics_hpc.ipynb",
       "bipartite": 0
     },
     {
@@ -498,235 +498,11 @@
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/author_docs.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/author_docs.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_SUMMARY.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_SUMMARY.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_FULL_GRID.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_FULL_GRID.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/lda_model_k{K}_a0p1_e0p1.pkl",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/lda_model_k{K}_a0p1_e0p1.pkl",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/vectorizer_k{K}_a0p1_e0p1.pkl",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/vectorizer_k{K}_a0p1_e0p1.pkl",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AI_pruned_tweets_with_topic_weights_v2.json",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AI_pruned_tweets_with_topic_weights_v2.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/author_sentiment_mean.pkl",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/author_sentiment_mean.pkl",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/candidate_diversity_scores.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/candidate_diversity_scores.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/focused_grid_results.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/focused_grid_results.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/hdbscan_author_clusters.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/hdbscan_author_clusters.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/theta_lowest_catchall_k12.npy",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/theta_lowest_catchall_k12.npy",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/embedding_lowest_catchall_k12.npy",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/embedding_lowest_catchall_k12.npy",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/dominant_topics_lowest_catchall_k12.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/dominant_topics_lowest_catchall_k12.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/high_k_grid_results.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/high_k_grid_results.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/umap_dimensionality_comparison.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/umap_dimensionality_comparison.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/theta_v3stopwords_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/theta_v3stopwords_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
       "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
       "kind": "artifact",
       "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
       "glob": false,
       "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topics_k{K}_top_terms.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topics_k{K}_top_terms.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topics_k{K}_top_terms.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topics_k{K}_top_terms.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/bow_bigram/author_topics_k{K}_top_terms.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/bow_bigram/author_topics_k{K}_top_terms.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/bow_unigram/author_topics_k{K}_top_terms.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/bow_unigram/author_topics_k{K}_top_terms.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topics_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}_top_terms.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topics_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}_top_terms.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topic_matrix_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topic_matrix_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/lda_model_k16_a0p1_e0p1.pkl",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/lda_model_k16_a0p1_e0p1.pkl",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/vectorizer_k16_a0p1_e0p1.pkl",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/vectorizer_k16_a0p1_e0p1.pkl",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topic_matrix_tfidf_unigram_k{best_k}_a0p1_e0p1.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topic_matrix_tfidf_unigram_k{best_k}_a0p1_e0p1.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topic_matrix_tfidf_unigram_k{best_k}_a0p01_e0p1.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topic_matrix_tfidf_unigram_k{best_k}_a0p01_e0p1.csv",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topics_tfidf_unigram_k{best_k}_a0p01_e0p1_top_terms.csv",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topics_tfidf_unigram_k{best_k}_a0p01_e0p1_top_terms.csv",
-      "glob": false,
-      "templated": true,
       "bipartite": 1
     },
     {
@@ -1184,6 +960,94 @@
       "glob": false,
       "templated": false,
       "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv",
+      "kind": "artifact",
+      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
     }
   ],
   "edges": [
@@ -1468,84 +1332,58 @@
       "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/author_docs.csv",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_SUMMARY.csv",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_FULL_GRID.csv",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/lda_model_k{K}_a0p1_e0p1.pkl",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/vectorizer_k{K}_a0p1_e0p1.pkl",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AI_pruned_tweets_with_topic_weights_v2.json",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/author_sentiment_mean.pkl",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/candidate_diversity_scores.csv",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "direction": "write",
+      "manual": true
     },
     {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/focused_grid_results.csv",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/hdbscan_author_clusters.csv",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/theta_lowest_catchall_k12.npy",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/embedding_lowest_catchall_k12.npy",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/dominant_topics_lowest_catchall_k12.csv",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/high_k_grid_results.csv",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/umap_dimensionality_comparison.csv",
-      "direction": "write"
-    },
-    {
-      "src": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/theta_v3stopwords_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}.csv",
-      "direction": "write"
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv",
+      "direction": "write",
+      "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/05_embedding_mapping",
@@ -1953,7 +1791,7 @@
     },
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
       "direction": "read"
     },
     {
@@ -1967,78 +1805,8 @@
       "direction": "read"
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/ALL_REPRESENTATIONS_LDA_FULL_GRID.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/focused_grid_results.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topics_k{K}_top_terms.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topics_k{K}_top_terms.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/bow_bigram/author_topics_k{K}_top_terms.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/bow_unigram/author_topics_k{K}_top_terms.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topics_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}_top_terms.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_bigram/author_topic_matrix_tfidf_bigram_k{K}_a{a_tag}_e{e_tag}.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/lda_model_k16_a0p1_e0p1.pkl",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/vectorizer_k16_a0p1_e0p1.pkl",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topic_matrix_tfidf_unigram_k{best_k}_a0p1_e0p1.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topic_matrix_tfidf_unigram_k{best_k}_a0p01_e0p1.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/full_v2_cleaned/tfidf_unigram/author_topics_tfidf_unigram_k{best_k}_a0p01_e0p1_top_terms.csv",
-      "dst": "03_Analysis_and_Modeling/04c_lda_author_topics_v2",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
       "direction": "read"
     },
     {
@@ -2222,6 +1990,30 @@
     {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json",
       "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
       "direction": "read",
       "manual": true
     }

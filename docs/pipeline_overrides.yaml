@@ -17,7 +17,7 @@ glob_artifacts:
   - "MyDrive/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_checkpoint_*.pkl"
   - "MyDrive/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/checkpoint_*.pkl"
   # 2026-10-10: 01b writes ai/art_full_classified_{alias}.json (f-string inside output_path_for);
-  # 04c reads ai_full_classified_{SENTIMENT_MODEL...}.json. Same files, one node each.
+  # 03/04_lda_author_topics_hpc reads ai_full_classified_{SENTIMENT_MODEL...}.json. Same files, one node each.
   - "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json"
   - "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json"
 
@@ -227,3 +227,57 @@ manual_edges:
     artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json'
     direction: read
     note: '8b: block_is_valid() re-reads a block before reusing it; the merge concatenates the blocks'
+  # 2026-10-10: 03/04_lda_author_topics_hpc replaces 04c; paths built from the BACKBONES
+  # registry and per-backbone loops, which the parser cannot resolve. HPC paths.
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json'
+    direction: read
+    note: 'BACKBONES registry (lda_paths); HPC copy of the 04/01 export'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json'
+    direction: read
+    note: 'BACKBONES registry (lda_paths); HPC copy of the 04/01 export'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl'
+    direction: write
+    note: 'lda_stream: cache of the cleaned tweets of every backbone author'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl'
+    direction: read
+    note: 'lda_stream: reused when present'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv'
+    direction: write
+    note: 'lda_threshold: tweets per backbone author'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv'
+    direction: write
+    note: 'lda_grid: model-selection grid per backbone'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl'
+    direction: write
+    note: 'lda_final_fit'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl'
+    direction: write
+    note: 'lda_final_fit'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json'
+    direction: write
+    note: 'lda_final_fit: configuration and fit statistics'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv'
+    direction: write
+    note: 'lda_final_fit'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv'
+    direction: write
+    note: 'lda_final_fit: topic mixture + five community labels per author'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv'
+    direction: read
+    note: 'lda_checks: read back and checked'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv'
+    direction: write
+    note: 'lda_sentiment: mean sentiment per backbone author (when 01b output exists)'

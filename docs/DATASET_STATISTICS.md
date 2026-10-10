@@ -2,19 +2,19 @@
 status: active
 type: reference
 id: twitter_ai.dataset_statistics
-description: Exhaustive report of the AI Public Trust Twitter dataset pipeline — collection, dictionary construction, pruning filters, text processing, and retweet-network generation — together with the full summary statistics from the full-data Colab run. Source material for the blog post.
-label: [dataset, statistics, preprocessing, network]
+description: Exhaustive report of the AI Public Trust Twitter dataset pipeline — collection, dictionary construction, pruning filters, text processing, retweet-network generation, the two author backbones and their community partitions — together with the full summary statistics from the full-data Colab runs. Source material for the blog post.
+label: [dataset, statistics, preprocessing, network, communities]
 volatility: evolving
 scope: project-specific
 repository: [twitter_ai]
-last_checked: '2026-08-24'
+last_checked: '2026-10-10'
 ---
 
 # Dataset Preprocessing Pipeline & Summary Statistics
 
 This document reports, end to end, how the **AI Public Trust** Twitter dataset was collected, preprocessed, and turned into author-interaction networks, and gives the summary statistics of the resulting corpus. It is written to be exhaustive; a blog post can be distilled from it.
 
-The numbers come from the full-data Colab run of the pipeline (executed August 2026). The machine-readable master summary is [notebooks/02_Processing/dataset_statistics_summary.json](../notebooks/02_Processing/dataset_statistics_summary.json) (mirrored from `Data Sets/Cleaned Data/dataset_statistics_summary.json` on Google Drive).
+The corpus numbers come from the full-data Colab run of the pipeline (executed August 2026; the 2026-10-10 re-run of `02` reproduced every count). The backbone and community numbers come from the 2026-10-10 runs of `02` and `04_Network_Analysis/01`. The cell-by-cell provenance of every number, and every file the pipeline reads or writes, is in [AUTHOR_AND_NETWORK_PIPELINE_TRACE.md](AUTHOR_AND_NETWORK_PIPELINE_TRACE.md). The machine-readable master summary is [notebooks/02_Processing/dataset_statistics_summary.json](../notebooks/02_Processing/dataset_statistics_summary.json) (mirrored from `Data Sets/Cleaned Data/dataset_statistics_summary.json` on Google Drive).
 
 ## Pipeline Overview
 
@@ -26,10 +26,14 @@ flowchart TD
     D --> E["AI corpus<br/>17.41M tweets"]
     D --> F["AI+Art corpus<br/>3.58M tweets"]
     E --> G["Timeline dict / author corpus dict /<br/>retweet network dict"]
-    G --> H["Directed retweet network<br/>3.38M nodes, 7.77M edges<br/>(GML / GraphML / GEXF / JSON)"]
+    G --> H["Directed retweet network<br/>3.38M nodes, 7.77M edges<br/>(GML, influence + information-flow orientations)"]
+    H --> I["LWCC backbone<br/>3.26M authors"]
+    H --> J["Retweeted-once backbone<br/>202,710 authors"]
+    I --> K["Stage 4 — 04_Network_Analysis/01<br/>5 community-detection methods per backbone<br/>→ annotated GMLs + author→community JSON"]
+    J --> K
 ```
 
-Notebooks: [01_Ingestion/02_twitter_api_mining.ipynb](../notebooks/01_Ingestion/02_twitter_api_mining.ipynb) → [02_Processing/01_api_data_to_dictionaries.ipynb](../notebooks/02_Processing/01_api_data_to_dictionaries.ipynb) → [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb).
+Notebooks: [01_Ingestion/02_twitter_api_mining.ipynb](../notebooks/01_Ingestion/02_twitter_api_mining.ipynb) → [02_Processing/01_api_data_to_dictionaries.ipynb](../notebooks/02_Processing/01_api_data_to_dictionaries.ipynb) → [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb) → [04_Network_Analysis/01_network_analysis.ipynb](../notebooks/04_Network_Analysis/01_network_analysis.ipynb).
 
 ## 1. Data Collection (Twitter API)
 
@@ -164,6 +168,10 @@ The single pruning pass writes two nested corpora:
 | AI corpus | 4,775,711 |
 | AI+Art corpus | 1,440,802 |
 | Retweet interaction graph | 3,379,040 |
+| LWCC backbone (§7.1) | 3,264,499 |
+| Retweeted-once backbone (§7.1) | 202,710 |
+
+Of the 4,775,711 corpus authors, 1,396,671 never took part in a retweet and appear in no network. The LWCC backbone holds 68.4% of corpus authors (96.6% of the retweet graph); the retweeted-once backbone holds 4.2% of corpus authors (6.0% of the retweet graph).
 
 ## 7. Network Generation
 
@@ -177,11 +185,11 @@ The single pruning pass writes two nested corpora:
 
 - **Nodes** are authors, named by `str(author_id)` (author id is the node identity; in GML exports it becomes each vertex's `label` attribute, while the GML `id` is just an integer index).
 - **Edges** point **retweeter → retweeted author**, with `weight` = number of times that retweeter retweeted that author. Consequently weighted **in-degree = retweets received** (influence/reach) and weighted **out-degree = retweets made** (amplification activity).
-- Self-loops are possible (authors retweeting themselves) and are not filtered at this stage.
+- Self-loops are possible (authors retweeting themselves): 32,216 of them. The full graph keeps them; both backbones remove them (§7.1).
 
 Replies and quotes are *not* edges in this graph — `type_of_network = 'retweeted'` is a parameter, so reply/quote networks can be generated by the same code.
 
-**Serialization.** The graph is exported to four formats — `Full_Network.gml`, `.graphml`, `.gexf`, and `.json` (node-link) — each verified by an immediate read-back and node/edge-set equality check against the in-memory graph (all passed).
+**Serialization.** The graph is written in two orientations: `Full_Network_Influence.gml` (edges retweeter → retweeted, as built) and `Full_Network_InfoFlow.gml` (the transpose, edges retweeted → retweeter, the direction content travels), both in `Networks/2_full_graphs/`. Each file is verified by an immediate read-back and node/edge-set equality check against the in-memory graph (all passed). GML is the default format because every downstream notebook reads it; GraphML, GEXF and node-link JSON can be added through `EXPORT_FORMATS`. The pre-October 2026 notebook wrote a single orientation as `Full_Network.{gml,graphml,gexf,json}`; those files are legacy.
 
 **Full network topology:**
 
@@ -193,7 +201,7 @@ Replies and quotes are *not* edges in this graph — `type_of_network = 'retweet
 | Weakly connected components | 49,464 |
 | Largest WCC | 3,264,499 nodes (96.61%) |
 
-The giant component covering 96.6% of authors indicates a single, densely interconnected retweet conversation rather than fragmented communities of discourse.
+The giant component covers 96.6% of authors, so almost every author is connected to the same retweet conversation. Connectivity does not mean the absence of communities: inside that component, community detection finds strong modular structure (Leiden modularity 0.77, §7.2).
 
 **Top 10 most-retweeted authors (weighted in-degree)** and **top 10 most active retweeters (weighted out-degree):**
 
@@ -210,18 +218,48 @@ The giant component covering 96.6% of authors indicates a single, densely interc
 | 9 | 247180104 | 42,353 | 770285228929712128 | 6,704 |
 | 10 | 1618937075218219009 | 40,835 | 992943418052460544 | 6,640 |
 
-**Test network** (from the small test dataset; pipeline validation only): 446 nodes, 334 edges, weight 363, 122 weakly connected components, largest 32 nodes (7.17%).
+**Test network** (from the small test dataset; pipeline validation only): 446 nodes, 334 edges, weight 363, 122 weakly connected components, largest 32 nodes (7.17%). Its retweeted-once backbone has 3 nodes; the test data is too small to carry one.
+
+### 7.1 Author backbones
+
+`02` cuts two backbones from the full graph. Both remove self-loops and keep the largest weakly connected component (LWCC); they differ in whether a degree cut comes first. Each is written in both orientations to `Networks/3_backbones/` (`<stem>_Influence.gml`, `<stem>_InfoFlow.gml`). The information-flow file is the one analysed downstream.
+
+| Backbone | Rule | Authors | Edges | Retweets kept |
+|---|---|---:|---:|---:|
+| **LWCC** (`Full_LWCC_*`) | self-loops removed, largest weakly connected component | 3,264,499 | 7,670,516 | 9,458,703 (98.14%) |
+| **Retweeted once** (`Full_RetweetedOnce_*`) | self-loops removed, retweeted ≥ 1× by someone else (363,618 authors), then LWCC | 202,710 | 882,530 | 1,269,747 (13.17%) |
+
+The two answer different questions. The LWCC keeps every retweeter and every edge, so community structure is informed by who amplifies whom. Most of its authors only retweet: 317,533 are retweeted inside it and 3,095,219 retweet. The retweeted-once backbone is exactly the amplified population, but it discards 87% of the retweet volume, because pure retweeters leave with their edges. Inside it, 132,603 authors are retweeted and 143,043 retweet. The distributions of retweets received are heavy-tailed on both (power-law α ≈ 1.87 and 1.84) but a lognormal fits better (p < 0.001).
+
+> **Superseded backbone.** Before 2026-10-07 the analysed backbone was `Final_OutThreshold1.gml` (1,984,599 authors), cut with an out-strength ≥ 1 rule. On the retweeter → retweeted graph that kept authors who *made* a retweet, not authors who were retweeted. Every community result, map and blog figure from before that date descends from it. See the trace document §5.1 and §9.
+
+### 7.2 Communities
+
+[04_Network_Analysis/01_network_analysis.ipynb](../notebooks/04_Network_Analysis/01_network_analysis.ipynb) runs five methods on the information-flow file of each backbone. Label propagation, Louvain and Leiden (fast) run on the undirected collapse with summed weights; directed Leiden and Infomap run on the directed graph. Results from the 2026-10-10 run:
+
+| Method | Retweeted once: communities | Modularity | LWCC: communities | Modularity |
+|---|---:|---:|---:|---:|
+| Label propagation | 4,489 | 0.652 | 36,189 | 0.668 |
+| Louvain | 1,031 | 0.742 | 2,331 | 0.763 |
+| Leiden (fast) | 1,119 | 0.747 | 2,983 | 0.774 |
+| Leiden (directed) | 1,089 | 0.744 | 2,951 | 0.772 |
+| Infomap | 17,117 | 0.415 | 136,744 | 0.513 |
+
+The three modularity methods agree closely (AMI 0.78–0.85 on both backbones). Label propagation sits in the middle (AMI ≈ 0.55) and puts about 1.6M of the LWCC's authors into two communities. Infomap is a different kind of partition, many small random-walk modules (AMI 0.26–0.52, ARI < 0.03). The two Leiden variants are the stable choice. The largest Leiden-directed communities hold 47,527 and 46,239 authors on the retweeted-once backbone and 619,125 and 386,553 on the LWCC. Full tables, community sizes and pairwise agreement are in the trace document §9.3.
+
+**Outputs** (`Networks/4_communities/<RetweetedOnce|LWCC>/`): five annotated graphs per backbone, `<stem>_InfoFlow_<method>.gml`, each the backbone with one vertex attribute `community_<method>` (read back as `community<method without underscores>`, float → int); and one `<stem>_author_communities.json` per backbone, `{author_id: {method: community}}` for all five methods. Both JSONs are the author sets of the author-level topic models (`03_Analysis_and_Modeling/04_lda_author_topics_hpc`).
 
 ## 8. Provenance & Artifacts
 
-- **Compute:** full run executed on Google Colab against Drive-hosted data. Pruning pass ≈ 2h12m wall time (36.5M records at ~4,700 rec/s); network-dict pass ≈ 17m; graph build + topology stats ≈ 16m.
+- **Compute:** full run executed on Google Colab against Drive-hosted data. Pruning pass ≈ 2h12m wall time (36.5M records at ~4,700 rec/s); network-dict pass ≈ 17m; graph build + topology stats ≈ 16m. In the 2026-10-10 runs: both full-graph exports ≈ 18m, LWCC backbone ≈ 21m, retweeted-once backbone ≈ 4m; community detection on both backbones ≈ 54m, partition comparison ≈ 32m.
 - **Drive artifacts** (under `My Drive/Colab Projects/AI Public Trust/Data Sets/`):
   - `AItrust_twits_dict.json`, `AItrust_author_dict.json` — Stage 1 outputs (raw dictionaries);
   - `Cleaned Data/AItrust_twits_pruned_dict.json` (AI corpus), `Cleaned Data/AItrust_Art_pruned_twit_dict.json` (AI+Art corpus);
-  - `Cleaned Data/full_pruning_stats.json`, `full_basic_counts_dict.pkl`, `full_timeline_dict.pkl`, `full_author_corpus_dict.pkl`, `full_network_stats.json`;
+  - `Cleaned Data/full_pruning_stats.json`, `full_basic_counts_dict.pkl`, `full_timeline_dict.pkl`, `full_author_corpus_dict.pkl`;
+  - `Cleaned Data/full_dual_network_stats.json` — statistics of the full graph in both orientations and of both backbones (written by the current `02`; the older `full_network_stats.json` came from the pre-October 2026 notebook);
   - `Cleaned Data/dataset_statistics_summary.json` — master summary (mirrored into this repo at [notebooks/02_Processing/](../notebooks/02_Processing/dataset_statistics_summary.json));
-  - `Networks/1_retweet_dicts/full_network_dict.pkl`, `Networks/2_full_graphs/Full_Network_{Influence,InfoFlow}.gml` (stage folders since 2026-10-10; the flat `Networks/Full_Network.{gml,graphml,gexf,json}` of the pre-2026-10 notebook are legacy);
-  - `_test`-suffixed counterparts of all of the above from the test-dataset branch.
+  - `Networks/1_retweet_dicts/full_network_dict.pkl`, `Networks/2_full_graphs/Full_Network_{Influence,InfoFlow}.gml`, `Networks/3_backbones/Full_{LWCC,RetweetedOnce}_{Influence,InfoFlow}.gml` and `Networks/4_communities/<RetweetedOnce|LWCC>/` (stage folders since 2026-10-10; the flat `Networks/Full_Network.{gml,graphml,gexf,json}` and `Final_OutThreshold1*` files of the pre-2026-10 notebooks are legacy);
+  - test-dataset counterparts: `_test`-suffixed files in `Cleaned Data/`, and `Test_*` graphs plus `test_network_dict.pkl` in `Networks/test/`.
 - **Caveats worth stating in the blog post:**
   - The raw-side funnel percentages are relative to *records scanned*, which double-count tweets (duplicates from expansions and overlapping windows); relative to *unique* tweets, retention is 17.41M / 25.64M ≈ 67.9%.
   - `GPT` and `BERT` as bare keywords can admit rare false positives (e.g. the name "Bert"); the English heuristic is intentionally permissive toward ASCII-heavy non-English tweets that pass all screens.
