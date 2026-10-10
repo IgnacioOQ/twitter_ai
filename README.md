@@ -13,6 +13,9 @@ The work centres on a single longitudinal dataset (`AI Public Trust`) and is wri
 - **Entry point for new readers:** [notebooks/notebook_setup.md](notebooks/notebook_setup.md) — describes how every notebook is structured and which Drive paths it touches.
 - **Completed network-aligned community analysis and blog figures:** [docs/blog_analysis/README.md](docs/blog_analysis/README.md) — validated labels, compact results, final figures and reproducibility commands.
 
+- **Author analysis:** [src/author_analysis/README.md](src/author_analysis/README.md) — author profiles, topic fitting, matching and summaries.
+- **2D/3D network viewer:** [visualizations/author_network/README.md](visualizations/author_network/README.md) — browser viewer and layout tools.
+
 ## Repository Structure
 
 ```

@@ -46,20 +46,7 @@ EMOTIONS = [
     "surprise",
     "trust",
 ]
-TOPIC_LABELS = {
-    0: "Marketing/Social",
-    1: "AI Art Discourse",
-    2: "AI Tools/Code",
-    3: "Bard/LLMs",
-    4: "Visual AI Art",
-    5: "Bot/Spam",
-    6: "Tech/Programming",
-    7: "News/Updates",
-    8: "NFT/Crypto",
-    9: "Web3/DeFi",
-    10: "General AI",
-    11: "Trading/Invest",
-}
+TOPIC_LABELS = {}
 
 CUSTOM_STOPWORDS = {
     "ai", "artificial", "intelligence", "chatgpt", "gpt", "openai",
@@ -226,12 +213,11 @@ def clean_and_tokenize(text: str) -> list[str]:
 def aggregate_topics(
     matched_ids: set[str], output_wide: Path, output_long: Path
 ) -> dict:
-    """Apply the existing frozen K=12 model to author-week documents."""
-    log("Loading frozen K=12 topic model and dictionary")
+    """Apply the existing frozen model to author-week documents."""
+    log("Loading frozen topic model and dictionary")
     model = LdaModel.load(str(FROZEN_MODEL))
     dictionary = Dictionary.load(str(FROZEN_DICT))
-    if model.num_topics != 12:
-        raise RuntimeError(f"Expected 12 topics, found {model.num_topics}")
+
 
     author_week_texts: dict[tuple[str, str], list[str]] = defaultdict(list)
     total = 0
@@ -264,7 +250,7 @@ def aggregate_topics(
 
     log(f"Inferring fixed topic distributions for {len(author_week_texts):,} author-weeks")
     weekly_topic_sums: dict[str, np.ndarray] = defaultdict(
-        lambda: np.zeros(12, dtype=float)
+        lambda: np.zeros(model.num_topics, dtype=float)
     )
     weekly_active: Counter[str] = Counter()
     weekly_usable: Counter[str] = Counter()
@@ -283,7 +269,7 @@ def aggregate_topics(
         if not bow:
             weekly_oov[week] += 1
             continue
-        topic_probs = np.zeros(12, dtype=float)
+        topic_probs = np.zeros(model.num_topics, dtype=float)
         for topic_id, probability in model.get_document_topics(
             bow, minimum_probability=0
         ):
@@ -303,7 +289,7 @@ def aggregate_topics(
     long_rows = []
     for week in sorted(weekly_active):
         usable = weekly_usable[week]
-        means = weekly_topic_sums[week] / usable if usable else np.zeros(12)
+        means = weekly_topic_sums[week] / usable if usable else np.zeros(model.num_topics)
         week_end = datetime.fromisoformat(week).date() + timedelta(days=6)
         row = {
             "week_start": week,
@@ -316,7 +302,7 @@ def aggregate_topics(
             "n_out_of_vocabulary_documents": weekly_oov[week],
             "n_source_posts": weekly_posts[week],
         }
-        for topic_id in range(12):
+        for topic_id in range(model.num_topics):
             row[f"topic_{topic_id}_mean"] = means[topic_id]
             long_rows.append(
                 {
@@ -325,7 +311,7 @@ def aggregate_topics(
                     "iso_year": row["iso_year"],
                     "iso_week": row["iso_week"],
                     "topic_id": topic_id,
-                    "topic_label": TOPIC_LABELS[topic_id],
+                    "topic_label": TOPIC_LABELS.get(topic_id, f"Topic {topic_id}"),
                     "mean_topic_share": means[topic_id],
                     "n_active_authors": weekly_active[week],
                     "n_usable_author_week_documents": usable,
@@ -367,9 +353,8 @@ def main() -> None:
     parser.add_argument("--frozen-dictionary", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument(
-        "--exclude-types", nargs="*", default=["retweet"],
-        help=("Exact source type strings to exclude. The historical files used "
-              "'retweeted', so their records remain unless explicitly listed."),
+        "--exclude-types", nargs="*", default=["retweet", "retweeted"],
+        help="Exact source type strings to exclude; both pure-retweet spellings are excluded by default.",
     )
     args = parser.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
@@ -391,8 +376,8 @@ def main() -> None:
     if not isinstance(matched_ids_list, list):
         raise RuntimeError("Matched-author input must resolve to a list of IDs")
     matched_ids = set(map(str, matched_ids_list))
-    if len(matched_ids) != 198_326:
-        raise RuntimeError(f"Expected 198326 matched authors, found {len(matched_ids)}")
+    if not matched_ids or len(matched_ids) != len(matched_ids_list):
+        raise ValueError("Matched IDs must be non-empty and unique")
     excluded_types = set(args.exclude_types)
 
     metadata = {
@@ -405,13 +390,9 @@ def main() -> None:
             ),
             "topics": (
                 "eligible post text concatenated within author-week and scored with the "
-                "existing frozen K=12 model and dictionary; no model fitting"
+                "existing frozen model and dictionary; no model fitting"
             ),
             "excluded_exact_type_strings": sorted(excluded_types),
-            "historical_retweet_note": (
-                "Historical results retained records whose source type was 'retweeted'; "
-                "the earlier exclusion condition matched only 'retweet'."
-            ),
         },
         "matched_authors": len(matched_ids),
     }

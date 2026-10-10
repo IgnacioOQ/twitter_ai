@@ -13,7 +13,7 @@ import pandas as pd
 
 import render_non_temporal_figures as common
 
-COLLECTION_END = pd.Timestamp("2023-02-27T12:00:00Z")
+COLLECTION_END: pd.Timestamp
 RESULTS: Path
 
 
@@ -22,8 +22,8 @@ def prepare_weekly(frame: pd.DataFrame) -> pd.DataFrame:
     data["week_start"] = pd.to_datetime(data["week_start"], utc=True)
     data["week_end"] = pd.to_datetime(data["week_end"], utc=True)
     data["boundary_status"] = np.where(
-        data["week_start"] == COLLECTION_END.normalize(),
-        "incomplete: collection ended Monday 12:00 UTC", "complete",
+        data["week_start"] + pd.Timedelta(days=7) > COLLECTION_END,
+        "incomplete: collection ended within this week", "complete",
     )
     data["plotted"] = data["boundary_status"].eq("complete")
     return data
@@ -97,20 +97,26 @@ def plot_weekly_emotions() -> None:
 def plot_weekly_topics() -> None:
     data = prepare_weekly(pd.read_csv(RESULTS / "weekly_topics_long.csv"))
     data["topic_id"] = data["topic_id"].astype(int)
+    topic_names = data[['topic_id', 'topic_label']].drop_duplicates().sort_values('topic_id')
+    if topic_names.topic_id.tolist() != list(range(len(topic_names))):
+        raise ValueError('Weekly topic IDs must be contiguous with one label each')
+    common.TOPICS = topic_names.topic_label.tolist()
+    colors = list(common.PALETTE['topic_colors'].values())
+    common.TOPIC_COLORS = {name: colors[i % len(colors)] for i, name in enumerate(common.TOPICS)}
     data["score_scale"] = "frozen-model topic probability; author-balanced weekly mean"
     data["week_definition"] = "ISO week beginning Monday, UTC"
     data["interpretation"] = "weekly composition among authors with usable topic text"
     data.to_csv(common.DATA_OUT / "05_weekly_topic_prevalence.csv", index=False)
     draw = data[data["plotted"]]
     wide = draw.pivot(index="week_start", columns="topic_id", values="mean_topic_share")
-    wide = wide.reindex(columns=range(12)).sort_index()
+    wide = wide.reindex(columns=range(len(common.TOPICS))).sort_index()
     for theme in ("dark", "light"):
         with common.figure_theme(theme) as tokens:
             fig, ax = plt.subplots(figsize=(15, 7.2))
             areas = ax.stackplot(
-                wide.index, *[wide[index].to_numpy() for index in range(12)],
-                colors=[common.TOPIC_COLORS[common.TOPICS[index]] for index in range(12)],
-                labels=[common.TOPICS[index] for index in range(12)],
+                wide.index, *[wide[index].to_numpy() for index in range(len(common.TOPICS))],
+                colors=[common.TOPIC_COLORS[common.TOPICS[index]] for index in range(len(common.TOPICS))],
+                labels=[common.TOPICS[index] for index in range(len(common.TOPICS))],
                 alpha=0.96, linewidth=0.35,
             )
             ax.set_ylim(0, 1)
@@ -118,7 +124,7 @@ def plot_weekly_topics() -> None:
             ax.set_xlabel("Week beginning Monday (UTC)")
             format_dates(ax, draw)
             common.finish_axes(ax, tokens, "y")
-            fig.legend(areas, [common.TOPICS[index] for index in range(12)],
+            fig.legend(areas, [common.TOPICS[index] for index in range(len(common.TOPICS))],
                        loc="center left", bbox_to_anchor=(0.79, 0.52),
                        ncol=1, title="Fixed topic")
             fig.subplots_adjust(left=0.08, right=0.77, top=0.97, bottom=0.14)
@@ -126,13 +132,17 @@ def plot_weekly_topics() -> None:
 
 
 def main() -> None:
-    global RESULTS
+    global RESULTS, COLLECTION_END
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--weekly-dir", type=Path, required=True)
+    parser.add_argument("--collection-end", required=True, help="Actual collection end as a timezone-aware ISO timestamp")
     parser.add_argument("--output-root", type=Path, default=common.OUT)
     parser.add_argument("--figures", nargs="+", choices=("sentiment", "emotions", "topics"),
                         default=["sentiment", "emotions", "topics"])
     args = parser.parse_args()
+    COLLECTION_END = pd.Timestamp(args.collection_end)
+    if COLLECTION_END.tzinfo is None:
+        parser.error('--collection-end must include a timezone')
     RESULTS = args.weekly_dir
     common.OUT = args.output_root
     common.DATA_OUT = args.output_root / "data"

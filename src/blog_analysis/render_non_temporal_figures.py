@@ -33,8 +33,6 @@ MATCHED_JSON = WORK / "matched_authors.json"
 LABELS_CSV = REPO_ROOT / "outputs" / "community_analysis" / "community_labels.csv"
 RAW_FIG_DIR = WORK / "matrices"
 HPC_TABLES = WORK / "tables"
-for directory in [DATA_OUT, FIG_OUT / "dark" / "png", FIG_OUT / "dark" / "svg", FIG_OUT / "light" / "png", FIG_OUT / "light" / "svg"]:
-    directory.mkdir(parents=True, exist_ok=True)
 
 PALETTE = json.loads(PALETTE_PATH.read_text(encoding="utf-8"))
 TOPICS = PALETTE["topic_order"]
@@ -180,8 +178,8 @@ def load_matched() -> pd.DataFrame:
     print(f"Loading fixed matched-author data: {MATCHED_JSON}", flush=True)
     data = json.loads(MATCHED_JSON.read_text(encoding="utf-8"))
     frame = pd.DataFrame.from_records(data)
-    if len(frame) != 198_326:
-        raise RuntimeError(f"Expected 198326 authors, found {len(frame)}")
+    if frame.empty or frame.author_id.duplicated().any():
+        raise ValueError('Matched authors must be non-empty and unique')
     return frame
 
 
@@ -197,8 +195,9 @@ def umap_projection() -> pd.DataFrame:
     required = {"umap_1", "umap_2", "topic_id"}
     if not required.issubset(data.columns):
         raise ValueError(f"Saved projection lacks columns: {sorted(required - set(data.columns))}")
-    if len(data) != 198_326:
-        raise ValueError(f"Expected 198326 projected authors, found {len(data)}")
+    matched = load_matched()
+    if data.author_id.duplicated().any() or set(data.author_id) != set(matched.author_id):
+        raise ValueError('Projection and matched author IDs differ')
     data["topic_id"] = data["topic_id"].astype(int)
     data["topic_label"] = data["topic_id"].map(dict(enumerate(TOPICS)))
     return data
@@ -207,7 +206,7 @@ def umap_projection() -> pd.DataFrame:
 def plot_umap() -> None:
     data = umap_projection()
     data["rendered_topic_overlay"] = False
-    for topic_id in range(12):
+    for topic_id in range(len(TOPICS)):
         index = data.index[data["topic_id"] == topic_id]
         if len(index) > 5_000:
             index = data.loc[index].sample(n=5_000, random_state=topic_id + 1).index
@@ -226,7 +225,7 @@ def plot_umap() -> None:
     )
     summary["projection_seed"] = 0
     summary["projection_status"] = "existing saved projection; no refit"
-    summary.to_csv(DATA_OUT / "04_umap_12_topics.csv", index=False)
+    summary.to_csv(DATA_OUT / "04_umap_topics.csv", index=False)
 
     for theme in ["dark", "light"]:
         with figure_theme(theme) as tokens:
@@ -261,7 +260,7 @@ def plot_umap() -> None:
             )
             plt.setp(legend.get_title(), weight="semibold")
             fig.subplots_adjust(left=0.055, right=0.79, top=0.985, bottom=0.075)
-            save(fig, "04_umap_12_topics", theme)
+            save(fig, "04_umap_topics", theme)
 
 def topic_sentiment_data() -> pd.DataFrame:
     data = pd.read_csv(HPC_TABLES / "topic_sentiment_fuzzy_network_subset.csv")
@@ -374,10 +373,10 @@ def plot_community_topic_enrichment(labels: pd.DataFrame) -> None:
                 norm=TwoSlopeNorm(vmin=-span, vcenter=0, vmax=span),
                 interpolation="nearest",
             )
-            ax.set_xticks(np.arange(12), TOPICS, rotation=38, ha="right")
+            ax.set_xticks(np.arange(len(TOPICS)), TOPICS, rotation=38, ha="right")
             ax.set_yticks(np.arange(len(data)), data["display_label"])
             ax.tick_params(length=0)
-            ax.set_xticks(np.arange(-0.5, 12, 1), minor=True)
+            ax.set_xticks(np.arange(-0.5, len(TOPICS), 1), minor=True)
             ax.set_yticks(np.arange(-0.5, len(data), 1), minor=True)
             ax.grid(which="minor", color=tokens["background"], linewidth=1.1)
             ax.tick_params(which="minor", bottom=False, left=False)
@@ -474,7 +473,7 @@ def plot_topic_weighted_net(matched: pd.DataFrame, labels: pd.DataFrame) -> None
     matrix = matrix.loc[labels["display_label"], TOPICS]
     values = matrix.to_numpy(dtype=float)
     valid = values[np.isfinite(values)]
-    span = max(abs(valid.min()), abs(valid.max()))
+    span = max(float(np.max(np.abs(valid))), 1e-6) if valid.size else 1.0
     cmap = LinearSegmentedColormap.from_list(
         "net_sentiment", [SENTIMENT_COLORS["negative"], SENTIMENT_COLORS["net_zero"], SENTIMENT_COLORS["positive"]]
     )
@@ -490,10 +489,10 @@ def plot_topic_weighted_net(matched: pd.DataFrame, labels: pd.DataFrame) -> None
                 norm=TwoSlopeNorm(vmin=-span, vcenter=0, vmax=span),
                 interpolation="nearest",
             )
-            ax.set_xticks(np.arange(12), TOPICS, rotation=38, ha="right")
+            ax.set_xticks(np.arange(len(TOPICS)), TOPICS, rotation=38, ha="right")
             ax.set_yticks(np.arange(len(matrix)), matrix.index)
             ax.tick_params(length=0)
-            ax.set_xticks(np.arange(-0.5, 12, 1), minor=True)
+            ax.set_xticks(np.arange(-0.5, len(TOPICS), 1), minor=True)
             ax.set_yticks(np.arange(-0.5, len(matrix), 1), minor=True)
             ax.grid(which="minor", color=tokens["background"], linewidth=1.1)
             ax.tick_params(which="minor", bottom=False, left=False)
@@ -550,237 +549,23 @@ def plot_emotion_sd(matched: pd.DataFrame, labels: pd.DataFrame) -> None:
             save(fig, "10_within_community_emotion_sd", theme)
 
 
-def contrast_data(labels: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    composition = load_raw_matrix("topic_composition.csv")
-    sentiment = load_raw_matrix("sentiment_means.csv")
-    emotions = load_raw_matrix("emotion_means.csv")
-    ids = [0, 8]
-    label_map = labels.set_index("community_id")["display_label"].to_dict()
-    composition = composition[composition["community_id"].isin(ids)].set_index("community_id")
-    sentiment = sentiment[sentiment["community_id"].isin(ids)].set_index("community_id")
-    emotions = emotions[emotions["community_id"].isin(ids)].set_index("community_id")
-
-    key_topics = ["AI Art Discourse", "AI Tools/Code", "Bard/LLMs", "Visual AI Art", "General AI"]
-    topic_rows = []
-    for cid in ids:
-        for topic in key_topics:
-            topic_rows.append(
-                {
-                    "community_id": cid,
-                    "display_label": label_map[cid],
-                    "metric_group": "topic_share",
-                    "metric": topic,
-                    "value": composition.loc[cid, topic],
-                    "is_other": False,
-                }
-            )
-        topic_rows.append(
-            {
-                "community_id": cid,
-                "display_label": label_map[cid],
-                "metric_group": "topic_share",
-                "metric": "Other topics",
-                "value": 1 - composition.loc[cid, key_topics].sum(),
-                "is_other": True,
-            }
-        )
-    topic_out = pd.DataFrame(topic_rows)
-
-    sentiment_rows = []
-    for cid in ids:
-        for metric in ["positive", "neutral", "negative"]:
-            sentiment_rows.append(
-                {
-                    "community_id": cid,
-                    "display_label": label_map[cid],
-                    "metric_group": "sentiment",
-                    "metric": metric,
-                    "value": sentiment.loc[cid, metric],
-                }
-            )
-    sentiment_out = pd.DataFrame(sentiment_rows)
-
-    emotion_rows = []
-    for cid in ids:
-        for metric in EMOTIONS:
-            emotion_rows.append(
-                {
-                    "community_id": cid,
-                    "display_label": label_map[cid],
-                    "metric_group": "emotion",
-                    "metric": metric,
-                    "value": emotions.loc[cid, metric],
-                }
-            )
-    emotion_out = pd.DataFrame(emotion_rows)
-    pd.concat([topic_out, sentiment_out, emotion_out], ignore_index=True).to_csv(
-        DATA_OUT / "11_ai_art_community_contrast.csv", index=False
-    )
-    return topic_out, sentiment_out, emotion_out
 
 
-def plot_contrast(labels: pd.DataFrame) -> None:
-    topic_data, sentiment_data, emotion_data = contrast_data(labels)
-    ids = [0, 8]
-    display = labels.set_index("community_id")["display_label"].to_dict()
-    topic_metrics = topic_data[topic_data["community_id"] == 0]["metric"].tolist()
-    topic_colors = [TOPIC_COLORS.get(metric, "#b8b8bd") for metric in topic_metrics]
-
-    for theme in ["dark", "light"]:
-        with figure_theme(theme) as tokens:
-            fig = plt.figure(figsize=(16.5, 10))
-            grid = fig.add_gridspec(
-                2, 2,
-                width_ratios=[1.08, 1.2],
-                height_ratios=[1, 1],
-                wspace=0.36,
-                hspace=0.52,
-            )
-            ax_topic = fig.add_subplot(grid[0, 0])
-            ax_sent = fig.add_subplot(grid[1, 0])
-            ax_emotion = fig.add_subplot(grid[:, 1])
-
-            y = np.arange(2)
-            left = np.zeros(2)
-            topic_handles = []
-            for metric, color in zip(topic_metrics, topic_colors):
-                values = np.array([
-                    topic_data[
-                        (topic_data["community_id"] == cid)
-                        & (topic_data["metric"] == metric)
-                    ]["value"].iloc[0]
-                    for cid in ids
-                ])
-                bars = ax_topic.barh(
-                    y, values, left=left, color=color,
-                    height=0.52, label=metric,
-                )
-                topic_handles.append(bars[0])
-                left += values
-            ax_topic.set_yticks(y, [display[cid] for cid in ids])
-            ax_topic.invert_yaxis()
-            ax_topic.set_xlim(0, 1)
-            ax_topic.xaxis.set_major_formatter(mpl.ticker.PercentFormatter(1))
-            ax_topic.set_xlabel("Mean topic share")
-            ax_topic.set_title("(a)", loc="left", pad=7)
-            finish_axes(ax_topic, tokens, "x")
-
-            left = np.zeros(2)
-            sentiment_handles = []
-            for metric in ["positive", "neutral", "negative"]:
-                values = np.array([
-                    sentiment_data[
-                        (sentiment_data["community_id"] == cid)
-                        & (sentiment_data["metric"] == metric)
-                    ]["value"].iloc[0]
-                    for cid in ids
-                ])
-                bars = ax_sent.barh(
-                    y, values, left=left,
-                    color=SENTIMENT_COLORS[metric],
-                    height=0.52, label=metric.title(),
-                )
-                sentiment_handles.append(bars[0])
-                left += values
-            ax_sent.set_yticks(y, [display[cid] for cid in ids])
-            ax_sent.invert_yaxis()
-            ax_sent.set_xlim(0, 1)
-            ax_sent.xaxis.set_major_formatter(mpl.ticker.PercentFormatter(1))
-            ax_sent.set_xlabel("Mean sentiment probability")
-            ax_sent.set_title("(b)", loc="left", pad=7)
-            finish_axes(ax_sent, tokens, "x")
-            ax_sent.legend(
-                sentiment_handles,
-                ["Positive", "Neutral", "Negative"],
-                loc="lower right",
-                bbox_to_anchor=(1, 1.04),
-                ncol=3,
-                borderaxespad=0,
-            )
-
-            emotion_order = sorted(
-                EMOTIONS,
-                key=lambda emotion: abs(
-                    emotion_data[
-                        (emotion_data["community_id"] == 8)
-                        & (emotion_data["metric"] == emotion)
-                    ]["value"].iloc[0]
-                    - emotion_data[
-                        (emotion_data["community_id"] == 0)
-                        & (emotion_data["metric"] == emotion)
-                    ]["value"].iloc[0]
-                ),
-            )
-            y_em = np.arange(len(emotion_order))
-            vals0 = np.array([
-                emotion_data[
-                    (emotion_data["community_id"] == 0)
-                    & (emotion_data["metric"] == emotion)
-                ]["value"].iloc[0]
-                for emotion in emotion_order
-            ])
-            vals8 = np.array([
-                emotion_data[
-                    (emotion_data["community_id"] == 8)
-                    & (emotion_data["metric"] == emotion)
-                ]["value"].iloc[0]
-                for emotion in emotion_order
-            ])
-            for y_pos, value0, value8 in zip(y_em, vals0, vals8):
-                ax_emotion.hlines(
-                    y_pos, min(value0, value8), max(value0, value8),
-                    color=tokens["grid"], linewidth=2.2,
-                )
-            point0 = ax_emotion.scatter(
-                vals0, y_em, color=community_color(0),
-                s=40, label=display[0], zorder=3,
-            )
-            point8 = ax_emotion.scatter(
-                vals8, y_em, color=community_color(8),
-                s=40, label=display[8], zorder=3,
-            )
-            ax_emotion.set_yticks(
-                y_em, [emotion.title() for emotion in emotion_order]
-            )
-            ax_emotion.set_xlim(0, max(vals0.max(), vals8.max()) * 1.12)
-            ax_emotion.set_xlabel("Mean emotion probability")
-            ax_emotion.set_title("(c)", loc="left", pad=7)
-            finish_axes(ax_emotion, tokens, "x")
-            fig.legend(
-                [point0, point8],
-                [display[0], display[8]],
-                loc="upper center",
-                bbox_to_anchor=(0.76, 0.975),
-                ncol=2,
-            )
-
-            fig.legend(
-                topic_handles,
-                topic_metrics,
-                loc="lower center",
-                bbox_to_anchor=(0.31, 0.015),
-                ncol=3,
-                title="Topic key",
-            )
-            fig.subplots_adjust(
-                left=0.18, right=0.975,
-                top=0.89, bottom=0.18,
-            )
-            save(fig, "11_ai_art_community_contrast", theme)
 
 def main() -> None:
     global OUT, DATA_OUT, FIG_OUT, WORK
-    global MATCHED_JSON, LABELS_CSV, RAW_FIG_DIR, HPC_TABLES
+    global MATCHED_JSON, LABELS_CSV, RAW_FIG_DIR, HPC_TABLES, TOPICS, TOPIC_COLORS
 
     choices = (
         "timeline", "umap", "topic_sentiment", "community_topic_enrichment",
-        "community_sentiment", "topic_weighted_net", "emotion_sd", "contrast",
+        "community_sentiment", "topic_weighted_net", "emotion_sd",
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-root", type=Path, default=WORK,
                         help="External fixed inputs; defaults to data_sets/blog_analysis")
     parser.add_argument("--output-root", type=Path, default=OUT)
-    parser.add_argument("--labels", type=Path, default=LABELS_CSV)
+    parser.add_argument("--labels", type=Path, help="Community labels for this input bundle")
+    parser.add_argument("--topic-labels", type=Path, help="Topic labels for this model")
     parser.add_argument("--figures", nargs="+", choices=choices, default=list(choices))
     args = parser.parse_args()
 
@@ -789,7 +574,13 @@ def main() -> None:
     DATA_OUT = OUT / "data"
     FIG_OUT = OUT
     MATCHED_JSON = WORK / "matched_authors.json"
-    LABELS_CSV = args.labels
+    LABELS_CSV = args.labels or WORK / "community_labels.csv"
+    topic_labels = pd.read_csv(args.topic_labels or WORK / "topic_labels.csv").sort_values("topic_id")
+    if topic_labels.topic_id.tolist() != list(range(len(topic_labels))):
+        raise ValueError("Topic label IDs must be contiguous")
+    TOPICS = topic_labels.label.tolist()
+    palette_colors = list(PALETTE["topic_colors"].values())
+    TOPIC_COLORS = {label: palette_colors[i % len(palette_colors)] for i, label in enumerate(TOPICS)}
     RAW_FIG_DIR = WORK / "matrices"
     HPC_TABLES = WORK / "tables"
     for directory in [
@@ -801,7 +592,7 @@ def main() -> None:
     requested = set(args.figures)
     labels = label_table() if requested & {
         "community_topic_enrichment", "community_sentiment",
-        "topic_weighted_net", "emotion_sd", "contrast",
+        "topic_weighted_net", "emotion_sd",
     } else None
     matched = load_matched() if requested & {"topic_weighted_net", "emotion_sd"} else None
 
@@ -819,8 +610,6 @@ def main() -> None:
         plot_topic_weighted_net(matched, labels)
     if "emotion_sd" in requested:
         plot_emotion_sd(matched, labels)
-    if "contrast" in requested:
-        plot_contrast(labels)
     print("Requested non-temporal figures complete", flush=True)
 
 if __name__ == "__main__":
