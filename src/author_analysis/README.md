@@ -50,6 +50,12 @@ min_df=5, max_df=0.7 and 50 batch-LDA iterations. Selection uses a seeded sample
 up to 100,000 authors and up to 20,000 coherence documents. The combined score keeps
 the notebook weights: coherence 0.25, diversity 0.30, non-collapse 0.15, evenness 0.30.
 The selected configuration is refitted on all qualifying authors of that backbone.
+The final fit records dominant-topic counts, mean memberships and empty feature rows.
+A final dominant-topic share above 90%, or an increase above 15 percentage points
+relative to selection, requires review and stops dependent analysis. These are
+review triggers, not requirements that real topics be balanced. The fitted outputs
+are preserved for diagnosis. Passing them does not establish semantic quality or
+stability; inspect terms and representative posts before interpreting topics.
 CPU workers are controlled by `--jobs`; the default is the Slurm allocation or one.
 The full grid and final fit should first be benchmarked on a smoke run.
 

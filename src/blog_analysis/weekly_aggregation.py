@@ -23,6 +23,7 @@ import pickle
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.author_analysis.common import exact_id, read_posts, sha256
 from src.author_analysis.topic_model import clean_tweet_text, METHOD_VERSION
+from src.author_analysis.topic_quality import require_topic_review_passed
 
 
 # Input paths are supplied by CLI in main(); declarations keep helper functions typed.
@@ -320,6 +321,7 @@ def main() -> None:
     FROZEN_MODEL = args.model_dir / 'lda_model.pkl'
     FROZEN_VECTORIZER = args.model_dir / 'vectorizer.pkl'
     model_info = json.loads((args.model_dir / 'model.json').read_text(encoding='utf-8'))
+    require_topic_review_passed(model_info)
     if model_info['method_version'] != METHOD_VERSION or model_info['backbone'] != args.backbone:
         raise ValueError('Model belongs to another backbone or method')
     if model_info['model_sha256'] != sha256(FROZEN_MODEL) or model_info['vectorizer_sha256'] != sha256(FROZEN_VECTORIZER):

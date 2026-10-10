@@ -4,6 +4,7 @@ import json
 import numpy as np
 from .common import (configuration, communities, read_profiles, topic_columns, scores,
                      EMOTIONS, SENTIMENTS, sha256)
+from .topic_quality import require_topic_review_passed
 
 
 def main():
@@ -18,6 +19,7 @@ def main():
     if set(topics.author_id) != set(sentiment.author_id) or set(topics.author_id) != set(emotion.author_id):
         raise ValueError('Affect coverage must equal topic-eligible authors')
     model_info = json.loads((root/'topics/model.json').read_text(encoding='utf-8'))
+    require_topic_review_passed(model_info)
     coverage = json.loads((root/'affect/coverage.json').read_text(encoding='utf-8'))
     topic_hash = sha256(root/'topics/author_topics.csv')
     if model_info['backbone'] != config['backbone'] or model_info['author_topics_sha256'] != topic_hash or coverage['author_topics_sha256'] != topic_hash:
