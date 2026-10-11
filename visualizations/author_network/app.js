@@ -116,7 +116,7 @@ let topicSizes = [], topicOrder = [], communityOrder = [];
 function focusIsActive() { return focusKeys.size > 0; }
 function communityKey(node) {
     const c=node[F.community];
-    return c==null||c<0?'missing':communityIsLabelled(c)?String(c):'tail';
+    return c==null||c<0?'missing':communityIsLabelled(c)||Object.keys(communityLabels).length===0?String(c):'tail';
 }
 function topicKey(node) {
     const t=node[F.dominantTopic];
@@ -144,7 +144,7 @@ function initialiseFocusControls() {
     applyFocus();
 }
 function toggleGroup(kind,key,checked) {
-    // Like the other atlases, ticking in a different lens starts a new selection.
+    // Ticking in a different categorical lens starts a new selection.
     if(focusKind!==kind){focusKeys.clear();focusKind=kind;}
     checked?focusKeys.add(key):focusKeys.delete(key);
     if(!focusKeys.size)focusKind=null;

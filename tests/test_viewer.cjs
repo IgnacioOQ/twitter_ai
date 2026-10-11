@@ -36,6 +36,9 @@ const calls=[];context.capture=p=>calls.push(p.focusPass);context.depth=()=>call
 run("toggleGroup('topic',0,true);regl={clear:depth};drawFocusedCloud(capture,{},true)");
 assert.deepEqual(calls,[0,'depth',1]);
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+run("clearFocus();communityLabels={};initialiseFocusControls()");
+assert.deepEqual(Array.from(run('communityOrder.map(row=>row.key)')),['0','2','1','9'],'unlabelled networks retain distinct numeric communities');
+run("toggleGroup('community','9',true)");check(n=>n.c===9);
 for(const removed of ['More options','Focus on authors','id="legend-tabs"'])assert.ok(!html.includes(removed));
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,new Set(ids).size);
 console.log('PASS: portable 3-topic/6-author viewer; sorted legends, retained selection, clear, safe excerpts, 3D focus order.');
