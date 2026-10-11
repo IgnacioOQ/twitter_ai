@@ -38,6 +38,8 @@ def main(argv=None):
     parser.add_argument('--author-id-attribute', default='label', help='Exact author ID vertex attribute')
     parser.add_argument('--community-algorithm', default='leiden_directed')
     parser.add_argument('--topic-labels', type=Path, help='Labels for this exact topic model; otherwise numeric')
+    parser.add_argument('--community-labels', type=Path, help='Reviewed community descriptions for this partition')
+    parser.add_argument('--provenance', type=Path, help='Bind presentation to an exact fitted model and input corpus')
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args(argv)
@@ -68,8 +70,23 @@ def main(argv=None):
               'figure-inputs': [matched, network/'tables/topic_sentiment_fuzzy_network_subset.csv', network/'communities/figures/topic_composition.csv'],
               'projection': [matched]}[args.stage]
     if args.topic_labels: inputs.append(args.topic_labels)
+    if args.community_labels: inputs.append(args.community_labels)
+    if args.provenance: inputs.append(args.provenance)
     missing = [str(p) for p in inputs if not p.is_file()]
     if missing: parser.error('Missing inputs:\n' + '\n'.join(missing))
+    if args.provenance:
+        from .common import sha256
+        provenance = json.loads(args.provenance.read_text(encoding='utf-8'))
+        metadata = json.loads((network/'topics/model.json').read_text(encoding='utf-8'))
+        if (sha256(network/'topics/lda_model.pkl') != provenance['model_sha256']
+                or sha256(network/'topics/vectorizer.pkl') != provenance['vectorizer_sha256']
+                or sha256(network/'topics/author_topics.csv') != provenance['author_topics_sha256']
+                or sha256(network/'topics/author_documents.jsonl') != provenance['input_sha256']['documents_sha256']
+                or metadata['documents']['documents_sha256'] != provenance['input_sha256']['documents_sha256']
+                or metadata['n_authors'] != provenance['eligible_authors']
+                or args.community_algorithm != provenance['community_algorithm']
+                or args.backbone != provenance['backbone']):
+            parser.error('Presentation provenance does not match this fitted model and population')
     if args.stage not in ['prepare', 'topics', 'affect']:
         model_metadata = network/'topics/model.json'
         if model_metadata.is_file():
@@ -81,6 +98,7 @@ def main(argv=None):
                   matched=str(matched), author_id_attribute=args.author_id_attribute,
                   community_algorithm=args.community_algorithm, seed=args.seed,
                   model_settings=settings.to_dict(), smoke=args.smoke,
+                  community_labels=str(args.community_labels.resolve()) if args.community_labels else None,
                   topic_labels=str(args.topic_labels.resolve()) if args.topic_labels else None)
     if args.check:
         print(json.dumps({'stage': args.stage, 'inputs': [str(p) for p in inputs]}, indent=2))

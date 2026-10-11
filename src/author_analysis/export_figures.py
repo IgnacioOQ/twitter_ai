@@ -19,10 +19,22 @@ def main():
     matched.to_json(output/'matched_authors.json',orient='records',double_precision=15)
     matched.to_csv(output/'matched_authors.csv',index=False)
     (output/'matched_author_ids.json').write_text(json.dumps(matched.author_id.tolist()),encoding='utf-8')
-    pd.DataFrame({'topic_id':list(labels),'label':list(labels.values())}).to_csv(output/'topic_labels.csv',index=False)
+    if config['topic_labels']:
+        from .common import topic_presentation
+        topic_presentation(config['topic_labels']).to_csv(output/'topic_labels.csv',index=False)
+    else:
+        pd.DataFrame({'topic_id':list(labels),'label':list(labels.values())}).to_csv(output/'topic_labels.csv',index=False)
     counts=matched.groupby('leiden_directed').size().sort_values(ascending=False).head(21)
     pd.DataFrame({'community_id':counts.index,'display_label':[f'Community {i}' for i in counts.index],
                   'n_authors':counts.values}).to_csv(output/'community_labels.csv',index=False)
+    if config.get('community_labels'):
+        reviewed = pd.read_csv(config['community_labels'],keep_default_na=False)
+        actual = matched.groupby('leiden_directed').size()
+        if (reviewed.community_id.duplicated().any()
+                or not set(reviewed.community_id).issubset(actual.index)
+                or not all(actual.loc[r.community_id] == r.n_authors for r in reviewed.itertuples())):
+            raise ValueError('Community descriptions do not match the supplied population')
+        reviewed.to_csv(output/'community_labels.csv',index=False)
     for name in ['corpus_sentiment_network_subset.csv','corpus_emotions_network_subset.csv',
                  'topic_prevalence_dominant_network_subset.csv','topic_prevalence_fuzzy_network_subset.csv',
                  'topic_sentiment_fuzzy_network_subset.csv','topic_emotion_fuzzy_network_subset.csv']:

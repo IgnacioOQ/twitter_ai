@@ -202,8 +202,12 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         weekly=pd.read_csv(self.root/'weekly/weekly_sentiment.csv')
         self.assertEqual(int(weekly.n_scored_posts.sum()),160)
+        labels = self.root/'topic_labels.csv'
+        pd.DataFrame({'topic_id':range(4),'label':[f'Topic {i}' for i in range(4)],
+                      'colour':['#ff6d3a','#35b9ff','#e65bdb','#f1d54a']}).to_csv(labels,index=False)
         result = subprocess.run([sys.executable,'src/blog_analysis/render_temporal_figures.py',
             '--weekly-dir',str(self.root/'weekly'),'--output-root',str(self.root/'weekly_figures'),
+            '--topic-labels',str(labels),
             '--collection-end','2023-02-27T12:00:00Z'],
             cwd=ROOT,capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)

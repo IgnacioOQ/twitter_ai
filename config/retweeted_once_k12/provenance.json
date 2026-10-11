@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "backbone": "RetweetedOnce",
+  "community_algorithm": "leiden_directed",
+  "collection_start": "2022-10-30T00:00:00Z",
+  "collection_end": "2023-02-27T12:00:00Z",
+  "network_authors": 202710,
+  "eligible_authors": 164291,
+  "includes_retweets": true,
+  "source_revision": "8ee75557861cb75a4a9fc20fa73788ab5667b8e7",
+  "input_sha256": {
+    "tweets_sha256": "9920268c88c4808ecbc650076e2e462cfd0c5a8d911349fffaafb824d10b2a9d",
+    "communities_sha256": "7756b32b5623a928912bb9daea95be73d378ff24261746cfb7ad2cc9471498b3",
+    "documents_sha256": "c4be1839e6479cf455d45dba73bf4ef2070e226d9b6c6f31df66559b56a9adb5"
+  },
+  "model_sha256": "bd0b5bc63b7bc2ebe504288bea07cc53250754ea714a7f1c8ba1e7aecb2f0b2a",
+  "vectorizer_sha256": "5501b6530d53a4b2a55269eec8687faa511c4be8d03a68707fabe30945b36321",
+  "author_topics_sha256": "3d087a012393d67cbfb583f709b73cc48fe2134a4f22c8dc5ab2a10a86060fbe",
+  "versions": {
+    "sklearn": "1.9.1",
+    "gensim": "4.4.0",
+    "numpy": "2.4.6"
+  },
+  "semantic_review_completed": true,
+  "sensitivity_review_completed": true,
+  "approved_for_exploratory_use": true,
+  "robust_individual_taxonomy": false,
+  "model_use": "Exploratory reference selected by semantic review; not the automatic grid-score winner.",
+  "robustness": {
+    "cosine_aligned_dominant_agreement": 0.7654284166509425,
+    "mean_total_variation": 0.16645555198192596,
+    "net_sentiment_rank_correlation": 0.8671328671328673,
+    "community_cells_substantial_both": 54,
+    "community_substantial_sign_flips": 5
+  },
+  "robustness_conditions": {
+    "seed_a": 42,
+    "seed_b": 43,
+    "identical_fitted_vocabulary_and_idf": true,
+    "min_community_authors": 1000,
+    "absolute_log2_enrichment": 0.5
+  },
+  "limitations": [
+    "Membership matching is not semantic validation; some smaller topic meanings differ between fits.",
+    "All-post profiles include amplification through retweets.",
+    "Topic-weighted affect is author-level, not sentiment of posts about that topic.",
+    "Some query terms have unrelated meanings; topic and community labels do not identify personal beliefs."
+  ],
+  "contrast": {
+    "community_ids": [
+      0,
+      4
+    ],
+    "topic_ids": [
+      2,
+      8,
+      1,
+      9,
+      11
+    ]
+  },
+  "results_url": "https://drive.google.com/drive/folders/1C4-R40VDIyhn5yFovLAmVjUBE5RSqDLc",
+  "atlas_url": "https://davidfreeborn.github.io/twitter-authors-map/"
+}

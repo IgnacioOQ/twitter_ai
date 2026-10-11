@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Community descriptions</title><style>
+body{margin:2rem auto;padding:0 1.5rem;max-width:55rem;background:#111118;color:#e6e6ee;font:17px/1.6 system-ui}
+a{color:#9dc9fa}section{border-top:1px solid #454552;padding:1rem 0}h1,h2{font-family:Georgia,serif}h2{font-size:1.3rem}
+</style></head><body><a href="index.html">Back to map</a><h1>Community descriptions</h1>
+<p>Labels describe prevalent post content, not every author or their identity. Read confidence and interpretation alongside each label.</p>
+<main id="labels">Loading descriptions…</main><script>
+(async()=>{const target=document.getElementById('labels');try{
+const response=await fetch('data/community_labels.json');if(!response.ok)throw new Error('No descriptions supplied for this network.');
+const data=await response.json();target.replaceChildren();
+Object.values(data.communities).sort((a,b)=>b.n_authors-a.n_authors).forEach(row=>{
+const section=document.createElement('section'),heading=document.createElement('h2'),detail=document.createElement('p'),confidence=document.createElement('p');
+heading.textContent=row.display_label||row.label;detail.textContent=row.evidence_summary||row.short_description||'';
+confidence.textContent='Confidence: '+(row.confidence||'unspecified')+' · Authors: '+Number(row.n_authors).toLocaleString();
+section.append(heading,confidence,detail);target.append(section);});
+}catch(error){target.textContent=error.message;}})();
+</script></body></html>

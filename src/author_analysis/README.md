@@ -85,7 +85,7 @@ are undefined and recorded as missing values, not as zero effects.
 ```sh
 python src/blog_analysis/render_non_temporal_figures.py --input-root OUT/networks/RetweetedOnce/figure_inputs --output-root OUT/networks/RetweetedOnce/figures --figures umap topic_sentiment community_topic_enrichment community_sentiment topic_weighted_net emotion_sd
 python src/blog_analysis/weekly_aggregation.py --backbone RetweetedOnce --matched-authors OUT/networks/RetweetedOnce/figure_inputs/matched_author_ids.json --posts "DATA/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json" --sentiment-classified "DATA/Data Sets/Cleaned Data/ai_full_classified_twitter-roberta-base-sentiment-latest.json" --emotion-classified "DATA/Data Sets/Cleaned Data/ai_full_classified_twitter-roberta-base-emotion-multilabel-latest.json" --model-dir OUT/networks/RetweetedOnce/topics --out-dir OUT/networks/RetweetedOnce/weekly
-python src/blog_analysis/render_temporal_figures.py --weekly-dir OUT/networks/RetweetedOnce/weekly --output-root OUT/networks/RetweetedOnce/weekly_figures --collection-end TIMESTAMP
+python src/blog_analysis/render_temporal_figures.py --weekly-dir OUT/networks/RetweetedOnce/weekly --output-root OUT/networks/RetweetedOnce/weekly_figures --topic-labels OUT/networks/RetweetedOnce/figure_inputs/topic_labels.csv --collection-end TIMESTAMP
 ```
 
 TIMESTAMP is the actual timezone-aware collection end. Weekly topics use the saved
@@ -101,3 +101,58 @@ detection is repeated by the downstream figure/viewer stages.
 Tests: `python -m unittest discover -s tests -v`. Set `SFDP_RUNNER` to the compiled
 Graphviz helper for the native 3D integration test. Generated data, models, figures,
 run records and exploratory notes stay outside version control.
+
+## Supplied twelve-topic configuration
+
+config/retweeted_once_k12 describes 164,291 eligible RetweetedOnce authors.
+All 202,710 network authors belong to the full network's largest weakly connected
+component. The model uses unigram TF-IDF, K=12, alpha=0.3, eta=0.1, seed=42 and
+50 maximum iterations. It is selected by semantic review, not the automatic grid winner.
+
+Pass --model-config config/retweeted_once_k12/model.json to prepare and topics.
+Pass --topic-labels config/retweeted_once_k12/topics.csv to downstream stages.
+For figure-inputs and export, also pass --community-labels config/retweeted_once_k12/communities.csv.
+Counts are checked against the actual population. See the [figure commands](../../docs/blog_analysis/README.md).
+
+provenance.json records input/model hashes, software versions, author counts, review
+qualifications and result links. Add --provenance config/retweeted_once_k12/provenance.json
+to downstream run commands to bind presentation to the exact supplied fit.
+Do not reuse its model-specific names for LWCC or another fit. Refitting can differ
+across dependency versions/platforms even with the same seed; review terms and posts.
+
+A controlled seed-42/43 comparison gives 76.5% leading-topic agreement after
+author-membership cosine matching. Some matched topics differ in meaning.
+Five of 54 substantial community-topic enrichments reverse direction between fits
+(community size >=1,000 and absolute log2 enrichment >=0.5 in both).
+These are descriptive filters, not universal robustness thresholds.
+All-post profiles include amplification; topic-weighted affect is author-level,
+not sentiment of posts about a topic.
+
+## Controlled stability checks
+
+Use trusted bundles containing model.json, author_topics.csv, lda_model.pkl and
+vectorizer.pkl. A repeat also needs the reference author_documents.jsonl.
+Pickles execute Python when loaded; use your trusted analysis artifacts.
+
+    python -m src.author_analysis.check_stability --reference OUT/networks/RetweetedOnce/topics --repeat-seed 43 --jobs 8 --profiles OUT/networks/RetweetedOnce/data/matched_authors.parquet --output DIAGNOSTIC
+
+The repeat keeps the exact fitted vocabulary and IDF and does not replace the reference.
+For saved fits, replace --repeat-seed 43 with --candidate CANDIDATE.
+Outputs include leading-topic agreement, adjusted Rand index, membership total
+variation and optional affect/enrichment comparisons. The output directory must be new.
+Inspect terms and posts separately: membership matching is not semantic matching.
+
+## Adopt an explicitly reviewed saved fit
+
+    python -m src.author_analysis.adopt_reviewed_fit --source SAVED_TOPICS --prepared PREPARED_TOPICS --review REVIEW.json --output NEW_OUT/networks/RetweetedOnce/topics
+
+REVIEW.json must identify model_sha256 and set semantic_review_completed,
+sensitivity_review_completed and approved_for_exploratory_use to true.
+The supplied provenance.json applies only to its exact identified fit.
+PREPARED_TOPICS contains author_documents.jsonl and documents.json from prepare.
+
+Adoption verifies fingerprints, authors, numerical quality and a deterministic
+sample of saved probabilities against the fitted model. It refuses existing output
+directories, unreviewed fits and diagnostic-only bundles. Source files stay intact.
+Run affect and downstream stages against NEW_OUT; cached results are not silently copied.
+Adoption does not trigger a model sweep or full-corpus fit.

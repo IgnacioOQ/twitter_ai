@@ -6,7 +6,7 @@
 // Data
 let nodes = [];
 let summary = {};
-const ASSET_VERSION = '1';
+const ASSET_VERSION = 'standalone-1';
 const versionedAsset = path => `${path}?v=${ASSET_VERSION}`;
 
 // Descriptive labels for the supplied network communities
@@ -104,11 +104,97 @@ const COMMUNITY_COLORS = [
 
 let TOPIC_NAMES = [];
 
-const TOPIC_PALETTE = [
-    [0.89, 0.10, 0.11], [0.22, 0.49, 0.72], [0.30, 0.69, 0.29], [0.60, 0.31, 0.64],
-    [1.00, 0.50, 0.00], [1.00, 1.00, 0.20], [0.65, 0.34, 0.16], [0.97, 0.51, 0.75],
-    [0.60, 0.60, 0.60], [0.40, 0.76, 0.65], [0.99, 0.55, 0.38], [0.55, 0.63, 0.80]
-];
+
+
+// Shared topic colours: identical to light/dark plots and their legends.
+let TOPIC_PALETTE = [];
+
+// A selection belongs to one category lens and survives changes of colour view.
+let focusKeys = new Set(), focusKind = null;
+let focusMask = null, focusBuffer = null, focusTotals = null;
+let topicSizes = [], topicOrder = [], communityOrder = [];
+function focusIsActive() { return focusKeys.size > 0; }
+function communityKey(node) {
+    const c=node[F.community];
+    return c==null||c<0?'missing':communityIsLabelled(c)?String(c):'tail';
+}
+function topicKey(node) {
+    const t=node[F.dominantTopic];
+    return Number.isInteger(t)&&t>=0&&t<TOPIC_NAMES.length?t:-1;
+}
+function matchesFocus(node) {
+    return !focusIsActive() || focusKeys.has(focusKind==='topic'?topicKey(node):communityKey(node));
+}
+function buildLegendOrder() {
+    topicSizes=Array(TOPIC_NAMES.length).fill(0);
+    const sizes=new Map();
+    for(const n of nodes) {
+        const topic=topicKey(n);if(topic>=0)topicSizes[topic]++;
+        const key=communityKey(n);sizes.set(key,(sizes.get(key)||0)+1);
+    }
+    topicOrder=TOPIC_NAMES.map((_,i)=>i).sort((a,b)=>topicSizes[b]-topicSizes[a]||a-b);
+    communityOrder=[...sizes].map(([key,count])=>({key,count})).sort((a,b)=>b.count-a.count||a.key.localeCompare(b.key));
+}
+function initialiseFocusControls() {
+    buildLegendOrder();
+    const selector=document.getElementById('topic-select');
+    selector.replaceChildren(...topicOrder.map(i=>{
+        const option=document.createElement('option');option.value=i;option.textContent=TOPIC_NAMES[i];return option;
+    }));
+    applyFocus();
+}
+function toggleGroup(kind,key,checked) {
+    // Like the other atlases, ticking in a different lens starts a new selection.
+    if(focusKind!==kind){focusKeys.clear();focusKind=kind;}
+    checked?focusKeys.add(key):focusKeys.delete(key);
+    if(!focusKeys.size)focusKind=null;
+    applyFocus();
+}
+function clearFocus() {focusKeys.clear();focusKind=null;applyFocus();updateLegend(colorMode);}
+function renderSelectionLegend(mode) {
+    const container=document.getElementById('legend');
+    const kind=mode==='community'?'community':'topic';
+    const rgb=c=>`rgb(${c.map(x=>Math.round(x*255)).join(',')})`;
+    let items=kind==='topic'?topicOrder.map(i=>({key:i,name:TOPIC_NAMES[i],count:topicSizes[i],color:TOPIC_PALETTE[i]}))
+        :communityOrder.map(({key,count})=>({key,count,name:key==='tail'?'Other communities (combined)':key==='missing'?'No data':communityLabel(Number(key)),color:key==='tail'?null:key==='missing'?GREY:COMMUNITY_COLORS[Number(key)%COMMUNITY_COLORS.length]}));
+    const missingTopics=nodes.length-topicSizes.reduce((a,b)=>a+b,0);
+    if(kind==='topic'&&missingTopics)items.push({key:-1,name:'No data',count:missingTopics,color:GREY});
+    items.sort((a,b)=>b.count-a.count);
+    for(const item of items){
+        const row=document.createElement('label');row.className='legend-choice';
+        const input=document.createElement('input');input.type='checkbox';input.checked=focusKind===kind&&focusKeys.has(item.key);
+        input.addEventListener('change',()=>toggleGroup(kind,item.key,input.checked));
+        const swatch=document.createElement('span');swatch.className='legend-swatch'+(item.color?'':' legend-swatch-multi');
+        if(item.color)swatch.style.background=rgb(item.color);
+        const name=document.createElement('span');name.textContent=item.name;
+        const count=document.createElement('span');count.className='legend-count';count.textContent=item.count.toLocaleString();count.setAttribute('aria-hidden','true');
+        row.title=item.count.toLocaleString()+' authors';row.append(input,swatch,name,count);container.appendChild(row);
+    }
+}
+function applyFocus() {
+    if(!focusMask)focusMask=new Float32Array(nodes.length);
+    let count=0,in3d=0;
+    for(let i=0;i<nodes.length;i++){
+        const included=matchesFocus(nodes[i]);focusMask[i]=included?1:0;
+        if(included){count++;if(visible3D?.[i])in3d++;}
+    }
+    focusTotals={count,in3d};if(focusBuffer)focusBuffer.subdata(focusMask);
+    pickDirty=true;document.getElementById('tooltip').style.display='none';
+    updateFocusStatus();if(selectedNode)updateFoundStatus(selectedNode);
+}
+function updateFocusStatus() {
+    if(!focusTotals)return;
+    const {count,in3d}=focusTotals;
+    document.getElementById('focus-map-status').hidden=!focusIsActive();
+    document.getElementById('focus-status').textContent=count.toLocaleString()+' selected'+(viewMode==='3d'?' · '+in3d.toLocaleString()+' in 3D':'');
+    document.getElementById('focus-status').title=focusKind==='topic'?'Selected in Topics':'Selected in Communities';
+}
+function drawFocusedCloud(draw,props,is3d) {
+    if(!focusIsActive()){draw({...props,focusPass:-1});return;}
+    draw({...props,focusPass:0});
+    if(is3d)regl.clear({depth:1});
+    draw({...props,focusPass:1});
+}
 
 // Sentiment colours are expressed as
 // exact 8-bit RGB fractions so WebGL points and CSS legends render identically.
@@ -140,7 +226,7 @@ const GREY = [0.35, 0.35, 0.42];
 // Community label helpers
 // ============================================================================
 
-// Presentation-only short label for the labelled labelled set; numeric IDs remain
+// Presentation-only short label for the labelled set; numeric IDs remain
 // stored separately in each node and in the community key.
 function communityLabel(c) {
     if (c === null || c === undefined || c < 0) return 'No community';
@@ -314,7 +400,8 @@ function multiplyMatrix4(out, a, b) {
 }
 
 function updateCameraMatrices(canvas, deltaSeconds) {
-    const damping = 1 - Math.exp(-Math.min(deltaSeconds, 0.05) * 13);
+    const damping = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 1 : 1 - Math.exp(-Math.min(deltaSeconds, 0.05) * 13);
     const previous = [camera3D.yaw, camera3D.pitch, camera3D.distance, ...camera3D.target];
     camera3D.yaw = lerp(camera3D.yaw, camera3D.desiredYaw, damping);
     camera3D.pitch = lerp(camera3D.pitch, camera3D.desiredPitch, damping);
@@ -354,16 +441,27 @@ function cameraBasis3D() {
 async function init() {
     try {
         const [nodesResp, summaryResp, labelsResp] = await Promise.all([
-            fetch('data/nodes.json'),
-            fetch('data/build_summary.json'),
+            fetch(versionedAsset('data/nodes.json')),
+            fetch(versionedAsset('data/build_summary.json')),
             fetch(versionedAsset('data/community_labels.json')).catch(() => null)
         ]);
 
+        if (!nodesResp.ok) throw new Error(`Author data: HTTP ${nodesResp.status}`);
+        if (!summaryResp.ok) throw new Error(`Map summary: HTTP ${summaryResp.status}`);
         nodes = await nodesResp.json();
         summary = await summaryResp.json();
         if (!nodes.length) throw new Error('The viewer node file is empty');
+        if (summary.matched_authors !== nodes.length) throw new Error('Author data and map summary belong to different versions');
         const count = Object.keys(nodes[0]).filter(key => /^t[0-9]+$/.test(key)).length;
         TOPIC_NAMES = Array.from({length: count}, (_, i) => summary.topic_labels?.[i] || `Topic ${i}`);
+        const suppliedColours = summary.topic_colours;
+        if (suppliedColours && (suppliedColours.length !== count || suppliedColours.some(c => !/^#[0-9a-f]{6}$/i.test(c)))) {
+            throw new Error('Provide one valid hex colour per model topic');
+        }
+        TOPIC_PALETTE = suppliedColours
+            ? suppliedColours.map(hex => [1,3,5].map(i => parseInt(hex.slice(i,i+2),16)/255))
+            : Array.from({length:count}, (_,i) => COMMUNITY_COLORS[i % COMMUNITY_COLORS.length]);
+        document.getElementById('analysis-status').textContent = summary.analysis_status || 'Topics are exploratory; assess semantic quality and sensitivity before interpretation.';
         const selector = document.getElementById('topic-select');
         selector.replaceChildren(...TOPIC_NAMES.map((label, i) => {
             const option = document.createElement('option');
@@ -411,11 +509,12 @@ async function init() {
         viewY = (minY + maxY) / 2;
         const rangeX = maxX - minX;
         const rangeY = maxY - minY;
-        viewScale = 0.9 / Math.max(rangeX, rangeY) * 2;
+        viewScale = fitted2DScale(rangeX, rangeY);
 
         // Initialize WebGL
         initWebGL();
 
+        initialiseFocusControls();
         // Build initial colors
         updateColors();
 
@@ -473,6 +572,8 @@ function initWebGL() {
     positionBuffer3D = regl.buffer({ data: new Float32Array(0), usage: 'static' });
     visibilityBuffer3D = regl.buffer({ data: new Float32Array(nodes.length), usage: 'static' });
     colorBuffer = regl.buffer({ data: colors, usage: 'dynamic' });
+    focusMask=new Float32Array(nodes.length).fill(1);
+    focusBuffer=regl.buffer({data:focusMask,usage:'dynamic'});
     sizeBuffer = regl.buffer(sizes);
     pickIdBuffer = regl.buffer(pickIds);
     selectedPosition3DBuffer = regl.buffer(new Float32Array([0, 0, 0]));
@@ -485,12 +586,15 @@ function initWebGL() {
             attribute vec2 position;
             attribute vec3 color;
             attribute float size;
+            attribute float focused;
             uniform vec2 viewOffset;
             uniform float viewScale;
             uniform vec2 resolution;
+            varying float vFocused;
             varying vec3 vColor;
 
             void main() {
+                vFocused=focused;
                 vec2 pos = (position - viewOffset) * viewScale;
                 pos.x *= resolution.y / resolution.x;
                 gl_Position = vec4(pos, 0, 1);
@@ -500,22 +604,29 @@ function initWebGL() {
         `,
         frag: `
             precision highp float;
+            uniform float focusPass;
+            varying float vFocused;
             varying vec3 vColor;
 
             void main() {
+                if(focusPass>0.5 && vFocused<0.5)discard;
+                if(focusPass>-0.5 && focusPass<0.5 && vFocused>0.5)discard;
                 vec2 cxy = 2.0 * gl_PointCoord - 1.0;
                 float r = dot(cxy, cxy);
                 if (r > 1.0) discard;
                 float alpha = 1.0 - smoothstep(0.5, 1.0, r);
-                gl_FragColor = vec4(vColor, alpha);
+                gl_FragColor = focusPass>-0.5 && focusPass<0.5
+                    ?vec4(vec3(0.36,0.38,0.43),alpha*0.16):vec4(vColor,alpha);
             }
         `,
         attributes: {
             position: positionBuffer2D,
             color: colorBuffer,
+            focused: focusBuffer,
             size: sizeBuffer
         },
         uniforms: {
+            focusPass: regl.prop('focusPass'),
             viewOffset: regl.prop('viewOffset'),
             viewScale: regl.prop('viewScale'),
             resolution: regl.prop('resolution')
@@ -537,13 +648,16 @@ function initWebGL() {
             attribute float visibility;
             attribute vec3 color;
             attribute float size;
+            attribute float focused;
             uniform mat4 view;
             uniform mat4 projection;
             uniform float pointScale;
+            varying float vFocused;
             varying vec3 vColor;
             varying float vDepth;
 
             void main() {
+                vFocused=focused;
                 if (visibility < 0.5) {
                     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
                     gl_PointSize = 0.0;
@@ -561,12 +675,16 @@ function initWebGL() {
         `,
         frag: `
             precision highp float;
+            uniform float focusPass;
             uniform float fogNear;
             uniform float fogFar;
+            varying float vFocused;
             varying vec3 vColor;
             varying float vDepth;
 
             void main() {
+                if(focusPass>0.5 && vFocused<0.5)discard;
+                if(focusPass>-0.5 && focusPass<0.5 && vFocused>0.5)discard;
                 vec2 cxy = 2.0 * gl_PointCoord - 1.0;
                 float r = dot(cxy, cxy);
                 if (r > 1.0) discard;
@@ -574,16 +692,19 @@ function initWebGL() {
                 if (edge < 0.025) discard;
                 float fog = 1.0 - smoothstep(fogNear, fogFar, vDepth);
                 float alpha = edge * mix(0.06, 0.56, fog);
-                gl_FragColor = vec4(vColor, alpha);
+                gl_FragColor = focusPass>-0.5 && focusPass<0.5
+                    ?vec4(vec3(0.36,0.38,0.43),alpha*0.16):vec4(vColor,alpha);
             }
         `,
         attributes: {
             position: positionBuffer3D,
             visibility: visibilityBuffer3D,
             color: colorBuffer,
+            focused: focusBuffer,
             size: sizeBuffer
         },
         uniforms: {
+            focusPass: regl.prop('focusPass'),
             view: regl.prop('view'),
             projection: regl.prop('projection'),
             pointScale: regl.prop('pointScale'),
@@ -607,6 +728,7 @@ function initWebGL() {
             precision highp float;
             attribute vec3 position;
             attribute float visibility;
+            attribute float focused;
             attribute float size;
             attribute float pickId;
             uniform mat4 view;
@@ -616,7 +738,7 @@ function initWebGL() {
             varying float vPickId;
 
             void main() {
-                if (visibility < 0.5) {
+                if (visibility < 0.5 || focused < 0.5) {
                     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
                     gl_PointSize = 0.0;
                     vPickId = 0.0;
@@ -646,6 +768,7 @@ function initWebGL() {
         attributes: {
             position: positionBuffer3D,
             visibility: visibilityBuffer3D,
+            focused: focusBuffer,
             size: sizeBuffer,
             pickId: pickIdBuffer
         },
@@ -721,6 +844,8 @@ function render(now) {
     const canvas = document.getElementById('graph-canvas');
     const dpr = window.devicePixelRatio;
     resizeCanvasIfNeeded(canvas);
+    // Refresh regl's drawing-buffer dimensions after responsive resizing.
+    regl.poll();
     regl.clear({ color: [0.07, 0.07, 0.10, 1], depth: 1 });
 
     if (viewMode === '3d' && positions3D) {
@@ -728,14 +853,14 @@ function render(now) {
         updateCameraMatrices(canvas, deltaSeconds);
         const fogNear = Math.max(0.15, camera3D.distance - 1.15);
         const fogFar = camera3D.distance + 1.7;
-        drawPoints3D({
+        drawFocusedCloud(drawPoints3D, {
             view: camera3D.view,
             projection: camera3D.projection,
             pointScale: 1.65 * dpr,
             fogNear,
             fogFar
-        });
-        if (selectedNode && nodeVisibleIn3D(selectedNode)) {
+        }, true);
+        if (selectedNode && nodeVisibleIn3D(selectedNode) && matchesFocus(selectedNode)) {
             drawSelected3D({
                 view: camera3D.view,
                 projection: camera3D.projection,
@@ -743,11 +868,11 @@ function render(now) {
             });
         }
     } else {
-        drawPoints2D({
+        drawFocusedCloud(drawPoints2D, {
             viewOffset: [viewX, viewY],
             viewScale: viewScale,
             resolution: [canvas.width, canvas.height]
-        });
+        }, false);
     }
 
     lastFrameTime = now;
@@ -814,13 +939,10 @@ function updateColors() {
             const topicIdx = document.getElementById('topic-select').value;
             const val = node[F.topic(topicIdx)];
             if (val !== null && val !== undefined) {
-                // Light grey (low) to saturated teal (high)
+                // Low membership is pale; high membership uses this topic's shared colour.
                 const t = Math.min(1, Math.max(0, val * 2.5));
-                color = [
-                    0.85 - t * 0.65,  // 0.85 -> 0.20
-                    0.85 - t * 0.25,  // 0.85 -> 0.60
-                    0.88 - t * 0.13   // 0.88 -> 0.75
-                ];
+                const target = TOPIC_PALETTE[Number(topicIdx)];
+                color = [0.85,0.85,0.88].map((channel,j)=>channel+t*(target[j]-channel));
                 validCount++;
             }
         }
@@ -849,6 +971,7 @@ function updateColors() {
 
     if (colorBuffer) colorBuffer.subdata(colors);
     updateLegend(mode);
+
 }
 
 function updateLegend(mode) {
@@ -858,57 +981,8 @@ function updateLegend(mode) {
     // Helper to create RGB string
     const rgb = (c) => `rgb(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)})`;
 
-    if (mode === 'community') {
-        // Discrete swatches: the labelled communities, largest first, then
-        // a single entry for the unlabelled long tail.
-        const comms = [...new Set(nodes.map(n => n[F.community]))]
-            .filter(c => c !== null && c >= 0);
-
-        let labelled = labelledCommunityOrder.filter(c => communityIsLabelled(c));
-        if (labelled.length === 0) {
-            labelled = comms.slice().sort((a, b) => a - b).slice(0, 12);
-        }
-        const nTail = comms.length - labelled.length;
-
-        const items = labelled.map(c => ({
-            label: communityLabel(c),
-            color: COMMUNITY_COLORS[c % COMMUNITY_COLORS.length]
-        }));
-        if (nTail > 0) {
-            items.push({
-                label: `${nTail.toLocaleString()} long-tail communities`,
-                color: null
-            });
-        }
-        items.push({ label: 'No data', color: GREY });
-
-        for (const item of items) {
-            const div = document.createElement('div');
-            div.className = 'legend-item';
-            const swatch = item.color
-                ? `<span class="legend-swatch" style="background:${rgb(item.color)}"></span>`
-                : `<span class="legend-swatch legend-swatch-multi"></span>`;
-            div.innerHTML = `${swatch}<span class="legend-label">${item.label}</span>`;
-            container.appendChild(div);
-        }
-    }
-    else if (mode === 'dominant_topic') {
-        // Discrete swatches for topics
-        for (let i = 0; i < TOPIC_NAMES.length; i++) {
-            const div = document.createElement('div');
-            div.className = 'legend-item';
-            div.innerHTML = `
-                <span class="legend-swatch" style="background:${rgb(TOPIC_PALETTE[i % TOPIC_PALETTE.length])}"></span>
-                <span class="legend-label">${escapeHtml(TOPIC_NAMES[i])}</span>
-            `;
-            container.appendChild(div);
-        }
-        const noData = document.createElement('div');
-        noData.className = 'legend-item';
-        noData.innerHTML = `<span class="legend-swatch" style="background:${rgb(GREY)}"></span><span class="legend-label">No data</span>`;
-        container.appendChild(noData);
-    }
-    else if (mode === 'sentiment') {
+    if(mode==='community'||mode==='dominant_topic')renderSelectionLegend(mode);
+    if (mode === 'sentiment') {
         // Gradient bar for sentiment
         const sentType = document.getElementById('sentiment-select').value;
         const gradientDiv = document.createElement('div');
@@ -938,7 +1012,7 @@ function updateLegend(mode) {
         const gradientDiv = document.createElement('div');
         gradientDiv.className = 'legend-gradient-wrap';
         gradientDiv.innerHTML = `
-            <div class="legend-gradient" style="background: linear-gradient(to right, ${rgb([0.85,0.85,0.88])}, ${rgb([0.20,0.60,0.75])})"></div>
+            <div class="legend-gradient" style="background: linear-gradient(to right, ${rgb([0.85,0.85,0.88])}, ${rgb(TOPIC_PALETTE[Number(document.getElementById('topic-select').value)])})"></div>
             <div class="legend-gradient-labels"><span>Low</span><span>High</span></div>
         `;
         container.appendChild(gradientDiv);
@@ -1067,6 +1141,7 @@ async function setViewMode(mode) {
         updateSelected3DPosition();
     }
     pickDirty = true;
+    applyFocus();
     updateProjectionUi();
 }
 
@@ -1089,12 +1164,21 @@ function updateProjectionUi() {
             ? 'Drag to rotate · Shift/right-drag to pan · Wheel to zoom'
             : 'Drag to pan · Wheel to zoom';
     }
+    const status = document.getElementById('search-status');
+    const query = document.getElementById('search-input').value.trim();
+    const index = nodeIndexById.get(query);
+    if (status?.classList.contains('found') && index !== undefined) {
+        updateFoundStatus(nodes[index]);
+    }
 }
 
 function reset3DView(immediate) {
     camera3D.desiredYaw = CAMERA3D_HOME_YAW;
     camera3D.desiredPitch = CAMERA3D_HOME_PITCH;
-    camera3D.desiredDistance = camera3D.homeDistance;
+    const canvas = document.getElementById('graph-canvas');
+    const aspect = Math.max(1, canvas.clientWidth) / Math.max(1, canvas.clientHeight);
+    const halfFov = Math.atan(Math.tan(Math.PI / 8) * Math.min(1, aspect));
+    camera3D.desiredDistance = Math.min(8, camera3D.homeDistance * Math.sin(Math.PI / 8) / Math.sin(halfFov));
     camera3D.desiredTarget = [0, 0, 0];
     if (immediate) {
         camera3D.yaw = camera3D.desiredYaw;
@@ -1293,28 +1377,34 @@ function setupEventListeners() {
         touchDown = null;
     }, { passive: false });
 
-    // Color mode radio buttons
-    const radioItems = document.querySelectorAll('.radio-item');
-    radioItems.forEach(item => {
-        item.addEventListener('click', () => {
-            // Update active state
-            radioItems.forEach(r => r.classList.remove('active'));
-            item.classList.add('active');
+    canvas.addEventListener('keydown', e => {
+        if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','Home'].includes(e.key)) return;
+        e.preventDefault();
+        if(e.key==='Home') { fitToScreen();return; }
+        if(e.key==='+'||e.key==='=') {zoomIn();return;}
+        if(e.key==='-') {zoomOut();return;}
+        const dx=e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:0;
+        const dy=e.key==='ArrowUp'?1:e.key==='ArrowDown'?-1:0;
+        if(viewMode==='2d') {
+            viewX+=dx*0.12/viewScale;viewY+=dy*0.12/viewScale;
+        } else {
+            camera3D.desiredYaw+=dx*0.1;
+            camera3D.desiredPitch=clamp(camera3D.desiredPitch+dy*0.1,-1.45,1.45);
+        }
+        pickDirty=true;
+    });
 
-            // Get mode from data attribute
-            const mode = item.dataset.mode;
-            if (mode) {
-                colorMode = mode;
-
-                // Show/hide sub-options
-                document.getElementById('sentiment-options').classList.toggle('visible', mode === 'sentiment');
-                document.getElementById('topic-options').classList.toggle('visible', mode === 'topic_membership');
-                document.getElementById('emotion-options').classList.toggle('visible', mode === 'emotion');
-
-                updateColors();
-            }
+    document.querySelectorAll('input[name="color-mode"]').forEach(input=>{
+        input.addEventListener('change',()=>{
+            colorMode=input.value;
+            document.querySelectorAll('.radio-item').forEach(item=>item.classList.toggle('active',item.dataset.mode===colorMode));
+            document.getElementById('sentiment-options').classList.toggle('visible',colorMode==='sentiment');
+            document.getElementById('topic-options').classList.toggle('visible',colorMode==='topic_membership');
+            document.getElementById('emotion-options').classList.toggle('visible',colorMode==='emotion');
+            updateColors();
         });
     });
+    document.getElementById('focus-clear').addEventListener('click',clearFocus);
 
     // Sub-selects
     document.getElementById('sentiment-select').addEventListener('change', updateColors);
@@ -1369,7 +1459,9 @@ function pickNodeAt2D(e) {
     let minDist = Infinity;
     const threshold = 0.08 / viewScale;
 
-    for (const node of nodes) {
+    for (let i=0;i<nodes.length;i++) {
+        if (focusMask && focusMask[i]===0) continue;
+        const node=nodes[i];
         const dx = node.x - dataX;
         const dy = node.y - dataY;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1428,7 +1520,7 @@ function showTooltip(e) {
     if (nearest) {
         hoverNode = nearest;
         let html = `<div class="tt-author">${nearest[F.id]}</div>`;
-        html += `<div class="tt-row"><span class="tt-label">Community</span><span class="tt-value">${nearest[F.community]}</span></div>`;
+        html += `<div class="tt-row"><span class="tt-label">Community</span><span class="tt-value">${escapeHtml(communityLabel(nearest[F.community]))}</span></div>`;
         html += `<div class="tt-row"><span class="tt-label">Full degree</span><span class="tt-value">${nearest[F.fullDegree]?.toFixed(0) || '-'}</span></div>`;
         html += `<div class="tt-row"><span class="tt-label">Matched degree</span><span class="tt-value">${nearest[F.matchedDegree]?.toFixed(0) || '-'}</span></div>`;
 
@@ -1484,6 +1576,9 @@ function loadExamplePosts() {
     fetch(versionedAsset('data/representative_posts.json'))
         .then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))))
         .then(j => {
+            if (j.n_total !== undefined && j.n_total !== nodes.length) {
+                throw new Error('Example posts belong to a different map population');
+            }
             examplePosts = j.posts || j;
             examplePostsState = 'ready';
             console.log(`Loaded ${Object.keys(examplePosts).length} Example posts`);
@@ -1512,7 +1607,10 @@ function examplePostHtml(node) {
     if (!record) {
         return title + `<div class='ap-empty'>No sufficiently informative example post available.</div>`;
     }
-    return title + `<blockquote class='ap-excerpt'>${escapeHtml(record[3])}</blockquote>`;
+    const types = {original: 'Original post', quoted: 'Quote post', replied_to: 'Reply', retweeted: 'Retweet — shared content'};
+    const type = types[record[2]] || 'Post';
+    return title + `<div class='ap-empty'>${escapeHtml(type)} · Illustrative excerpt</div>`
+        + `<blockquote class='ap-excerpt'>${escapeHtml(record[3])}</blockquote>`;
 }
 
 function showAuthorPanel(node) {
@@ -1582,6 +1680,17 @@ function closeAuthorPanel() {
 // Controls
 // ============================================================================
 
+function updateFoundStatus(node) {
+    const status = document.getElementById('search-status');
+    if (!status) return;
+    status.className = 'search-status found';
+    status.innerHTML = `Found <strong>${escapeHtml(node[F.id])}</strong><br>`
+        + escapeHtml(communityLabel(node[F.community]))
+        + (!matchesFocus(node)?'<br>Outside the selected group. Clear selection to show on map.':'')
+        + (viewMode === '3d' && !nodeVisibleIn3D(node)
+            ? '<br>Outside the 3D giant component' : '');
+}
+
 function searchAuthor() {
     const query = document.getElementById('search-input').value.trim();
     if (!query) return;
@@ -1598,14 +1707,7 @@ function searchAuthor() {
             viewScale = 0.3;
         }
 
-        if (status) {
-            status.className = 'search-status found';
-            status.innerHTML = `Found <strong>${escapeHtml(node[F.id])}</strong><br>`
-                + escapeHtml(communityLabel(node[F.community]))
-                + (viewMode === '3d' && !nodeVisibleIn3D(node)
-                    ? '<br>Outside the 3D giant component'
-                    : '');
-        }
+        updateFoundStatus(node);
         showAuthorPanel(node);
     } else {
         if (status) {
@@ -1615,6 +1717,12 @@ function searchAuthor() {
         closeAuthorPanel();
     }
 }
+function fitted2DScale(rangeX, rangeY) {
+    const canvas = document.getElementById('graph-canvas');
+    const aspect = Math.max(1, canvas.clientWidth) / Math.max(1, canvas.clientHeight);
+    return 1.8 / Math.max(rangeX / aspect, rangeY, 1e-12);
+}
+
 function resetView() {
     if (viewMode === '3d') {
         reset3DView(false);
@@ -1624,7 +1732,7 @@ function resetView() {
     viewY = (minY + maxY) / 2;
     const rangeX = maxX - minX;
     const rangeY = maxY - minY;
-    viewScale = 0.9 / Math.max(rangeX, rangeY) * 2;
+    viewScale = fitted2DScale(rangeX, rangeY);
 }
 
 function fitToScreen() {

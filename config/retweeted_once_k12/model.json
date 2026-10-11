@@ -1,0 +1,35 @@
+{
+  "min_tweets": 3,
+  "grid_sample_authors": 100000,
+  "coherence_docs": 20000,
+  "k_grid": [
+    8,
+    12,
+    16,
+    20
+  ],
+  "alpha_grid": [
+    0.05,
+    0.1,
+    0.3
+  ],
+  "eta_grid": [
+    0.01,
+    0.1
+  ],
+  "representations": [
+    "tfidf_unigram",
+    "tfidf_bigram"
+  ],
+  "max_df": 0.7,
+  "min_df": 5,
+  "max_iter": 50,
+  "seed": 42,
+  "selected_model": [
+    "tfidf_unigram",
+    12,
+    0.3,
+    0.1
+  ],
+  "max_posts": null
+}

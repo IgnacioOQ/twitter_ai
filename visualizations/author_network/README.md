@@ -54,3 +54,31 @@ For descriptive graph/geometry measurements and equal-axis renders, use
 `python -m src.network.visualization.render_layout_3d --help`. Structural validation
 checks file consistency; geometry measurements still need scientific interpretation.
 New data or dependency versions can produce different layouts.
+
+## Descriptions, colours and example posts
+
+Pass --topic-labels and --community-labels to the author-analysis export command
+to generate the matching topic names/colours and community descriptions.
+Topic colours come from the supplied topic CSV; no particular topic count or
+author population is built into the template. The labels page reads the same data.
+
+    python -m src.network.visualization.build_examples --authors OUT/networks/RetweetedOnce/topics/author_topics.csv --posts POSTS.jsonl --output OUT/networks/RetweetedOnce/viewer/representative_posts.json
+
+The --authors input is any CSV with one unique author_id per row, such as
+OUT/networks/RetweetedOnce/topics/author_topics.csv. Use that file if a separate
+author-ID CSV is not present. POSTS.jsonl is the same canonical all-post corpus
+used for analysis; either text or processed_text is supported. The output must
+not already exist. Selection prefers original posts, then quotes, replies and
+retweets; within each type it selects the most distinct informative tokens.
+These are illustrative excerpts, not representative samples. Missing examples are
+reported and never remove an author.
+
+Topic and community legend entries are largest first. Tick boxes select the union
+of groups in that lens; changing colour view retains exactly those authors.
+Ticking a group in a different categorical lens starts a new selection.
+Clear selection restores all authors. Camera controls do not change the selection.
+Topics, sentiment and emotions never determine network coordinates.
+
+The portable template can be served against any compatible external bundle.
+Tests: node tests/test_viewer.cjs. The browser renderer uses the same selection
+and camera implementation as the published atlas.

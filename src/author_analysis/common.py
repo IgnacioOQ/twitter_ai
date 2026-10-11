@@ -92,6 +92,7 @@ def topic_labels(path, count):
     frame = pd.read_csv(path, keep_default_na=False)
     if frame.topic_id.duplicated().any() or set(frame.topic_id) != set(range(count)):
         raise ValueError('Topic labels must contain each model topic exactly once')
+    frame = frame.sort_values('topic_id')
     return dict(zip(frame.topic_id, frame.label))
 
 
@@ -115,3 +116,19 @@ def read_posts(path):
             except (ValueError, KeyError, TypeError) as exc:
                 raise ValueError(f'Invalid post at line {number} of {path}') from exc
             yield record
+
+
+def topic_presentation(path):
+    """Read model-specific labels and optional hex colours without changing IDs."""
+    import re
+    frame = pd.read_csv(path, keep_default_na=False).sort_values('topic_id')
+    if frame.empty or frame.topic_id.tolist() != list(range(len(frame))):
+        raise ValueError('Topic IDs must be contiguous and unique')
+    if frame.label.duplicated().any() or not frame.label.map(lambda v:isinstance(v,str) and bool(v.strip())).all():
+        raise ValueError('Topic labels must be nonempty and unique')
+    if 'display_label' not in frame: frame['display_label'] = frame.label
+    if frame.display_label.duplicated().any() or (frame.display_label == '').any():
+        raise ValueError('Display labels must be nonempty and unique')
+    if 'colour' in frame and not frame.colour.map(lambda v:bool(re.fullmatch(r'#[0-9a-fA-F]{6}',str(v)))).all():
+        raise ValueError('Topic colours must be six-digit hex values')
+    return frame
