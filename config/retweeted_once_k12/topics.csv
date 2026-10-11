@@ -1,0 +1,13 @@
+topic_id,label,display_label,colour,confidence,interpretation
+0,Education & fandom (mixed),0: Education & fandom (mixed),#e8a0bd,low,Education-related top terms coexist with fandom and non-English uses of ai; high-membership excerpts prominently contain fandom. No coherent single-subject claim.
+1,AI images & avatars (mixed),1: AI images & avatars (mixed),#a9d4ed,low,"Image-generation tools, avatars and viral image threads, alongside mixed informal and non-English text."
+2,AI art & artists' debate,2: AI art & artists' debate,#35b9ff,medium,"Generated art, voice imitation, artist rights and criticism; author excerpts prominently object to non-consensual creative uses."
+3,"Writing, reviews & mixed content","3: Writing, reviews & mixed content",#909f3d,low,"Unclear aggregate terms; high-membership excerpts include fiction promotion, reviews and writing about AI. A mixed residual topic."
+4,Games & fandom (mixed),4: Games & fandom (mixed),#b28a60,low,Gaming terms such as bard and dnd coexist with unrelated fandom and merchandise promotion in high-membership excerpts. Not all content concerns AI.
+5,AI research & industry,5: AI research & industry,#e65bdb,medium,"Machine learning, data science, healthcare, technical services and industry-facing AI applications."
+6,Crypto promotion & giveaways,6: Crypto promotion & giveaways,#b9bec5,medium,"Token promotion, price expectations, follow/retweet giveaways and repeated promotional text. No inference of automated or coordinated accounts."
+7,AI crypto launchpads,7: AI crypto launchpads,#4b9f98,medium,AIPAD and other launchpad/IDO promotion and AI-branded crypto projects.
+8,"General AI use, tools & writing","8: General AI use, tools & writing",#ff6d3a,medium,"Broad language-model, coding, writing, tools and general AI discussion; combines varied applications and commentary."
+9,AI art sharing & NFTs,9: AI art sharing & NFTs,#f1d54a,medium,"Generated-art sharing, collections, creative work and NFT promotion."
+10,Politics & AI bias,10: Politics & AI bias,#9975e8,medium,"Claims of political bias in chatbots and broader political discussion; describes content, not verified bias or author identity."
+11,Crypto & blockchain,11: Crypto & blockchain,#54c97e,medium,"AI-branded crypto, blockchain, Web3 and token projects, investment and promotion."

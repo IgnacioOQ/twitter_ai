@@ -43,6 +43,30 @@ EMOTION_COLORS = PALETTE["emotion_colors"]
 COMMUNITY_RGB = PALETTE["community_colors_rgb"]
 
 
+
+TOPIC_COLUMN_LABELS = {}
+CONTRAST_IDS = []
+CONTRAST_TOPICS = []
+
+
+def configure_topics(path):
+    global TOPICS, TOPIC_COLORS, TOPIC_COLUMN_LABELS
+    # Import through the repository package even when this renderer is run as a script.
+    import sys
+    root = str(Path(__file__).resolve().parents[2])
+    if root not in sys.path: sys.path.insert(0, root)
+    from src.author_analysis.common import topic_presentation
+    labels = topic_presentation(path)
+    TOPICS = labels.display_label.tolist()
+    colors = labels.colour.tolist() if 'colour' in labels else [rgb_to_hex(COMMUNITY_RGB[i % len(COMMUNITY_RGB)]) for i in range(len(labels))]
+    if len(colors) < len(TOPICS): raise ValueError('Supply a colour for every topic')
+    TOPIC_COLORS = dict(zip(TOPICS, colors))
+    PALETTE['topic_colors'] = TOPIC_COLORS.copy()
+    TOPIC_COLUMN_LABELS = {f'Topic {r.topic_id}':r.display_label for r in labels.itertuples()}
+    TOPIC_COLUMN_LABELS.update(dict(zip(labels.label, labels.display_label)))
+    return labels
+
+
 def rgb_to_hex(rgb: list[float]) -> str:
     return "#" + "".join(f"{round(value * 255):02x}" for value in rgb)
 
@@ -102,6 +126,7 @@ def label_table() -> pd.DataFrame:
 def load_raw_matrix(filename: str) -> pd.DataFrame:
     df = pd.read_csv(RAW_FIG_DIR / filename, index_col=0)
     ids = df.index.to_series().str.extract(r"C(\d+)", expand=False).astype(int)
+    df = df.rename(columns=TOPIC_COLUMN_LABELS)
     df.insert(0, "community_id", ids.to_numpy())
     return df.reset_index(drop=True)
 
@@ -552,13 +577,232 @@ def plot_emotion_sd(matched: pd.DataFrame, labels: pd.DataFrame) -> None:
 
 
 
+
+def contrast_data(labels: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    composition = load_raw_matrix("topic_composition.csv")
+    sentiment = load_raw_matrix("sentiment_means.csv")
+    emotions = load_raw_matrix("emotion_means.csv")
+    ids = CONTRAST_IDS
+    label_map = labels.set_index("community_id")["display_label"].to_dict()
+    composition = composition[composition["community_id"].isin(ids)].set_index("community_id")
+    sentiment = sentiment[sentiment["community_id"].isin(ids)].set_index("community_id")
+    emotions = emotions[emotions["community_id"].isin(ids)].set_index("community_id")
+
+    key_topics = CONTRAST_TOPICS
+    topic_rows = []
+    for cid in ids:
+        for topic in key_topics:
+            topic_rows.append(
+                {
+                    "community_id": cid,
+                    "display_label": label_map[cid],
+                    "metric_group": "topic_share",
+                    "metric": topic,
+                    "value": composition.loc[cid, topic],
+                    "is_other": False,
+                }
+            )
+        topic_rows.append(
+            {
+                "community_id": cid,
+                "display_label": label_map[cid],
+                "metric_group": "topic_share",
+                "metric": "Other topics",
+                "value": 1 - composition.loc[cid, key_topics].sum(),
+                "is_other": True,
+            }
+        )
+    topic_out = pd.DataFrame(topic_rows)
+
+    sentiment_rows = []
+    for cid in ids:
+        for metric in ["positive", "neutral", "negative"]:
+            sentiment_rows.append(
+                {
+                    "community_id": cid,
+                    "display_label": label_map[cid],
+                    "metric_group": "sentiment",
+                    "metric": metric,
+                    "value": sentiment.loc[cid, metric],
+                }
+            )
+    sentiment_out = pd.DataFrame(sentiment_rows)
+
+    emotion_rows = []
+    for cid in ids:
+        for metric in EMOTIONS:
+            emotion_rows.append(
+                {
+                    "community_id": cid,
+                    "display_label": label_map[cid],
+                    "metric_group": "emotion",
+                    "metric": metric,
+                    "value": emotions.loc[cid, metric],
+                }
+            )
+    emotion_out = pd.DataFrame(emotion_rows)
+    pd.concat([topic_out, sentiment_out, emotion_out], ignore_index=True).to_csv(
+        DATA_OUT / "11_ai_art_community_contrast.csv", index=False
+    )
+    return topic_out, sentiment_out, emotion_out
+
+def plot_contrast(labels: pd.DataFrame) -> None:
+    topic_data, sentiment_data, emotion_data = contrast_data(labels)
+    ids = CONTRAST_IDS
+    display = labels.set_index("community_id")["display_label"].to_dict()
+    topic_metrics = topic_data[topic_data["community_id"] == CONTRAST_IDS[0]]["metric"].tolist()
+    topic_colors = [TOPIC_COLORS.get(metric, "#b8b8bd") for metric in topic_metrics]
+
+    for theme in ["dark", "light"]:
+        with figure_theme(theme) as tokens:
+            fig = plt.figure(figsize=(16.5, 10))
+            grid = fig.add_gridspec(
+                2, 2,
+                width_ratios=[1.08, 1.2],
+                height_ratios=[1, 1],
+                wspace=0.36,
+                hspace=0.52,
+            )
+            ax_topic = fig.add_subplot(grid[0, 0])
+            ax_sent = fig.add_subplot(grid[1, 0])
+            ax_emotion = fig.add_subplot(grid[:, 1])
+
+            y = np.arange(2)
+            left = np.zeros(2)
+            topic_handles = []
+            for metric, color in zip(topic_metrics, topic_colors):
+                values = np.array([
+                    topic_data[
+                        (topic_data["community_id"] == cid)
+                        & (topic_data["metric"] == metric)
+                    ]["value"].iloc[0]
+                    for cid in ids
+                ])
+                bars = ax_topic.barh(
+                    y, values, left=left, color=color,
+                    height=0.52, label=metric,
+                )
+                topic_handles.append(bars[0])
+                left += values
+            ax_topic.set_yticks(y, [display[cid] for cid in ids])
+            ax_topic.invert_yaxis()
+            ax_topic.set_xlim(0, 1)
+            ax_topic.xaxis.set_major_formatter(mpl.ticker.PercentFormatter(1))
+            ax_topic.set_xlabel("Mean topic share")
+            ax_topic.set_title("(a)", loc="left", pad=7)
+            finish_axes(ax_topic, tokens, "x")
+
+            left = np.zeros(2)
+            sentiment_handles = []
+            for metric in ["positive", "neutral", "negative"]:
+                values = np.array([
+                    sentiment_data[
+                        (sentiment_data["community_id"] == cid)
+                        & (sentiment_data["metric"] == metric)
+                    ]["value"].iloc[0]
+                    for cid in ids
+                ])
+                bars = ax_sent.barh(
+                    y, values, left=left,
+                    color=SENTIMENT_COLORS[metric],
+                    height=0.52, label=metric.title(),
+                )
+                sentiment_handles.append(bars[0])
+                left += values
+            ax_sent.set_yticks(y, [display[cid] for cid in ids])
+            ax_sent.invert_yaxis()
+            ax_sent.set_xlim(0, 1)
+            ax_sent.xaxis.set_major_formatter(mpl.ticker.PercentFormatter(1))
+            ax_sent.set_xlabel("Mean sentiment probability")
+            ax_sent.set_title("(b)", loc="left", pad=7)
+            finish_axes(ax_sent, tokens, "x")
+            ax_sent.legend(
+                sentiment_handles,
+                ["Positive", "Neutral", "Negative"],
+                loc="lower right",
+                bbox_to_anchor=(1, 1.04),
+                ncol=3,
+                borderaxespad=0,
+            )
+
+            emotion_order = sorted(
+                EMOTIONS,
+                key=lambda emotion: abs(
+                    emotion_data[
+                        (emotion_data["community_id"] == CONTRAST_IDS[1])
+                        & (emotion_data["metric"] == emotion)
+                    ]["value"].iloc[0]
+                    - emotion_data[
+                        (emotion_data["community_id"] == CONTRAST_IDS[0])
+                        & (emotion_data["metric"] == emotion)
+                    ]["value"].iloc[0]
+                ),
+            )
+            y_em = np.arange(len(emotion_order))
+            vals0 = np.array([
+                emotion_data[
+                    (emotion_data["community_id"] == CONTRAST_IDS[0])
+                    & (emotion_data["metric"] == emotion)
+                ]["value"].iloc[0]
+                for emotion in emotion_order
+            ])
+            vals8 = np.array([
+                emotion_data[
+                    (emotion_data["community_id"] == CONTRAST_IDS[1])
+                    & (emotion_data["metric"] == emotion)
+                ]["value"].iloc[0]
+                for emotion in emotion_order
+            ])
+            for y_pos, value0, value8 in zip(y_em, vals0, vals8):
+                ax_emotion.hlines(
+                    y_pos, min(value0, value8), max(value0, value8),
+                    color=tokens["grid"], linewidth=2.2,
+                )
+            point0 = ax_emotion.scatter(
+                vals0, y_em, color=community_color(CONTRAST_IDS[0]),
+                s=40, label=display[CONTRAST_IDS[0]], zorder=3,
+            )
+            point8 = ax_emotion.scatter(
+                vals8, y_em, color=community_color(CONTRAST_IDS[1]),
+                s=40, label=display[CONTRAST_IDS[1]], zorder=3,
+            )
+            ax_emotion.set_yticks(
+                y_em, [emotion.title() for emotion in emotion_order]
+            )
+            ax_emotion.set_xlim(0, max(vals0.max(), vals8.max()) * 1.12)
+            ax_emotion.set_xlabel("Mean emotion probability")
+            ax_emotion.set_title("(c)", loc="left", pad=7)
+            finish_axes(ax_emotion, tokens, "x")
+            fig.legend(
+                [point0, point8],
+                [display[CONTRAST_IDS[0]], display[CONTRAST_IDS[1]]],
+                loc="upper center",
+                bbox_to_anchor=(0.76, 0.975),
+                ncol=2,
+            )
+
+            fig.legend(
+                topic_handles,
+                topic_metrics,
+                loc="lower center",
+                bbox_to_anchor=(0.31, 0.015),
+                ncol=3,
+                title="Topic key",
+            )
+            fig.subplots_adjust(
+                left=0.18, right=0.975,
+                top=0.89, bottom=0.18,
+            )
+            save(fig, "11_ai_art_community_contrast", theme)
+
+
 def main() -> None:
     global OUT, DATA_OUT, FIG_OUT, WORK
-    global MATCHED_JSON, LABELS_CSV, RAW_FIG_DIR, HPC_TABLES, TOPICS, TOPIC_COLORS
+    global MATCHED_JSON, LABELS_CSV, RAW_FIG_DIR, HPC_TABLES, TOPICS, TOPIC_COLORS, CONTRAST_IDS, CONTRAST_TOPICS
 
     choices = (
         "timeline", "umap", "topic_sentiment", "community_topic_enrichment",
-        "community_sentiment", "topic_weighted_net", "emotion_sd",
+        "community_sentiment", "topic_weighted_net", "emotion_sd", "community_contrast",
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-root", type=Path, default=WORK,
@@ -566,7 +810,8 @@ def main() -> None:
     parser.add_argument("--output-root", type=Path, default=OUT)
     parser.add_argument("--labels", type=Path, help="Community labels for this input bundle")
     parser.add_argument("--topic-labels", type=Path, help="Topic labels for this model")
-    parser.add_argument("--figures", nargs="+", choices=choices, default=list(choices))
+    parser.add_argument("--figures", nargs="+", choices=choices, default=list(choices[:-1]))
+    parser.add_argument("--contrast", type=Path, help="JSON containing contrast.community_ids and contrast.topic_ids")
     args = parser.parse_args()
 
     WORK = args.input_root
@@ -575,12 +820,7 @@ def main() -> None:
     FIG_OUT = OUT
     MATCHED_JSON = WORK / "matched_authors.json"
     LABELS_CSV = args.labels or WORK / "community_labels.csv"
-    topic_labels = pd.read_csv(args.topic_labels or WORK / "topic_labels.csv").sort_values("topic_id")
-    if topic_labels.topic_id.tolist() != list(range(len(topic_labels))):
-        raise ValueError("Topic label IDs must be contiguous")
-    TOPICS = topic_labels.label.tolist()
-    palette_colors = list(PALETTE["topic_colors"].values())
-    TOPIC_COLORS = {label: palette_colors[i % len(palette_colors)] for i, label in enumerate(TOPICS)}
+    configure_topics(args.topic_labels or WORK / "topic_labels.csv")
     RAW_FIG_DIR = WORK / "matrices"
     HPC_TABLES = WORK / "tables"
     for directory in [
@@ -590,9 +830,16 @@ def main() -> None:
         directory.mkdir(parents=True, exist_ok=True)
 
     requested = set(args.figures)
+    if "community_contrast" in requested:
+        if not args.contrast: parser.error("--contrast is required for community_contrast")
+        selection = json.loads(args.contrast.read_text(encoding="utf-8"))["contrast"]
+        CONTRAST_IDS = selection["community_ids"]
+        CONTRAST_TOPICS = [TOPICS[i] for i in selection["topic_ids"]]
+        if len(set(CONTRAST_IDS)) != 2 or len(set(CONTRAST_TOPICS)) != len(CONTRAST_TOPICS):
+            raise ValueError("Contrast needs two distinct communities and distinct topic IDs")
     labels = label_table() if requested & {
         "community_topic_enrichment", "community_sentiment",
-        "topic_weighted_net", "emotion_sd",
+        "topic_weighted_net", "emotion_sd", "community_contrast",
     } else None
     matched = load_matched() if requested & {"topic_weighted_net", "emotion_sd"} else None
 
@@ -610,6 +857,8 @@ def main() -> None:
         plot_topic_weighted_net(matched, labels)
     if "emotion_sd" in requested:
         plot_emotion_sd(matched, labels)
+    if "community_contrast" in requested:
+        plot_contrast(labels)
     print("Requested non-temporal figures complete", flush=True)
 
 if __name__ == "__main__":

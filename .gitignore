@@ -31,3 +31,6 @@ data_sets/
 
 # Local-only side datasets (AITA sentiment side analysis)
 notebooks/03_Analysis_and_Modeling/side_sentiment_analysis/
+
+# Generated analysis deliverables stay outside version control.
+/outputs/

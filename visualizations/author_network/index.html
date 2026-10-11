@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitter Authors Map</title>
+    <meta name="description" content="Explore an author network through communities, topics, sentiment, emotion and illustrative posts.">
+    <link rel="canonical" href="https://davidfreeborn.github.io/twitter-authors-map/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23121218'/%3E%3Ccircle cx='5' cy='6' r='2' fill='%231f78b4'/%3E%3Ccircle cx='11' cy='5' r='1.6' fill='%23ff7f0e'/%3E%3Ccircle cx='9' cy='11' r='2.2' fill='%232ca02c'/%3E%3C/svg%3E">
     <style>
         :root {
@@ -672,9 +674,25 @@
 
 .atlas-title{margin:0;padding:12px 16px;background:var(--bg-panel);border-bottom:1px solid var(--border)}.tool-page #app{height:calc(100dvh - 110px)}@media(max-width:700px){.tool-page #app{height:auto}}
 </style>
+<style>
+#interaction-hint { max-width:calc(100% - 90px); white-space:normal; text-align:center; }
+.info-note a { color:inherit; text-decoration:underline; }
+:focus-visible { outline:2px solid #b8c8ff; outline-offset:3px; }
+@media(prefers-reduced-motion:reduce) { *, *::before, *::after { animation:none!important; transition:none!important; } }
+</style>
+<style>
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.legend-choice{display:grid;grid-template-columns:15px 10px minmax(0,1fr) auto;gap:7px;align-items:center;padding:6px 0;cursor:pointer;font:14px/1.3 system-ui,sans-serif}
+.legend-choice input{margin:0;width:15px;height:15px;accent-color:#b9caff}
+.legend-choice .legend-swatch{width:10px;height:10px;margin:0}
+.legend-count{color:#a9a9b8;font-size:12px;font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+#focus-map-status{position:absolute;top:68px;left:16px;background:#111119e8;color:#eee;padding:4px 8px;display:flex;align-items:center;gap:10px;font:13px/1.4 system-ui,sans-serif}
+#focus-clear{border:0;background:none;color:inherit;font-size:22px;cursor:pointer;padding:0 4px;line-height:1.2}
+</style>
 </head>
 <body class="tool-page">
-    <h1 class="atlas-title">Twitter Authors Map</h1>
+<h1 class="atlas-title">Twitter Authors Map</h1>
     <div id="app">
         <aside id="controls">
             <div class="panel-header">
@@ -694,8 +712,7 @@
             <div class="panel-scroll">
                 <!-- Colour By -->
                 <div class="control-section">
-                    <h2>Colour By</h2>
-                    <div class="radio-group" id="color-mode-group">
+                    <div class="radio-group" id="color-mode-group" role="group" aria-label="Colour view">
                         <label class="radio-item active" data-mode="community">
                             <input type="radio" name="color-mode" value="community" checked>
                             <span class="radio-label">Network Community</span>
@@ -709,7 +726,7 @@
                             <span class="radio-label">Sentiment Valence</span>
                         </label>
                         <div class="sub-options" id="sentiment-options">
-                            <select class="sub-select" id="sentiment-select">
+                            <select class="sub-select" id="sentiment-select" aria-label="Sentiment measure">
                                 <option value="net">Overall (positive - negative)</option>
                                 <option value="positive">Positive</option>
                                 <option value="neutral">Neutral</option>
@@ -721,14 +738,14 @@
                             <span class="radio-label">Topic Membership</span>
                         </label>
                         <div class="sub-options" id="topic-options">
-                            <select class="sub-select" id="topic-select"></select>
+                            <select class="sub-select" id="topic-select" aria-label="Topic"></select>
                         </div>
                         <label class="radio-item" data-mode="emotion">
                             <input type="radio" name="color-mode" value="emotion">
                             <span class="radio-label">Emotion Score</span>
                         </label>
                         <div class="sub-options" id="emotion-options">
-                            <select class="sub-select" id="emotion-select">
+                            <select class="sub-select" id="emotion-select" aria-label="Emotion">
                                 <option value="anger">Anger</option>
                                 <option value="anticipation">Anticipation</option>
                                 <option value="disgust">Disgust</option>
@@ -747,7 +764,7 @@
 
                 <!-- Legend -->
                 <div class="control-section">
-                    <h2>Legend</h2>
+                    <h2 class="visually-hidden">Legend</h2>
                     <div class="legend" id="legend"></div>
                 </div>
 
@@ -755,7 +772,7 @@
                 <div class="control-section">
                     <h2>Search</h2>
                     <div class="search-box">
-                        <input type="text" class="search-input" id="search-input" placeholder="Author ID">
+                        <input type="text" class="search-input" id="search-input" aria-label="Author ID" placeholder="Author ID">
                         <button class="btn" onclick="searchAuthor()">Find</button>
                     </div>
                     <div class="search-status" id="search-status"></div>
@@ -763,16 +780,23 @@
 
                 <!-- Info -->
                 <div class="info-note">
-                    Each point represents a matched Twitter author. The 3D view is a structure-preserving network layout of the giant connected component . Native 3D force depth is combined with the 2D map's macro geometry through the weighted author network. Communities, topics, sentiment, emotion, label text and author attributes do not affect position. All authors remain available in the 2D view. Axes, orientation and absolute scale have no substantive meaning.
+                    Each point represents a matched Twitter author. The optional 3D view displays a structure-preserving network layout of the largest connected component. Native 3D force depth is combined with the 2D map's macro geometry through the weighted author network. Communities, topics, sentiment, emotion, label text and author attributes do not affect position. All authors remain available in the 2D view. Axes, orientation and absolute scale have no substantive meaning.
                 </div>
                 <div class="info-note">
-                    Community labels describe prevalent post content, not every author or authors' identities. Full labels and validation confidence remain in the analysis files.
+                    Community labels describe prevalent post content, not every author or authors' identities. Descriptions and review qualifications are supplied with the selected network. <a href="labels.html">Read the label descriptions and confidence</a>.
                 </div>
+                <!-- Map interpretation -->
+                <details class="info-note"><summary>About these results</summary>
+                    <p id="analysis-status">Topics are exploratory; assess semantic quality and sensitivity before interpretation.</p>
+                    <p>Author topics use eligible posts, including retweets. Topics are exploratory: authors' leading topics can change between model runs. Sentiment and emotion colours show model scores for language, not verified beliefs or feelings.</p>
+                    <p>Example posts are short illustrative excerpts. Original posts are preferred, followed by quotes, replies and retweets; shared content is identified. An example is not a representative sample of an author's views. Some authors have no sufficiently informative example.</p>
+                    <p>Search terms can also capture unrelated names, titles or other meanings. Network proximity reflects connections, not agreement. <a href="METHODS.md">Full methods</a>.</p>
+                </details>
             </div>
         </aside>
 
         <main id="canvas-container">
-            <canvas id="graph-canvas"></canvas>
+            <canvas id="graph-canvas" tabindex="0" aria-label="Author network. Arrow keys pan in 2D or rotate in 3D. Plus and minus zoom; Home fits the network."></canvas>
             <div id="projection-toolbar" aria-label="Network view controls">
                 <div class="projection-switch" role="group" aria-label="Network projection">
                     <button class="projection-btn active" id="view-2d" type="button"
@@ -783,6 +807,7 @@
                 <button class="canvas-tool-btn" type="button" onclick="resetView()">Reset</button>
                 <button class="canvas-tool-btn" type="button" onclick="fitToScreen()">Fit</button>
             </div>
+            <div id="focus-map-status" hidden><span id="focus-status" role="status" aria-live="polite"></span><button type="button" id="focus-clear" aria-label="Clear selection">×</button></div>
             <div id="interaction-hint">Drag to pan · Wheel to zoom</div>
 
             <div class="zoom-controls">
@@ -805,6 +830,6 @@
     </div>
 
     <script src="vendor/regl.min.js"></script>
-    <script src="app.js?v=1"></script>
+    <script src="app.js?v=standalone-1"></script>
 </body>
 </html>

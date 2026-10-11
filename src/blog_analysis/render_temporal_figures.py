@@ -94,15 +94,20 @@ def plot_weekly_emotions() -> None:
             common.save(fig, "03_weekly_emotions", theme)
 
 
-def plot_weekly_topics() -> None:
+def plot_weekly_topics(topic_labels=None) -> None:
     data = prepare_weekly(pd.read_csv(RESULTS / "weekly_topics_long.csv"))
     data["topic_id"] = data["topic_id"].astype(int)
     topic_names = data[['topic_id', 'topic_label']].drop_duplicates().sort_values('topic_id')
     if topic_names.topic_id.tolist() != list(range(len(topic_names))):
         raise ValueError('Weekly topic IDs must be contiguous with one label each')
-    common.TOPICS = topic_names.topic_label.tolist()
-    colors = list(common.PALETTE['topic_colors'].values())
-    common.TOPIC_COLORS = {name: colors[i % len(colors)] for i, name in enumerate(common.TOPICS)}
+    if topic_labels:
+        labels = common.configure_topics(topic_labels)
+        if len(labels) != len(topic_names): raise ValueError('Weekly topics and label configuration differ')
+        data['topic_label'] = data.topic_id.map(dict(enumerate(common.TOPICS)))
+    else:
+        common.TOPICS = topic_names.topic_label.tolist()
+        colors = list(common.PALETTE['topic_colors'].values()) or [common.rgb_to_hex(c) for c in common.COMMUNITY_RGB]
+        common.TOPIC_COLORS = {name: colors[i % len(colors)] for i,name in enumerate(common.TOPICS)}
     data["score_scale"] = "frozen-model topic probability; author-balanced weekly mean"
     data["week_definition"] = "ISO week beginning Monday, UTC"
     data["interpretation"] = "weekly composition among authors with usable topic text"
@@ -139,6 +144,7 @@ def main() -> None:
     parser.add_argument("--output-root", type=Path, default=common.OUT)
     parser.add_argument("--figures", nargs="+", choices=("sentiment", "emotions", "topics"),
                         default=["sentiment", "emotions", "topics"])
+    parser.add_argument("--topic-labels", type=Path, help="Model-specific labels and shared colours")
     args = parser.parse_args()
     COLLECTION_END = pd.Timestamp(args.collection_end)
     if COLLECTION_END.tzinfo is None:
@@ -149,12 +155,13 @@ def main() -> None:
     common.FIG_OUT = args.output_root
     common.DATA_OUT.mkdir(parents=True, exist_ok=True)
     requested = set(args.figures)
+    if "topics" in requested and not args.topic_labels: parser.error("--topic-labels is required when rendering topics")
     if "sentiment" in requested:
         plot_weekly_sentiment()
     if "emotions" in requested:
         plot_weekly_emotions()
     if "topics" in requested:
-        plot_weekly_topics()
+        plot_weekly_topics(args.topic_labels)
     print("Requested weekly figures complete", flush=True)
 
 

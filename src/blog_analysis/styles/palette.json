@@ -1,32 +1,6 @@
 {
-  "topic_order": [
-    "Marketing/Social",
-    "AI Art Discourse",
-    "AI Tools/Code",
-    "Bard/LLMs",
-    "Visual AI Art",
-    "Bot/Spam",
-    "Tech/Programming",
-    "News/Updates",
-    "NFT/Crypto",
-    "Web3/DeFi",
-    "General AI",
-    "Trading/Invest"
-  ],
-  "topic_colors": {
-    "Marketing/Social": "#e31a1c",
-    "AI Art Discourse": "#387db8",
-    "AI Tools/Code": "#4db04a",
-    "Bard/LLMs": "#994fa3",
-    "Visual AI Art": "#ff8000",
-    "Bot/Spam": "#ffff33",
-    "Tech/Programming": "#a65729",
-    "News/Updates": "#f782bf",
-    "NFT/Crypto": "#999999",
-    "Web3/DeFi": "#66c2a6",
-    "General AI": "#fc8c61",
-    "Trading/Invest": "#8ca1cc"
-  },
+  "topic_order": [],
+  "topic_colors": {},
   "community_colors_rgb": [
     [
       0.12,
