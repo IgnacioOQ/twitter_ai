@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Derive a bipartite producer/consumer graph from the project's notebooks.
 
-Nodes: (a) notebooks, (b) data artifacts (JSON / PKL / GML / CSV / GZ files).
-Edges: notebook -> artifact (writes), artifact -> notebook (reads).
+Nodes: (a) notebooks, (b) src/ scripts declared in the overrides file (stages
+that run from the command line, not from a notebook), (c) data artifacts
+(JSON / PKL / GML / CSV / GZ files).
+Edges: notebook or script -> artifact (writes), artifact -> notebook or script (reads).
 
 Run with no args to (re)generate docs/pipeline_graph.{json,png} and
 docs/pipeline_graph_notebooks.png from the live notebooks. The graph is
@@ -62,7 +64,12 @@ STAGE_COLORS = {
     4: "#e0c3f0",
     5: "#f5b0b0",
     6: "#dcdcdc",
+    7: "#f3e6d8",
 }
+STAGE_NAMES = {7: "Stage 7 (figures)"}
+
+# Node kinds that produce or consume artifacts. Scripts come from the overrides.
+PROCESS_KINDS = {"notebook", "script"}
 
 
 def _strip_drive_prefix(p: str) -> str:
@@ -463,13 +470,15 @@ def discover_notebooks() -> list[Path]:
 
 def load_overrides() -> dict:
     if not OVERRIDES_PATH.exists():
-        return {"alternatives": [], "glob_artifacts": [], "friendly_labels": {}}
+        return {"alternatives": [], "glob_artifacts": [], "friendly_labels": {},
+                "manual_edges": [], "scripts": []}
     with open(OVERRIDES_PATH) as f:
         data = yaml.safe_load(f) or {}
     data.setdefault("alternatives", [])
     data.setdefault("glob_artifacts", [])
     data.setdefault("friendly_labels", {})
     data.setdefault("manual_edges", [])
+    data.setdefault("scripts", [])
     return data
 
 
@@ -495,6 +504,16 @@ def build_graph(notebooks: list[Path], overrides: dict) -> tuple[nx.DiGraph, lis
             kind="notebook",
             stage=stage_of(nb_id),
             path=str(nb_path.relative_to(REPO_ROOT)),
+            bipartite=0,
+        )
+
+    # src/ scripts declared in the overrides: their I/O comes from manual_edges.
+    for entry in overrides.get("scripts", []):
+        G.add_node(
+            entry["id"],
+            kind="script",
+            stage=int(entry.get("stage", 0)),
+            path=entry.get("path", ""),
             bipartite=0,
         )
 
@@ -539,17 +558,20 @@ def build_graph(notebooks: list[Path], overrides: dict) -> tuple[nx.DiGraph, lis
         if len(pair) == 2 and pair[0] in G and pair[1] in G:
             G.add_edge(pair[0], pair[1], direction="alternative", style="alternative")
             G.add_edge(pair[1], pair[0], direction="alternative", style="alternative")
+        else:
+            warnings.append(f"alternative pair skipped (unknown notebook): {pair}")
 
     # Hand-declared edges for I/O the parser cannot see (paths assembled inside
     # user-defined functions, registry dicts, src/ workflows that write files).
-    # Each entry: {notebook, artifact, direction: write|read, note}. The artifact
+    # Each entry: {notebook, artifact, direction: write|read, note}; `notebook`
+    # may also name a script declared under `scripts`. The artifact
     # is a Drive path in the same form the parser emits (BASE_PATH prefix
     # stripped), e.g. "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/X.gml".
     for entry in overrides.get("manual_edges", []):
         nb_id = entry.get("notebook")
         art_id = canonical_artifact_id(entry.get("artifact", ""))
         direction = entry.get("direction", "write")
-        if nb_id not in G or not art_id or direction not in ("write", "read"):
+        if nb_id not in G or G.nodes[nb_id].get("kind") not in PROCESS_KINDS or not art_id or direction not in ("write", "read"):
             warnings.append(f"manual edge skipped (unknown notebook or bad entry): {entry}")
             continue
         if art_id not in G:
@@ -566,13 +588,13 @@ def build_graph(notebooks: list[Path], overrides: dict) -> tuple[nx.DiGraph, lis
 def project_to_notebook_dag(G: nx.DiGraph) -> nx.DiGraph:
     P = nx.DiGraph()
     for n, d in G.nodes(data=True):
-        if d.get("kind") == "notebook":
+        if d.get("kind") in PROCESS_KINDS:
             P.add_node(n, **d)
     for art, d in G.nodes(data=True):
         if d.get("kind") != "artifact":
             continue
-        producers = [u for u, _ in G.in_edges(art) if G.nodes[u].get("kind") == "notebook"]
-        consumers = [v for _, v in G.out_edges(art) if G.nodes[v].get("kind") == "notebook"]
+        producers = [u for u, _ in G.in_edges(art) if G.nodes[u].get("kind") in PROCESS_KINDS]
+        consumers = [v for _, v in G.out_edges(art) if G.nodes[v].get("kind") in PROCESS_KINDS]
         for p in producers:
             for c in consumers:
                 if p == c:
@@ -633,8 +655,8 @@ def render_full(G: nx.DiGraph, friendly: dict, out_path: Path):
     pos: dict = dict(nb_pos)
     artifacts = [n for n, d in G.nodes(data=True) if d.get("kind") == "artifact"]
     for art in artifacts:
-        producers = [u for u, _ in G.in_edges(art) if G.nodes[u].get("kind") == "notebook"]
-        consumers = [v for _, v in G.out_edges(art) if G.nodes[v].get("kind") == "notebook"]
+        producers = [u for u, _ in G.in_edges(art) if G.nodes[u].get("kind") in PROCESS_KINDS]
+        consumers = [v for _, v in G.out_edges(art) if G.nodes[v].get("kind") in PROCESS_KINDS]
         nbrs = producers + consumers
         nbr_ys = [nb_pos[n][1] for n in nbrs if n in nb_pos]
         nbr_xs = [nb_pos[n][0] for n in nbrs if n in nb_pos]
@@ -658,12 +680,14 @@ def render_full(G: nx.DiGraph, friendly: dict, out_path: Path):
 
     fig, ax = plt.subplots(figsize=(34, 22))
 
-    notebook_nodes = [n for n, d in G.nodes(data=True) if d.get("kind") == "notebook"]
-    nb_colors = [STAGE_COLORS.get(G.nodes[n].get("stage", 0), "#cccccc") for n in notebook_nodes]
-    nx.draw_networkx_nodes(
-        G, pos, nodelist=notebook_nodes, node_shape="s",
-        node_size=3000, node_color=nb_colors, edgecolors="#222", linewidths=1.4, ax=ax,
-    )
+    notebook_nodes = [n for n, d in G.nodes(data=True) if d.get("kind") in PROCESS_KINDS]
+    for kind, shape in (("notebook", "s"), ("script", "D")):
+        nodes = [n for n in notebook_nodes if G.nodes[n].get("kind") == kind]
+        nx.draw_networkx_nodes(
+            G, pos, nodelist=nodes, node_shape=shape, node_size=3000,
+            node_color=[STAGE_COLORS.get(G.nodes[n].get("stage", 0), "#cccccc") for n in nodes],
+            edgecolors="#222", linewidths=1.4, ax=ax,
+        )
 
     artifact_nodes = artifacts
     art_edge_colors = ["#444" for _ in artifact_nodes]
@@ -697,9 +721,11 @@ def render_full(G: nx.DiGraph, friendly: dict, out_path: Path):
     nx.draw_networkx_labels(G, pos, labels=art_labels, font_size=5, font_color="#333", ax=ax)
 
     legend_handles = [
-        mpatches.Patch(color=STAGE_COLORS[s], label=f"Stage {s}") for s in sorted(STAGE_COLORS)
+        mpatches.Patch(color=STAGE_COLORS[s], label=STAGE_NAMES.get(s, f"Stage {s}"))
+        for s in sorted(STAGE_COLORS)
     ]
     legend_handles += [
+        mpatches.Patch(facecolor="white", edgecolor="#222", label="square = notebook, diamond = src/ script"),
         mpatches.Patch(color="#fff5cc", label="Artifact"),
         mpatches.Patch(color="#3b6", label="write"),
         mpatches.Patch(color="#48a", label="read"),
@@ -721,20 +747,25 @@ def render_projection(G: nx.DiGraph, out_path: Path):
 
     fig, ax = plt.subplots(figsize=(22, 14))
     nb_nodes = list(P.nodes)
-    nb_colors = [STAGE_COLORS.get(P.nodes[n].get("stage", 0), "#cccccc") for n in nb_nodes]
-    nx.draw_networkx_nodes(
-        P, pos, nodelist=nb_nodes, node_shape="s",
-        node_size=3200, node_color=nb_colors, edgecolors="#222", linewidths=1.2, ax=ax,
-    )
+    for kind, shape in (("notebook", "s"), ("script", "D")):
+        nodes = [n for n in nb_nodes if P.nodes[n].get("kind") == kind]
+        nx.draw_networkx_nodes(
+            P, pos, nodelist=nodes, node_shape=shape, node_size=3200,
+            node_color=[STAGE_COLORS.get(P.nodes[n].get("stage", 0), "#cccccc") for n in nodes],
+            edgecolors="#222", linewidths=1.2, ax=ax,
+        )
     nx.draw_networkx_edges(P, pos, edge_color="#666", width=1.0, arrows=True, arrowsize=12, ax=ax)
     nx.draw_networkx_labels(P, pos, labels={n: _short_notebook_label(n) for n in nb_nodes}, font_size=8, ax=ax)
 
     legend_handles = [
-        mpatches.Patch(color=STAGE_COLORS[s], label=f"Stage {s}") for s in sorted(STAGE_COLORS)
+        mpatches.Patch(color=STAGE_COLORS[s], label=STAGE_NAMES.get(s, f"Stage {s}"))
+        for s in sorted(STAGE_COLORS)
     ]
+    legend_handles.append(mpatches.Patch(facecolor="white", edgecolor="#222",
+                                         label="square = notebook, diamond = src/ script"))
     ax.legend(handles=legend_handles, loc="lower left", fontsize=9)
     ax.set_axis_off()
-    ax.set_title("twitter_ai pipeline — notebook DAG (artifacts folded into edges)", fontsize=12)
+    ax.set_title("twitter_ai pipeline — notebook and script DAG (artifacts folded into edges)", fontsize=12)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=150, bbox_inches="tight")
@@ -818,10 +849,11 @@ def cmd_build(args):
     render_projection(G, OUT_PNG_NB)
 
     n_nb = sum(1 for _, d in G.nodes(data=True) if d.get("kind") == "notebook")
+    n_sc = sum(1 for _, d in G.nodes(data=True) if d.get("kind") == "script")
     n_art = sum(1 for _, d in G.nodes(data=True) if d.get("kind") == "artifact")
     n_w = sum(1 for _, _, d in G.edges(data=True) if d.get("direction") == "write")
     n_r = sum(1 for _, _, d in G.edges(data=True) if d.get("direction") == "read")
-    print(f"built: {n_nb} notebooks, {n_art} artifacts, {n_w} write edges, {n_r} read edges")
+    print(f"built: {n_nb} notebooks, {n_sc} scripts, {n_art} artifacts, {n_w} write edges, {n_r} read edges")
     print(f"wrote {OUT_JSON.relative_to(REPO_ROOT)}")
     print(f"wrote {OUT_PNG_FULL.relative_to(REPO_ROOT)}")
     print(f"wrote {OUT_PNG_NB.relative_to(REPO_ROOT)}")
@@ -867,10 +899,10 @@ def cmd_query(args):
     else:
         nbrs = nx.ancestors(G, target)
         label = "upstream of"
-    notebooks_only = sorted(n for n in nbrs if G.nodes[n].get("kind") == "notebook")
+    notebooks_only = sorted(n for n in nbrs if G.nodes[n].get("kind") in PROCESS_KINDS)
     artifacts_only = sorted(n for n in nbrs if G.nodes[n].get("kind") == "artifact")
     print(f"{label} {target}:")
-    print(f"  notebooks ({len(notebooks_only)}):")
+    print(f"  notebooks and scripts ({len(notebooks_only)}):")
     for n in notebooks_only:
         print(f"    {n}")
     print(f"  artifacts ({len(artifacts_only)}):")

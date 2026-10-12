@@ -162,6 +162,55 @@
       "bipartite": 0
     },
     {
+      "id": "author_analysis: layout",
+      "kind": "script",
+      "stage": 4,
+      "path": "src/network/visualization/build_matched_layout.py",
+      "bipartite": 0
+    },
+    {
+      "id": "author_analysis: export",
+      "kind": "script",
+      "stage": 4,
+      "path": "src/network/visualization/export_viewer.py",
+      "bipartite": 0
+    },
+    {
+      "id": "author_analysis: figure-inputs",
+      "kind": "script",
+      "stage": 7,
+      "path": "src/author_analysis/export_figures.py",
+      "bipartite": 0
+    },
+    {
+      "id": "author_analysis: projection",
+      "kind": "script",
+      "stage": 7,
+      "path": "src/author_analysis/project_topics.py",
+      "bipartite": 0
+    },
+    {
+      "id": "blog_analysis: weekly_aggregation",
+      "kind": "script",
+      "stage": 7,
+      "path": "src/blog_analysis/weekly_aggregation.py",
+      "bipartite": 0
+    },
+    {
+      "id": "blog_analysis: render_non_temporal",
+      "kind": "script",
+      "stage": 7,
+      "path": "src/blog_analysis/render_non_temporal_figures.py",
+      "bipartite": 0
+    },
+    {
+      "id": "blog_analysis: render_temporal",
+      "kind": "script",
+      "stage": 7,
+      "path": "src/blog_analysis/render_temporal_figures.py",
+      "bipartite": 0
+    },
+    {
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict_test.json",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict_test.json",
@@ -493,14 +542,6 @@
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_and_topics_k5.json",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_and_topics_k5.json",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
-      "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -962,89 +1003,201 @@
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_*.json",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_*.json",
+      "glob": true,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_documents.jsonl",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_documents.jsonl",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/grid_results.csv",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/grid_results.csv",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/model.json",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/model.json",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/top_terms.csv",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/top_terms.csv",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/lda_model.pkl",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/lda_model.pkl",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/vectorizer.pkl",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/vectorizer.pkl",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_topics.csv",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_topics.csv",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_sentiment.csv",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_sentiment.csv",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_emotions.csv",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_emotions.csv",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet",
       "glob": false,
       "templated": false,
       "bipartite": 1
     },
     {
-      "id": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/tables/*_network_subset.csv",
       "kind": "artifact",
-      "drive_path": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/tables/*_network_subset.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/communities/figures/*.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/communities/figures/*.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_edges.parquet",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_edges.parquet",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/viewer/nodes.json",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/viewer/nodes.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_authors.json",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_authors.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_author_ids.json",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_author_ids.json",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/topic_labels.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/topic_labels.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/community_labels.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/community_labels.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/umap_fixed_topic_scores_seed0.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/umap_fixed_topic_scores_seed0.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_sentiment.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_sentiment.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_emotions.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_emotions.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_topics_long.csv",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_topics_long.csv",
+      "glob": false,
+      "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figures/*",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figures/*",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1333,55 +1486,73 @@
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_documents.jsonl",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/grid_results.csv",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/model.json",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/top_terms.csv",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/lda_model.pkl",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/vectorizer.pkl",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_topics.csv",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_sentiment.csv",
       "direction": "write",
       "manual": true
     },
     {
       "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "dst": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_emotions.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/tables/*_network_subset.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/communities/figures/*.csv",
       "direction": "write",
       "manual": true
     },
@@ -1608,6 +1779,84 @@
       "direction": "write"
     },
     {
+      "src": "author_analysis: layout",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: layout",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_edges.parquet",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: export",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/viewer/nodes.json",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: figure-inputs",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_authors.json",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: figure-inputs",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_author_ids.json",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: figure-inputs",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/topic_labels.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: figure-inputs",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/community_labels.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "author_analysis: projection",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/umap_fixed_topic_scores_seed0.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "blog_analysis: weekly_aggregation",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_sentiment.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "blog_analysis: weekly_aggregation",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_emotions.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "blog_analysis: weekly_aggregation",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_topics_long.csv",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "blog_analysis: render_non_temporal",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figures/*",
+      "direction": "write",
+      "manual": true
+    },
+    {
+      "src": "blog_analysis: render_temporal",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figures/*",
+      "direction": "write",
+      "manual": true
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/AItrust_twits_dict_test.json",
       "dst": "02_Processing/01_api_data_to_dictionaries",
       "direction": "read"
@@ -1708,6 +1957,18 @@
       "direction": "read"
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
+      "dst": "blog_analysis: weekly_aggregation",
+      "direction": "read",
+      "manual": true
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/test/test_network_dict.pkl",
       "dst": "02_Processing/02_sanity_check_and_network_generation",
       "direction": "read"
@@ -1790,11 +2051,6 @@
       "manual": true
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json",
-      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/lda_grid_results.csv",
       "dst": "03_Analysis_and_Modeling/03_lda_tweet_topics",
       "direction": "read"
@@ -1802,11 +2058,6 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_pruned_twits_with_sentiment_and_topics_k5.json",
       "dst": "03_Analysis_and_Modeling/03_lda_tweet_topics",
-      "direction": "read"
-    },
-    {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json",
-      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
       "direction": "read"
     },
     {
@@ -1916,6 +2167,12 @@
       "manual": true
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/3_backbones/Full_RetweetedOnce_InfoFlow.gml",
+      "dst": "author_analysis: layout",
+      "direction": "read",
+      "manual": true
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_InfoFlow_label_propagation.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
@@ -1958,6 +2215,12 @@
       "manual": true
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/3_backbones/Full_LWCC_InfoFlow.gml",
+      "dst": "author_analysis: layout",
+      "direction": "read",
+      "manual": true
+    },
+    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/LWCC/Full_LWCC_InfoFlow_label_propagation.gml",
       "dst": "04_Network_Analysis/01_network_analysis",
       "direction": "read",
@@ -1988,32 +2251,128 @@
       "manual": true
     },
     {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
+      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "direction": "read",
+      "manual": true
+    },
+    {
       "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json",
       "dst": "03_Analysis_and_Modeling/01b_sentiment_emotion_hpc",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_*.json",
       "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json",
-      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_*.json",
+      "dst": "blog_analysis: weekly_aggregation",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl",
-      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/lda_model.pkl",
+      "dst": "blog_analysis: weekly_aggregation",
       "direction": "read",
       "manual": true
     },
     {
-      "src": "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv",
-      "dst": "03_Analysis_and_Modeling/04_lda_author_topics_hpc",
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/vectorizer.pkl",
+      "dst": "blog_analysis: weekly_aggregation",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet",
+      "dst": "author_analysis: layout",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet",
+      "dst": "author_analysis: figure-inputs",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet",
+      "dst": "author_analysis: projection",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/tables/*_network_subset.csv",
+      "dst": "author_analysis: figure-inputs",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/communities/figures/*.csv",
+      "dst": "author_analysis: figure-inputs",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet",
+      "dst": "author_analysis: export",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_authors.json",
+      "dst": "blog_analysis: render_non_temporal",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_author_ids.json",
+      "dst": "blog_analysis: weekly_aggregation",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/topic_labels.csv",
+      "dst": "blog_analysis: render_non_temporal",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/community_labels.csv",
+      "dst": "blog_analysis: render_non_temporal",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/umap_fixed_topic_scores_seed0.csv",
+      "dst": "blog_analysis: render_non_temporal",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_sentiment.csv",
+      "dst": "blog_analysis: render_temporal",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_emotions.csv",
+      "dst": "blog_analysis: render_temporal",
+      "direction": "read",
+      "manual": true
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_topics_long.csv",
+      "dst": "blog_analysis: render_temporal",
       "direction": "read",
       "manual": true
     }

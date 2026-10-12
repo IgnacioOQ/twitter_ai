@@ -2,19 +2,19 @@
 status: active
 type: reference
 id: twitter_ai.dataset_statistics
-description: Exhaustive report of the AI Public Trust Twitter dataset pipeline — collection, dictionary construction, pruning filters, text processing, retweet-network generation, the two author backbones and their community partitions — together with the full summary statistics from the full-data Colab runs. Source material for the blog post.
+description: Exhaustive report of the AI Public Trust Twitter dataset pipeline — collection, dictionary construction, pruning filters, text processing, retweet-network generation, the two author backbones, their community partitions and the author-level topic model — together with the full summary statistics from the full-data runs. Source material for the blog post.
 label: [dataset, statistics, preprocessing, network, communities]
 volatility: evolving
 scope: project-specific
 repository: [twitter_ai]
-last_checked: '2026-10-10'
+last_checked: '2026-10-12'
 ---
 
 # Dataset Preprocessing Pipeline & Summary Statistics
 
 This document reports, end to end, how the **AI Public Trust** Twitter dataset was collected, preprocessed, and turned into author-interaction networks, and gives the summary statistics of the resulting corpus. It is written to be exhaustive; a blog post can be distilled from it.
 
-The corpus numbers come from the full-data Colab run of the pipeline (executed August 2026; the 2026-10-10 re-run of `02` reproduced every count). The backbone and community numbers come from the 2026-10-10 runs of `02` and `04_Network_Analysis/01`. The cell-by-cell provenance of every number, and every file the pipeline reads or writes, is in [AUTHOR_AND_NETWORK_PIPELINE_TRACE.md](AUTHOR_AND_NETWORK_PIPELINE_TRACE.md). The machine-readable master summary is [notebooks/02_Processing/dataset_statistics_summary.json](../notebooks/02_Processing/dataset_statistics_summary.json) (mirrored from `Data Sets/Cleaned Data/dataset_statistics_summary.json` on Google Drive).
+The corpus numbers come from the full-data Colab run of the pipeline (executed August 2026; the 2026-10-10 re-run of `02` reproduced every count). The backbone and community numbers come from the 2026-10-10 runs of `02` and `04_Network_Analysis/01`; the author-topic numbers (§7.3) from the 2026-10-11 run recorded in [config/retweeted_once_k12/](../config/retweeted_once_k12/provenance.json). The cell-by-cell provenance of every number, and every file the pipeline reads or writes, is in [AUTHOR_AND_NETWORK_PIPELINE_TRACE.md](AUTHOR_AND_NETWORK_PIPELINE_TRACE.md). The machine-readable master summary is [notebooks/02_Processing/dataset_statistics_summary.json](../notebooks/02_Processing/dataset_statistics_summary.json) (mirrored from `Data Sets/Cleaned Data/dataset_statistics_summary.json` on Google Drive).
 
 ## Pipeline Overview
 
@@ -31,9 +31,11 @@ flowchart TD
     H --> J["Retweeted-once backbone<br/>202,710 authors"]
     I --> K["Stage 4 — 04_Network_Analysis/01<br/>5 community-detection methods per backbone<br/>→ annotated GMLs + author→community JSON"]
     J --> K
+    K --> L["03_Analysis_and_Modeling/04 + src/author_analysis<br/>author topics, sentiment, emotion, communities<br/>(retweeted once: 164,291 authors, K = 12)"]
+    L --> M["src/blog_analysis<br/>figures 1–11 and the author viewer"]
 ```
 
-Notebooks: [01_Ingestion/02_twitter_api_mining.ipynb](../notebooks/01_Ingestion/02_twitter_api_mining.ipynb) → [02_Processing/01_api_data_to_dictionaries.ipynb](../notebooks/02_Processing/01_api_data_to_dictionaries.ipynb) → [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb) → [04_Network_Analysis/01_network_analysis.ipynb](../notebooks/04_Network_Analysis/01_network_analysis.ipynb).
+Notebooks: [01_Ingestion/02_twitter_api_mining.ipynb](../notebooks/01_Ingestion/02_twitter_api_mining.ipynb) → [02_Processing/01_api_data_to_dictionaries.ipynb](../notebooks/02_Processing/01_api_data_to_dictionaries.ipynb) → [02_Processing/02_sanity_check_and_network_generation.ipynb](../notebooks/02_Processing/02_sanity_check_and_network_generation.ipynb) → [04_Network_Analysis/01_network_analysis.ipynb](../notebooks/04_Network_Analysis/01_network_analysis.ipynb) → [03_Analysis_and_Modeling/04_lda_author_topics_hpc.ipynb](../notebooks/03_Analysis_and_Modeling/04_lda_author_topics_hpc.ipynb) (which runs [src/author_analysis](../src/author_analysis/README.md)) → [src/blog_analysis](blog_analysis/README.md).
 
 ## 1. Data Collection (Twitter API)
 
@@ -170,6 +172,7 @@ The single pruning pass writes two nested corpora:
 | Retweet interaction graph | 3,379,040 |
 | LWCC backbone (§7.1) | 3,264,499 |
 | Retweeted-once backbone (§7.1) | 202,710 |
+| Retweeted-once authors with an author-topic profile (§7.3) | 164,291 |
 
 Of the 4,775,711 corpus authors, 1,396,671 never took part in a retweet and appear in no network. The LWCC backbone holds 68.4% of corpus authors (96.6% of the retweet graph); the retweeted-once backbone holds 4.2% of corpus authors (6.0% of the retweet graph).
 
@@ -231,7 +234,7 @@ The giant component covers 96.6% of authors, so almost every author is connected
 
 The two answer different questions. The LWCC keeps every retweeter and every edge, so community structure is informed by who amplifies whom. Most of its authors only retweet: 317,533 are retweeted inside it and 3,095,219 retweet. The retweeted-once backbone is exactly the amplified population, but it discards 87% of the retweet volume, because pure retweeters leave with their edges. Inside it, 132,603 authors are retweeted and 143,043 retweet. The distributions of retweets received are heavy-tailed on both (power-law α ≈ 1.87 and 1.84) but a lognormal fits better (p < 0.001).
 
-> **Superseded backbone.** Before 2026-10-07 the analysed backbone was `Final_OutThreshold1.gml` (1,984,599 authors), cut with an out-strength ≥ 1 rule. On the retweeter → retweeted graph that kept authors who *made* a retweet, not authors who were retweeted. Every community result, map and blog figure from before that date descends from it. See the trace document §5.1 and §9.
+> **Superseded backbone.** Before 2026-10-07 the analysed backbone kept authors who *made* a retweet (1,984,599), not authors who were retweeted. Results from before that date, including the numbers in the blog draft, are replaced by those below (trace document §5.3).
 
 ### 7.2 Communities
 
@@ -245,9 +248,36 @@ The two answer different questions. The LWCC keeps every retweeter and every edg
 | Leiden (directed) | 1,089 | 0.744 | 2,951 | 0.772 |
 | Infomap | 17,117 | 0.415 | 136,744 | 0.513 |
 
-The three modularity methods agree closely (AMI 0.78–0.85 on both backbones). Label propagation sits in the middle (AMI ≈ 0.55) and puts about 1.6M of the LWCC's authors into two communities. Infomap is a different kind of partition, many small random-walk modules (AMI 0.26–0.52, ARI < 0.03). The two Leiden variants are the stable choice. The largest Leiden-directed communities hold 47,527 and 46,239 authors on the retweeted-once backbone and 619,125 and 386,553 on the LWCC. Full tables, community sizes and pairwise agreement are in the trace document §9.3.
+The three modularity methods agree closely (AMI 0.78–0.85 on both backbones). Label propagation sits in the middle (AMI ≈ 0.55) and puts about 1.6M of the LWCC's authors into two communities. Infomap is a different kind of partition, many small random-walk modules (AMI 0.26–0.52, ARI < 0.03). The two Leiden variants are the stable choice. The largest Leiden-directed communities hold 47,527 and 46,239 authors on the retweeted-once backbone and 619,125 and 386,553 on the LWCC. Full tables, community sizes and pairwise agreement are in the trace document §6.1.
 
-**Outputs** (`Networks/4_communities/<RetweetedOnce|LWCC>/`): five annotated graphs per backbone, `<stem>_InfoFlow_<method>.gml`, each the backbone with one vertex attribute `community_<method>` (read back as `community<method without underscores>`, float → int); and one `<stem>_author_communities.json` per backbone, `{author_id: {method: community}}` for all five methods. Both JSONs are the author sets of the author-level topic models (`03_Analysis_and_Modeling/04_lda_author_topics_hpc`).
+**Outputs** (`Networks/4_communities/<RetweetedOnce|LWCC>/`): five annotated graphs per backbone, `<stem>_InfoFlow_<method>.gml`, each the backbone with one vertex attribute `community_<method>` (read back as `community<method without underscores>`, float → int); and one `<stem>_author_communities.json` per backbone, `{author_id: {method: community}}` for all five methods. Both JSONs are the author sets of the author-level analysis (§7.3).
+
+### 7.3 Author topics, sentiment and emotion
+
+[03_Analysis_and_Modeling/04_lda_author_topics_hpc.ipynb](../notebooks/03_Analysis_and_Modeling/04_lda_author_topics_hpc.ipynb) runs the stages of [src/author_analysis](../src/author_analysis/README.md) for one backbone at a time. Each author's document is all of their posts in the AI corpus — originals, replies, quotes and retweets — cleaned with the rules of §4; authors need at least three non-empty cleaned posts. A grid (TF-IDF unigram or unigram+bigram, K ∈ {8, 12, 16, 20}, α ∈ {0.05, 0.1, 0.3}, η ∈ {0.01, 0.1}) is scored on a seeded 100,000-author sample and the selected model is refitted on every eligible author. Each author then gets the mean sentiment and emotion scores of all their posts (the two full-corpus classifiers of `03_Analysis_and_Modeling/01b`) and their Leiden-directed community.
+
+**Retweeted-once backbone (run of 2026-10-11).** 164,291 of the 202,710 authors are eligible. The model is TF-IDF unigram, **K = 12**, α = 0.3, η = 0.1, seed 42, chosen by reading terms and posts rather than by the grid score. Its topics, with reviewed labels ([topics.csv](../config/retweeted_once_k12/topics.csv)):
+
+| Topic | Label | Confidence |
+|---:|---|---|
+| 0 | Education & fandom (mixed) | low |
+| 1 | AI images & avatars (mixed) | low |
+| 2 | AI art & artists' debate | medium |
+| 3 | Writing, reviews & mixed content | low |
+| 4 | Games & fandom (mixed) | low |
+| 5 | AI research & industry | medium |
+| 6 | Crypto promotion & giveaways | medium |
+| 7 | AI crypto launchpads | medium |
+| 8 | General AI use, tools & writing | medium |
+| 9 | AI art sharing & NFTs | medium |
+| 10 | Politics & AI bias | medium |
+| 11 | Crypto & blockchain | medium |
+
+The 21 largest Leiden-directed communities among these authors carry reviewed descriptions ([communities.csv](../config/retweeted_once_k12/communities.csv); each from c-TF-IDF terms and 25 posts by distinct authors). The five largest: *AI tools, news & discussion* (39,397), *AI-art debate & criticism* (37,737), *AI debate, politics & trading* (16,019), *AI in education & research* (15,120), *AI-art sharing & NFTs* (11,623).
+
+Stability: refitting with seed 43 on the same vocabulary keeps 76.5 % of authors on their leading topic (after matching topics by membership), and 5 of 54 substantial community–topic enrichments change sign. The fit is approved for exploratory use, not as a robust taxonomy.
+
+The LWCC backbone has not been fitted yet. Figures 1–11 and the interactive author viewer are built from these outputs by `src/blog_analysis` and `src/network/visualization`; results are in the Drive results folder linked from `provenance.json`, and the map at [davidfreeborn.github.io/twitter-authors-map](https://davidfreeborn.github.io/twitter-authors-map/).
 
 ## 8. Provenance & Artifacts
 
@@ -258,9 +288,12 @@ The three modularity methods agree closely (AMI 0.78–0.85 on both backbones). 
   - `Cleaned Data/full_pruning_stats.json`, `full_basic_counts_dict.pkl`, `full_timeline_dict.pkl`, `full_author_corpus_dict.pkl`;
   - `Cleaned Data/full_dual_network_stats.json` — statistics of the full graph in both orientations and of both backbones (written by the current `02`; the older `full_network_stats.json` came from the pre-October 2026 notebook);
   - `Cleaned Data/dataset_statistics_summary.json` — master summary (mirrored into this repo at [notebooks/02_Processing/](../notebooks/02_Processing/dataset_statistics_summary.json));
-  - `Networks/1_retweet_dicts/full_network_dict.pkl`, `Networks/2_full_graphs/Full_Network_{Influence,InfoFlow}.gml`, `Networks/3_backbones/Full_{LWCC,RetweetedOnce}_{Influence,InfoFlow}.gml` and `Networks/4_communities/<RetweetedOnce|LWCC>/` (stage folders since 2026-10-10; the flat `Networks/Full_Network.{gml,graphml,gexf,json}` and `Final_OutThreshold1*` files of the pre-2026-10 notebooks are legacy);
+  - `Networks/1_retweet_dicts/full_network_dict.pkl`, `Networks/2_full_graphs/Full_Network_{Influence,InfoFlow}.gml`, `Networks/3_backbones/Full_{LWCC,RetweetedOnce}_{Influence,InfoFlow}.gml` and `Networks/4_communities/<RetweetedOnce|LWCC>/` (stage folders since 2026-10-10);
+  - `Cleaned Data/ai_full_classified_twitter-roberta-base-{sentiment,emotion-multilabel}-latest.json` — per-tweet sentiment and emotion scores for the AI corpus (copied from the cluster run of `01b`);
+  - `Models/Topic Modeling/LDA/backbone_analysis/networks/<backbone>/` — author-level outputs (§7.3): documents, topic model, affect, matched authors, tables, figure inputs;
   - test-dataset counterparts: `_test`-suffixed files in `Cleaned Data/`, and `Test_*` graphs plus `test_network_dict.pkl` in `Networks/test/`.
 - **Caveats worth stating in the blog post:**
   - The raw-side funnel percentages are relative to *records scanned*, which double-count tweets (duplicates from expansions and overlapping windows); relative to *unique* tweets, retention is 17.41M / 25.64M ≈ 67.9%.
   - `GPT` and `BERT` as bare keywords can admit rare false positives (e.g. the name "Bert"); the English heuristic is intentionally permissive toward ASCII-heavy non-English tweets that pass all screens.
+  - Author topic and affect profiles include retweets, so they describe content an author posted *or amplified*, not their beliefs; topic and community labels describe prevalent content, not every member.
   - The `AI+Art` keyword list mixes generic aesthetic terms (*style*, *meaning*, *soul*, *character*) with art-domain ones, so that corpus is a high-recall, moderate-precision slice; downstream classifiers (notebooks/05_Classifiers) exist to refine it.

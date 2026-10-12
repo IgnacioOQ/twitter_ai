@@ -289,10 +289,10 @@ AI Public Trust/
 │       ├── 4_communities/                     (communities_folder)
 │       │   ├── RetweetedOnce/
 │       │   │   ├── Full_RetweetedOnce_InfoFlow_<method>.gml    [written by 04_Network_Analysis/01]  label_propagation, louvain, leiden_fast, leiden_directed, infomap
-│       │   │   └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}; read by 03_Analysis/04_lda_author_topics_hpc (HPC copy)
+│       │   │   └── Full_RetweetedOnce_author_communities.json  [written by 04_Network_Analysis/01]  {author_id: {method: community}}; read by 03_Analysis/04_lda_author_topics_hpc
 │       │   └── LWCC/
 │       │       ├── Full_LWCC_InfoFlow_<method>.gml             [written by 04_Network_Analysis/01]
-│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]  read by 03_Analysis/04_lda_author_topics_hpc (author set; HPC copy)
+│       │       └── Full_LWCC_author_communities.json           [written by 04_Network_Analysis/01]  read by 03_Analysis/04_lda_author_topics_hpc (author set)
 │       ├── 5_visualizations/                  (visualizations_folder)
 │       │   └── <NETWORK>/                     [written by 04_Network_Analysis/02]  maps, positions_*.parquet, optional network_with_layout.graphml
 │       └── test/                              (test_networks_folder)
@@ -301,7 +301,11 @@ AI Public Trust/
 ├── Literature/                                (literature_folder = BASE_PATH / 'Literature/')
 └── Models/
     └── Topic Modeling/                        (topic_models_folder = BASE_PATH / 'Models/Topic Modeling/')
-        └── lda_k5_topics_metadata.json        [written by 03_Analysis/03]
+        ├── lda_k5_topics_metadata.json        [written by 03_Analysis/03]
+        └── LDA/backbone_analysis/networks/<backbone>/   (OUT of 03_Analysis/04_lda_author_topics_hpc on Colab; stages of src/author_analysis)
+            ├── topics/                        model, author documents, author_topics.csv
+            ├── affect/  data/  tables/  communities/   author sentiment/emotion, matched authors, summaries
+            └── figure_inputs/  weekly/  figures/  layout/  viewer/   (src/ command-line stages; see docs/blog_analysis/README.md)
 ```
 
 ## Common Mistakes

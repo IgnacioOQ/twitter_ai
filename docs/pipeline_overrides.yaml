@@ -3,9 +3,8 @@
 
 # Notebook pairs that are mutually-exclusive runs of the same step.
 # Renders as a dashed edge between them; both still appear in the JSON.
-alternatives:
-  - ["03_Analysis_and_Modeling/01_sentiment_analysis",
-     "03_Analysis_and_Modeling/01_sentiment_analysis_v2"]
+# 2026-10-10: 01_sentiment_analysis_v2 was deleted, so its pair with 01 is gone.
+alternatives: []
   # 2026-10-09: the corrected network-stage copies were renamed over their
   # originals (02_Processing/02, 04_Network_Analysis/01 and /02), so no
   # alternative pairs remain for them.
@@ -20,6 +19,8 @@ glob_artifacts:
   # 03/04_lda_author_topics_hpc reads ai_full_classified_{SENTIMENT_MODEL...}.json. Same files, one node each.
   - "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/ai_full_classified_*.json"
   - "/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/art_full_classified_*.json"
+  # 2026-10-12: the Drive copies of the verified 01b outputs, read by the author-analysis stages.
+  - "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_*.json"
 
 # Optional friendly labels for cluttered artifact paths in the diagram only.
 # The JSON keeps the full Drive path; this just shortens what the picture shows.
@@ -227,57 +228,226 @@ manual_edges:
     artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Cleaned Data/Blocks/{ds_key}__{alias}__{num_blocks}blocks/block_{bid}.json'
     direction: read
     note: '8b: block_is_valid() re-reads a block before reusing it; the merge concatenates the blocks'
-  # 2026-10-10: 03/04_lda_author_topics_hpc replaces 04c; paths built from the BACKBONES
-  # registry and per-backbone loops, which the parser cannot resolve. HPC paths.
+  # 2026-10-12: 03/04_lda_author_topics_hpc runs the src/author_analysis stages prepare ... communities
+  # through run_stage(); every path is assembled inside src/, so all of its I/O is declared here.
+  # DATA = the Drive project folder, OUT = the Colab default of the notebook
+  # (Models/Topic Modeling/LDA/backbone_analysis); {backbone} = RetweetedOnce | LWCC.
+  # The src/ scripts below (declared under `scripts`) run from the command line on the same OUT.
   - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json'
     direction: read
-    note: 'BACKBONES registry (lda_paths); HPC copy of the 04/01 export'
+    note: 'prepare + affect: --tweets default'
   - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/RetweetedOnce/Full_RetweetedOnce_author_communities.json'
     direction: read
-    note: 'BACKBONES registry (lda_paths); HPC copy of the 04/01 export'
+    note: 'prepare/topics/match: author set and community labels of the backbone'
   - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl'
-    direction: write
-    note: 'lda_stream: cache of the cleaned tweets of every backbone author'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_texts.pkl'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/4_communities/LWCC/Full_LWCC_author_communities.json'
     direction: read
-    note: 'lda_stream: reused when present'
+    note: 'prepare/topics/match: author set and community labels of the backbone'
   - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_author_tweet_counts.csv'
-    direction: write
-    note: 'lda_threshold: tweets per backbone author'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}_grid_results.csv'
-    direction: write
-    note: 'lda_grid: model-selection grid per backbone'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/vectorizer.pkl'
-    direction: write
-    note: 'lda_final_fit'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/lda_model.pkl'
-    direction: write
-    note: 'lda_final_fit'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/model.json'
-    direction: write
-    note: 'lda_final_fit: configuration and fit statistics'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/top_terms.csv'
-    direction: write
-    note: 'lda_final_fit'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv'
-    direction: write
-    note: 'lda_final_fit: topic mixture + five community labels per author'
-  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/{backbone}/author_topics.csv'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_twitter-roberta-base-sentiment-latest.json'
     direction: read
-    note: 'lda_checks: read back and checked'
+    note: 'affect: --sentiment default (verified 01b output, copied from the cluster)'
   - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
-    artifact: '/projects/ComputationalPhilosophyLab/TwitterDataAnalysis/Models/Topic Modeling/LDA/author_level/backbones_2026-10/author_sentiment_mean.csv'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_twitter-roberta-base-emotion-multilabel-latest.json'
+    direction: read
+    note: 'affect: --emotions default (verified 01b output, copied from the cluster)'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_documents.jsonl'
     direction: write
-    note: 'lda_sentiment: mean sentiment per backbone author (when 01b output exists)'
+    note: 'prepare'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/grid_results.csv'
+    direction: write
+    note: 'topics: model-selection grid'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/model.json'
+    direction: write
+    note: 'topics: settings, fit statistics, review flags'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/top_terms.csv'
+    direction: write
+    note: 'topics'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/lda_model.pkl'
+    direction: write
+    note: 'topics: final fit'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/vectorizer.pkl'
+    direction: write
+    note: 'topics: final fit'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/author_topics.csv'
+    direction: write
+    note: 'topics: topic mixture per eligible author'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_sentiment.csv'
+    direction: write
+    note: 'affect'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/affect/author_emotions.csv'
+    direction: write
+    note: 'affect'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet'
+    direction: write
+    note: 'match: topics + affect + community per author'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/tables/*_network_subset.csv'
+    direction: write
+    note: 'summarize: corpus, topic prevalence, topic sentiment/emotion tables'
+  - notebook: '03_Analysis_and_Modeling/04_lda_author_topics_hpc'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/communities/figures/*.csv'
+    direction: write
+    note: 'communities: topic composition/capture/enrichment, sentiment and emotion matrices'
+  - notebook: 'author_analysis: layout'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet'
+    direction: read
+    note: 'matched authors'
+  - notebook: 'author_analysis: layout'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/3_backbones/Full_RetweetedOnce_InfoFlow.gml'
+    direction: read
+    note: '--graph default; edges among matched authors'
+  - notebook: 'author_analysis: layout'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/3_backbones/Full_LWCC_InfoFlow.gml'
+    direction: read
+    note: '--graph default; edges among matched authors'
+  - notebook: 'author_analysis: layout'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet'
+    direction: write
+  - notebook: 'author_analysis: layout'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_edges.parquet'
+    direction: write
+  - notebook: 'author_analysis: export'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet'
+    direction: read
+  - notebook: 'author_analysis: export'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/viewer/nodes.json'
+    direction: write
+    note: 'viewer bundle (visualizations/author_network); 3D coordinates added by build_layout_3d'
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet'
+    direction: read
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/tables/*_network_subset.csv'
+    direction: read
+    note: 'copied into figure_inputs/tables'
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/communities/figures/*.csv'
+    direction: read
+    note: 'copied into figure_inputs/matrices'
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_authors.json'
+    direction: write
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_author_ids.json'
+    direction: write
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/topic_labels.csv'
+    direction: write
+  - notebook: 'author_analysis: figure-inputs'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/community_labels.csv'
+    direction: write
+  - notebook: 'author_analysis: projection'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/data/matched_authors.parquet'
+    direction: read
+  - notebook: 'author_analysis: projection'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/umap_fixed_topic_scores_seed0.csv'
+    direction: write
+    note: 'fixed UMAP projection of topic scores'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_author_ids.json'
+    direction: read
+    note: '--matched-authors'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/AItrust_twits_pruned_dict.json'
+    direction: read
+    note: '--posts'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_twitter-roberta-base-sentiment-latest.json'
+    direction: read
+    note: '--sentiment-classified'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/ai_full_classified_twitter-roberta-base-emotion-multilabel-latest.json'
+    direction: read
+    note: '--emotion-classified'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/lda_model.pkl'
+    direction: read
+    note: '--model-dir: saved model applied to author-week documents, no refit'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/topics/vectorizer.pkl'
+    direction: read
+    note: '--model-dir'
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_sentiment.csv'
+    direction: write
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_emotions.csv'
+    direction: write
+  - notebook: 'blog_analysis: weekly_aggregation'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_topics_long.csv'
+    direction: write
+  - notebook: 'blog_analysis: render_non_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/matched_authors.json'
+    direction: read
+  - notebook: 'blog_analysis: render_non_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/community_labels.csv'
+    direction: read
+  - notebook: 'blog_analysis: render_non_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/topic_labels.csv'
+    direction: read
+  - notebook: 'blog_analysis: render_non_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figure_inputs/umap_fixed_topic_scores_seed0.csv'
+    direction: read
+  - notebook: 'blog_analysis: render_non_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figures/*'
+    direction: write
+    note: 'figures 1, 4, 6-11, light and dark PNG/SVG plus one CSV per figure'
+  - notebook: 'blog_analysis: render_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_sentiment.csv'
+    direction: read
+  - notebook: 'blog_analysis: render_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_emotions.csv'
+    direction: read
+  - notebook: 'blog_analysis: render_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/weekly/weekly_topics_long.csv'
+    direction: read
+  - notebook: 'blog_analysis: render_temporal'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/figures/*'
+    direction: write
+    note: 'figures 2, 3, 5'
+
+# src/ stages that run from the command line, not from a notebook (added 2026-10-12).
+# Drawn as diamonds; their reads and writes are the manual_edges that name them.
+# Stage 7 = blog figures.
+scripts:
+  - id: 'author_analysis: layout'
+    path: 'src/network/visualization/build_matched_layout.py'
+    stage: 4
+    note: 'python -m src.author_analysis.run layout'
+  - id: 'author_analysis: export'
+    path: 'src/network/visualization/export_viewer.py'
+    stage: 4
+    note: 'python -m src.author_analysis.run export'
+  - id: 'author_analysis: figure-inputs'
+    path: 'src/author_analysis/export_figures.py'
+    stage: 7
+    note: 'python -m src.author_analysis.run figure-inputs'
+  - id: 'author_analysis: projection'
+    path: 'src/author_analysis/project_topics.py'
+    stage: 7
+    note: 'python -m src.author_analysis.run projection'
+  - id: 'blog_analysis: weekly_aggregation'
+    path: 'src/blog_analysis/weekly_aggregation.py'
+    stage: 7
+    note: 'run directly'
+  - id: 'blog_analysis: render_non_temporal'
+    path: 'src/blog_analysis/render_non_temporal_figures.py'
+    stage: 7
+    note: 'run directly'
+  - id: 'blog_analysis: render_temporal'
+    path: 'src/blog_analysis/render_temporal_figures.py'
+    stage: 7
+    note: 'run directly'
