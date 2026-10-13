@@ -79,6 +79,12 @@ Ticking a group in a different categorical lens starts a new selection.
 Clear selection restores all authors. Camera controls do not change the selection.
 Topics, sentiment and emotions never determine network coordinates.
 
+The [published Twitter Authors Map](https://davidfreeborn.github.io/twitter-authors-map/)
+also has population-specific eight- and twelve-topic choices and account and
+retweet counts. Its runtime and optional datasets are maintained in the
+[atlas repository](https://github.com/DavidFreeborn/twitter-authors-map); see the
+[13 October release record](../../docs/VIEWER_RELEASE_2026-10-13.md).
+
 The portable template can be served against any compatible external bundle.
 Tests: node tests/test_viewer.cjs. The browser renderer uses the same selection
-and camera implementation as the published atlas.
+and camera conventions as the published atlas.
