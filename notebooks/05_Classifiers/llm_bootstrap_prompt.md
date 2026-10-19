@@ -151,6 +151,8 @@ raise `MAX_OUTPUT_TOKENS` before suspecting anything else.
 | `rationale` | The model's pass-1 rationale(s), one per selected category, separated by a vertical bar. |
 | `passes_agree` | Whether every labelling pass chose the same set of categories. |
 | `human_definition`, `human_value`, … `human_none` | **Yours.** Empty on delivery — fill in 0 or 1 for every category of a row you review. A row whose `human_*` columns are all filled is used with your labels instead of the model's by notebooks `02` and `03`. |
+| `audited` | 1 if a stronger model (`AUDIT_MODEL`, section 6 of the notebook) re-read this row with the same prompt. Only `none`-only rows are audited: the `AUDIT_N` with the most likes + retweets, random fill if fewer have any engagement. |
+| `audit_definition`, … `audit_none`, `audit_confidence`, `audit_rationale`, `audit_model` | The audit model's verdict, same shape as `pred_*`. **Blank on rows that were not audited.** A row with `audited = 1` and a substantive `audit_*` label is a false negative of pass 1 in the audit model's judgement — read it first. `pred_*` is never changed by the audit. |
 
 The model's `confidence` and each pass's raw predictions are **not** in the CSV. They are in the
 sibling `llm_bootstrap_labels_full_<stamp>.pkl`.

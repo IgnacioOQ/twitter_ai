@@ -66,19 +66,40 @@ The `rationale` column instructs the model to quote the deciding phrase, so a di
 
 ---
 
+## Second opinion on `none`
+
+The positive labels have been read and show almost no false positives. The false negatives have
+not been read, and `none` is ~80% of every run. Section 6 of notebook `01` therefore sends a
+**fixed** number of `none`-only rows to a stronger model (`AUDIT_MODEL`, default `gemini-4-argon`)
+with the **same prompt**: the `AUDIT_N` (default 500) with the most likes + retweets, topped up at
+random (`AUDIT_SEED`) when fewer than `AUDIT_N` have any engagement. Engagement is the selection
+key because those are the tweets that shape the discourse, and a false negative there costs more.
+
+The verdict is written beside the operative label — `audited`, `audit_<label>`,
+`audit_confidence`, `audit_rationale`, `audit_model`, blank on rows not audited — and **never
+replaces `pred_*`**. A row where the audit model assigns a substantive label is the highest-value
+row a human can review; the Audit Report cell lists them, highest audit confidence first. The
+audit has its own call counter (refuses the `AUDIT_N + 1`-th request) and token backstop
+(`AUDIT_MAX_TOKENS`), independent of `MAX_LLM_TWEETS`. Models newer than 3.1 Flash-Lite ignore
+`temperature` and cannot switch thinking off, so the audit sends no temperature, asks for
+`thinking_level = 'low'`, and raises `max_output_tokens` because thinking tokens count against it.
+Audited ids are added to the seen-ids basket.
+
+---
+
 ## Run-size cap, selection, and the seen-ids basket
 
-Notebook `01` enforces a hard ceiling of `MAX_LLM_TWEETS = 5_000` tweets per run, at three independent layers (config constant → dataframe truncation + assertion → a per-call counter inside `classify_tweet` that raises rather than exceed the budget). The cap binds **regardless of `SMOKE_TEST`**. Raising it is a deliberate edit, not a side effect of flipping the smoke-test flag. It caps *tweets*, not requests: with `N_LABEL_PASSES = 2` the request ceiling is 10 000.
+Notebook `01` enforces a hard ceiling of `MAX_LLM_TWEETS = 2_000` tweets per run, at three independent layers (config constant → dataframe truncation + assertion → a per-call counter inside `classify_tweet` that raises rather than exceed the budget). The cap binds **regardless of `SMOKE_TEST`**. Raising it is a deliberate edit, not a side effect of flipping the smoke-test flag. It caps *tweets*, not requests: with `N_LABEL_PASSES = 2` the request ceiling is 4 000.
 
 This exists because the criteria in `llm_bootstrap_prompt.md` are still being tuned. The full ~10 000-tweet bootstrap partition should not be spent on a definition that has not yet survived a read-through of its own low-confidence rows.
 
-A second, independent ceiling caps **token** spend: `MAX_SESSION_TOKENS = 24_000_000` per run. It must be sized against the *request* ceiling (`MAX_LLM_TWEETS × N_LABEL_PASSES` = 10 000 calls, ~22 M tokens at a padded 2 200 per call; the 2026-10 run measured ~1 620 per call), not against the tweet count — sized below that it stops being a backstop and silently truncates runs instead. The row cap is what should normally stop a run; this fires only if something inflates per-call cost (a much longer prompt, or a model whose thinking budget is not actually off). It can only be checked *between* calls, since `usage_metadata` arrives with the response, so the guarantee is "no further calls once crossed", with overshoot bounded by one call. **If it fires the run stops cleanly rather than raising** — completed rows are saved, basketed, and flagged `stopped_early` in both JSON artifacts. That matters because `CHECKPOINT_EVERY = 1_000`: an uncaught exception partway through a capped run would discard everything.
+A second, independent ceiling caps **token** spend: `MAX_SESSION_TOKENS = 9_000_000` per run. It must be sized against the *request* ceiling (`MAX_LLM_TWEETS × N_LABEL_PASSES` = 4 000 calls, ~8.8 M tokens at a padded 2 200 per call; the 2026-10 run measured ~1 620 per call), not against the tweet count — sized below that it stops being a backstop and silently truncates runs instead. The row cap is what should normally stop a run; this fires only if something inflates per-call cost (a much longer prompt, or a model whose thinking budget is not actually off). It can only be checked *between* calls, since `usage_metadata` arrives with the response, so the guarantee is "no further calls once crossed", with overshoot bounded by one call. **If it fires the run stops cleanly rather than raising** — completed rows are saved, basketed, and flagged `stopped_early` in both JSON artifacts. That matters because `CHECKPOINT_EVERY = 1_000`: an uncaught exception partway through a capped run would discard everything.
 
 **Selection is a fixed permutation, not a fresh sample.** The partition is sorted by `id`, permuted once with `SELECTION_SEED`, and sliced from the head. So the 500 tweets of a smoke run are a strict **subset** of the 2 000 of a full run — successive runs extend the labelled set instead of drawing a new one. (Two `df.sample(n=…)` calls sharing a seed but differing in `n` do *not* nest; that was the earlier behaviour and it would have produced two largely disjoint sets.) Treat `SELECTION_SEED` as frozen once a real run has happened — changing it re-draws which tweets get labelled.
 
 **Every tweet sent to the LLM is recorded** in `Classifiers_Data/HITL/llm_bootstrap_seen_ids_{DATASET_TYPE}.json`, which accumulates across runs (`ids`, `parse_error_ids`, and a per-run log). **These ids are training data — exclude them from any held-out evaluation set.**
 
-`partition_ids.pkl` cannot serve this purpose. It records which tweets are *eligible* for bootstrap labelling (~10 000), but with the cap only a fraction is ever labelled; the remaining ~5 000 of the bootstrap partition stay unseen and are legitimately usable as held-out data. The basket is the only record of where that line actually falls.
+`partition_ids.pkl` cannot serve this purpose. It records which tweets are *eligible* for bootstrap labelling (~10 000), but with the cap only a fraction is ever labelled; the remaining ~8 000 of the bootstrap partition stay unseen and are legitimately usable as held-out data. The basket is the only record of where that line actually falls.
 
 **Token spend is measured, not estimated.** A pre-flight cell prints projected tokens and cost before the loop runs (and warns above `COST_ALERT_USD`); the run cell reports the `usage_metadata` the API actually billed, including the implicit-cache hit rate; and each run appends a `llm_bootstrap_usage_<timestamp>.json`. Roughly 96% of every prompt is the identical criteria scaffold, so the cache-hit figure is the number to watch — if it is near zero, the Batch API (50% cheaper, and this workload is not latency-sensitive) is the next lever.
 
