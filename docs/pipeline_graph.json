@@ -715,25 +715,25 @@
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
       "glob": false,
-      "templated": false,
+      "templated": true,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full.pkl",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full_{RUN_STAMP}.pkl",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full.pkl",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full_{RUN_STAMP}.pkl",
       "glob": false,
-      "templated": false,
+      "templated": true,
       "bipartite": 1
     },
     {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{usage_record['timestamp'].replace(':', '')}.json",
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{RUN_STAMP}.json",
       "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{usage_record['timestamp'].replace(':', '')}.json",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{RUN_STAMP}.json",
       "glob": false,
       "templated": true,
       "bipartite": 1
@@ -1730,17 +1730,17 @@
     },
     {
       "src": "05_Classifiers/01_llm_bootstrap_labelling",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
       "direction": "write"
     },
     {
       "src": "05_Classifiers/01_llm_bootstrap_labelling",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full.pkl",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full_{RUN_STAMP}.pkl",
       "direction": "write"
     },
     {
       "src": "05_Classifiers/01_llm_bootstrap_labelling",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{usage_record['timestamp'].replace(':', '')}.json",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{RUN_STAMP}.json",
       "direction": "write"
     },
     {
@@ -2136,14 +2136,16 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
       "dst": "05_Classifiers/02_hitl_training_loop",
-      "direction": "read"
+      "direction": "read",
+      "manual": true
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels.csv",
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
       "dst": "05_Classifiers/03_final_inference",
-      "direction": "read"
+      "direction": "read",
+      "manual": true
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_seen_ids_AI.json",

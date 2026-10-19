@@ -8,7 +8,7 @@ between calls: whatever the model knows about this task, it knows from the fence
 It is the single authored copy. `notebooks/05_Classifiers/01_llm_bootstrap_labelling.ipynb`
 embeds this file verbatim as `PROMPT_DOC` (Colab does not clone the repo at runtime, so it
 cannot be read from disk there) and writes it back out unchanged next to the labels it
-produces. The copy sitting beside `llm_bootstrap_labels.csv` in Google Drive is byte-identical
+produces. The copy sitting beside `llm_bootstrap_labels_<stamp>.csv` in Google Drive is byte-identical
 to this one — that is asserted, not hoped for.
 
 `categories.md` in this folder explains *why* the taxonomy is shaped this way — what `none`
@@ -30,7 +30,7 @@ sent. Nothing outside the fence reaches the model — the prose in this file is 
 whoever reviews the labels.
 
 The tuning loop that this is built for: run with `SMOKE_TEST = True`, open
-`llm_bootstrap_labels_full.pkl`, sort by `confidence` ascending and read the bottom rows —
+`llm_bootstrap_labels_full_<stamp>.pkl`, sort by `confidence` ascending and read the bottom rows —
 those are where the criteria are underspecified. Edit the fence, sync, re-run.
 
 ## The prompt
@@ -139,7 +139,7 @@ raise `MAX_OUTPUT_TOKENS` before suspecting anything else.
 
 ## The CSV this produces
 
-`llm_bootstrap_labels.csv`, one row per tweet, in the same schema as a human
+`llm_bootstrap_labels_<stamp>.csv`, one row per tweet (`<stamp>` is the run's start date and time), in the same schema as a human
 `hitl_review_batch_*.csv`. Since it's multi-label, the CSV contains one-hot columns (0 or 1) for each category.
 
 | Column | Meaning |
@@ -153,7 +153,7 @@ raise `MAX_OUTPUT_TOKENS` before suspecting anything else.
 | `human_definition`, `human_value`, … `human_none` | **Yours.** Empty on delivery — fill in 0 or 1 for every category of a row you review. A row whose `human_*` columns are all filled is used with your labels instead of the model's by notebooks `02` and `03`. |
 
 The model's `confidence` and each pass's raw predictions are **not** in the CSV. They are in the
-sibling `llm_bootstrap_labels_full.pkl`.
+sibling `llm_bootstrap_labels_full_<stamp>.pkl`.
 
 Before overriding a label, read the fence. A label that looks wrong is often the criteria
 working exactly as written — which is a reason to edit this file, not just that row.

@@ -135,7 +135,7 @@ AI Public Trust/                                  (BASE_PATH)
 │   │
 │   └── Classifiers_Data/
 │       ├── HITL/
-│       │   ├── llm_bootstrap_labels.csv          ← LLM seed labels
+│       │   ├── llm_bootstrap_labels_<stamp>.csv  ← LLM seed labels, one per run
 │       │   └── hitl_review_batch_0{0..4}.csv     ← human-labelled rounds
 │       ├── Final/
 │       │   └── final_annotated_tweets.{pkl,csv}

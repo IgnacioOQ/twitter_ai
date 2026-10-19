@@ -435,8 +435,8 @@ Subfolders: `Partitioned Data/` (§13.4), `Tweet Sheets/` (§13.5), `Sentiment A
 | `HITL/base_playground_sample.csv` | `05/00b` | — | Sample for drafting label definitions. |
 | `HITL/hitl_review_batch_00.csv` | `05/00` | — | First human-review sheet. |
 | `HITL/hitl_review_batch_{PENDING_BATCH_TO_PROCESS}.csv` | `05/02` | — | Later review sheets. |
-| `HITL/llm_bootstrap_labels.csv` | `05/01` | `05/02`, `05/03` | LLM bootstrap labels. |
-| `HITL/llm_bootstrap_labels_full.pkl` | `05/01` | — | Full bootstrap output with confidence and rationale. |
+| `HITL/llm_bootstrap_labels_<stamp>.csv` | `05/01` | `05/02`, `05/03` | LLM bootstrap labels, one file per run (stamp = start date and time); consumers read the newest. The pre-2026-10-19 unstamped `llm_bootstrap_labels.csv` is the 2,000-tweet run. |
+| `HITL/llm_bootstrap_labels_full_<stamp>.pkl` | `05/01` | — | Full bootstrap output with confidence and rationale. |
 | `HITL/llm_bootstrap_seen_ids_AI.json` | `05/01` | `05/01` | Ids already sent to the LLM (resume without re-billing). |
 | `HITL/llm_bootstrap_usage_{timestamp}.json` | `05/01` | — | API usage and cost per run. |
 | `Final/final_annotated_tweets.pkl` (+ `.csv`) | `05/03` | `05/04` | Final annotations on the HITL remainder. |

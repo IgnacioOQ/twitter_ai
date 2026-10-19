@@ -32,6 +32,16 @@ friendly_labels: {}
 # 2026-10-10: Data Sets/Networks/ reorganised into stage folders
 # (1_retweet_dicts, 2_full_graphs, 3_backbones, 4_communities/<backbone>, 5_visualizations, test).
 manual_edges:
+  # 2026-10-19: 05/01 stamps its labels file (llm_bootstrap_labels_<YYYYMMDD_HHMM>.csv);
+  # 05/02 and 05/03 pick the newest by glob, which the parser cannot resolve.
+  - notebook: '05_Classifiers/02_hitl_training_loop'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv'
+    direction: read
+    note: 'newest stamped file chosen by hitl_folder.glob() in the Configuration cell'
+  - notebook: '05_Classifiers/03_final_inference'
+    artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv'
+    direction: read
+    note: 'newest stamped file chosen by hitl_folder.glob() in the Configuration cell'
   - notebook: '02_Processing/02_sanity_check_and_network_generation'
     artifact: 'My Drive/Colab Projects/AI Public Trust/Data Sets/Networks/test/Test_Network_Influence.gml'
     direction: write
