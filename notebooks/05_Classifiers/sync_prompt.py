@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Paste llm_bootstrap_prompt.md into notebook 01's `c-prompt` cell.
+"""Paste llm_bootstrap_prompt.md into the `c-prompt` cell of notebooks 01 and 01b.
 
 `llm_bootstrap_prompt.md` is the single authored copy of the prompt. The notebook cannot
-read it at runtime — `01_llm_bootstrap_labelling.ipynb` mounts Drive but does not clone
-this repo on Colab — so the file has to be embedded in the notebook as a literal. This
-script does that embedding, and is the only thing that should:
+read it at runtime — `01_llm_bootstrap_labelling.ipynb` and its Batch API form
+`01b_llm_bootstrap_labelling.ipynb` mount Drive but do not clone this repo on Colab — so the
+file has to be embedded in each notebook as a literal. This script does that embedding, and
+is the only thing that should:
 
     python3 notebooks/05_Classifiers/sync_prompt.py            # write
     python3 notebooks/05_Classifiers/sync_prompt.py --check    # verify only, exit 1 on drift
@@ -28,7 +29,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PROMPT_MD = HERE / "llm_bootstrap_prompt.md"
-NOTEBOOK = HERE / "01_llm_bootstrap_labelling.ipynb"
+NOTEBOOKS = [HERE / "01_llm_bootstrap_labelling.ipynb",
+             HERE / "01b_llm_bootstrap_labelling.ipynb"]
 CELL_ID = "c-prompt"
 
 INDENT, ENSURE_ASCII = 1, True
@@ -123,41 +125,47 @@ def main() -> int:
 
     doc = PROMPT_MD.read_text(encoding="utf-8")
     wanted = render_cell(doc)
-
-    raw = NOTEBOOK.read_text(encoding="utf-8")
-    nb = json.loads(raw)
-    if json.dumps(nb, indent=INDENT, ensure_ascii=ENSURE_ASCII) != raw:
-        sys.exit(f"ERROR: {NOTEBOOK.name} is not serialized as indent={INDENT}, "
-                 f"ensure_ascii={ENSURE_ASCII}; refusing to rewrite it wholesale.")
-
-    cell = next((c for c in nb["cells"] if c.get("id") == CELL_ID), None)
-    if cell is None:
-        sys.exit(f"ERROR: no cell with id {CELL_ID!r} in {NOTEBOOK.name}")
-
-    # Compare in the notebook's own representation. make_source drops the trailing
-    # newline the rendered cell ends with, so comparing raw strings never matches and
-    # --check would report drift forever.
     wanted_source = make_source(wanted)
-    if cell["source"] == wanted_source:
-        print(f"in sync — {PROMPT_MD.name} matches {NOTEBOOK.name} cell {CELL_ID!r}")
-        return 0
-
-    if args.check:
-        print(f"DRIFT: {NOTEBOOK.name} cell {CELL_ID!r} does not match {PROMPT_MD.name}.\n"
-              f"       Run: python3 {Path(__file__).name}", file=sys.stderr)
-        return 1
-
-    cell["source"] = wanted_source
-    cell.setdefault("metadata", {})["id"] = CELL_ID
-
-    out = json.dumps(nb, indent=INDENT, ensure_ascii=ENSURE_ASCII)
-    NOTEBOOK.write_text(out, encoding="utf-8")
-    json.loads(NOTEBOOK.read_text(encoding="utf-8"))   # round-trip check
-
     fp = hashlib.sha256(doc.encode("utf-8")).hexdigest()[:12]
-    print(f"synced {PROMPT_MD.name} ({len(doc):,} chars, sha256:{fp}) "
-          f"-> {NOTEBOOK.name} cell {CELL_ID!r}")
-    return 0
+
+    drift = 0
+    for NOTEBOOK in NOTEBOOKS:
+        raw = NOTEBOOK.read_text(encoding="utf-8")
+        nb = json.loads(raw)
+        if json.dumps(nb, indent=INDENT, ensure_ascii=ENSURE_ASCII) != raw:
+            print(f"ERROR: {NOTEBOOK.name} is not serialized as indent={INDENT}, "
+                  f"ensure_ascii={ENSURE_ASCII}; refusing to rewrite it wholesale.",
+                  file=sys.stderr)
+            drift += 1          # reported per notebook so the others are still checked
+            continue
+
+        cell = next((c for c in nb["cells"] if c.get("id") == CELL_ID), None)
+        if cell is None:
+            sys.exit(f"ERROR: no cell with id {CELL_ID!r} in {NOTEBOOK.name}")
+
+        # Compare in the notebook's own representation. make_source drops the trailing
+        # newline the rendered cell ends with, so comparing raw strings never matches and
+        # --check would report drift forever.
+        if cell["source"] == wanted_source:
+            print(f"in sync — {PROMPT_MD.name} matches {NOTEBOOK.name} cell {CELL_ID!r}")
+            continue
+
+        if args.check:
+            print(f"DRIFT: {NOTEBOOK.name} cell {CELL_ID!r} does not match {PROMPT_MD.name}.\n"
+                  f"       Run: python3 {Path(__file__).name}", file=sys.stderr)
+            drift += 1
+            continue
+
+        cell["source"] = wanted_source
+        cell.setdefault("metadata", {})["id"] = CELL_ID
+
+        out = json.dumps(nb, indent=INDENT, ensure_ascii=ENSURE_ASCII)
+        NOTEBOOK.write_text(out, encoding="utf-8")
+        json.loads(NOTEBOOK.read_text(encoding="utf-8"))   # round-trip check
+
+        print(f"synced {PROMPT_MD.name} ({len(doc):,} chars, sha256:{fp}) "
+              f"-> {NOTEBOOK.name} cell {CELL_ID!r}")
+    return 1 if drift else 0
 
 
 if __name__ == "__main__":
