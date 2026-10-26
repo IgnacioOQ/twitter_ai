@@ -134,6 +134,13 @@
       "bipartite": 0
     },
     {
+      "id": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "kind": "notebook",
+      "stage": 5,
+      "path": "notebooks/05_Classifiers/01b_llm_bootstrap_labelling.ipynb",
+      "bipartite": 0
+    },
+    {
       "id": "05_Classifiers/02_hitl_training_loop",
       "kind": "notebook",
       "stage": 5,
@@ -744,6 +751,46 @@
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_seen_ids_AI.json",
       "glob": false,
       "templated": false,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_state_{RUN_STAMP}.json",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_state_{RUN_STAMP}.json",
+      "glob": false,
+      "templated": true,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_pass{_p + 1}.jsonl",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_pass{_p + 1}.jsonl",
+      "glob": false,
+      "templated": true,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_{_k}_results.jsonl",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_{_k}_results.jsonl",
+      "glob": false,
+      "templated": true,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit.jsonl",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit.jsonl",
+      "glob": false,
+      "templated": true,
+      "bipartite": 1
+    },
+    {
+      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit_results.jsonl",
+      "kind": "artifact",
+      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit_results.jsonl",
+      "glob": false,
+      "templated": true,
       "bipartite": 1
     },
     {
@@ -1749,6 +1796,51 @@
       "direction": "write"
     },
     {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_state_{RUN_STAMP}.json",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_pass{_p + 1}.jsonl",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_{_k}_results.jsonl",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit.jsonl",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit_results.jsonl",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_full_{RUN_STAMP}.pkl",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_usage_{RUN_STAMP}.json",
+      "direction": "write"
+    },
+    {
+      "src": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_seen_ids_AI.json",
+      "direction": "write"
+    },
+    {
       "src": "05_Classifiers/02_hitl_training_loop",
       "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/hitl_review_batch_{PENDING_BATCH_TO_PROCESS}.csv",
       "direction": "write"
@@ -2112,6 +2204,11 @@
     },
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/AI Data/llm_bootstrap_dataset.pkl",
+      "dst": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/AI Data/llm_bootstrap_dataset.pkl",
       "dst": "05_Classifiers/03_final_inference",
       "direction": "read"
     },
@@ -2150,6 +2247,26 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_seen_ids_AI.json",
       "dst": "05_Classifiers/01_llm_bootstrap_labelling",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_seen_ids_AI.json",
+      "dst": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_state_{RUN_STAMP}.json",
+      "dst": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_pass{_p + 1}.jsonl",
+      "dst": "05_Classifiers/01b_llm_bootstrap_labelling",
+      "direction": "read"
+    },
+    {
+      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/batch/llm_bootstrap_batch_{RUN_STAMP}_audit.jsonl",
+      "dst": "05_Classifiers/01b_llm_bootstrap_labelling",
       "direction": "read"
     },
     {

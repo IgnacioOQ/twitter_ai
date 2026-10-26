@@ -418,7 +418,7 @@ Subfolders: `Partitioned Data/` (§13.4), `Tweet Sheets/` (§13.5), `Sentiment A
 | `base_dataset.pkl` | `05/00` | `05/00b`, `05/03` | HITL seed partition. |
 | `hitl_pending_batch_{i + 1}.pkl` | `05/00` | `05/02` (as `hitl_pending_batch_{PENDING_BATCH_TO_PROCESS}.pkl`) | Pending HITL batches, one per round. |
 | `inference_dataset.pkl` | `05/00` | `05/03` | Remainder held out for final inference. |
-| `llm_bootstrap_dataset.pkl` | `05/00` | `05/01`, `05/03` | Partition sent to the LLM labeller. |
+| `llm_bootstrap_dataset.pkl` | `05/00` | `05/01`, `05/01b`, `05/03` | Partition sent to the LLM labeller. |
 | `partition_ids.pkl` | `05/00` | `05/04` | Tweet ids per partition. |
 | `retweets_dataset.pkl` | `05/00` | `05/03` | Retweets split off from the partitions. |
 
@@ -435,10 +435,14 @@ Subfolders: `Partitioned Data/` (§13.4), `Tweet Sheets/` (§13.5), `Sentiment A
 | `HITL/base_playground_sample.csv` | `05/00b` | — | Sample for drafting label definitions. |
 | `HITL/hitl_review_batch_00.csv` | `05/00` | — | First human-review sheet. |
 | `HITL/hitl_review_batch_{PENDING_BATCH_TO_PROCESS}.csv` | `05/02` | — | Later review sheets. |
-| `HITL/llm_bootstrap_labels_<stamp>.csv` | `05/01` | `05/02`, `05/03` | LLM bootstrap labels, one file per run (stamp = start date and time); consumers read the newest. The pre-2026-10-19 unstamped `llm_bootstrap_labels.csv` is the 2,000-tweet run. |
-| `HITL/llm_bootstrap_labels_full_<stamp>.pkl` | `05/01` | — | Full bootstrap output with confidence and rationale. |
-| `HITL/llm_bootstrap_seen_ids_AI.json` | `05/01` | `05/01` | Ids already sent to the LLM (resume without re-billing). |
-| `HITL/llm_bootstrap_usage_{timestamp}.json` | `05/01` | — | API usage and cost per run. |
+| `HITL/llm_bootstrap_labels_<stamp>.csv` | `05/01`, `05/01b` | `05/02`, `05/03` | LLM bootstrap labels, one file per run (stamp = start date and time; for `05/01b`, the submit time); consumers read the newest, whichever notebook wrote it. The pre-2026-10-19 unstamped `llm_bootstrap_labels.csv` is the 2,000-tweet run. |
+| `HITL/llm_bootstrap_labels_full_<stamp>.pkl` | `05/01`, `05/01b` | — | Full bootstrap output with confidence and rationale. |
+| `HITL/llm_bootstrap_seen_ids_AI.json` | `05/01`, `05/01b` | `05/01`, `05/01b` | Ids already sent to the LLM; shared by both notebooks. |
+| `HITL/llm_bootstrap_usage_{timestamp}.json` | `05/01`, `05/01b` | — | API usage and cost per run; `05/01b` adds measured tokens, cost and the batch job names. |
+| `HITL/llm_bootstrap_audit_report_<stamp>.txt` | `05/01b` | — | The printed audit report (second opinion on `none`), saved as text. |
+| `HITL/batch/llm_bootstrap_batch_<stamp>_{pass1,pass2,audit}.jsonl` | `05/01b` | — | Batch API request files, one per job; the record of what was sent. |
+| `HITL/batch/llm_bootstrap_batch_<stamp>_{pass1,pass2,audit}_results.jsonl` | `05/01b` | — | Downloaded batch results; the API deletes its copy after six weeks. |
+| `HITL/batch/llm_bootstrap_batch_state_<stamp>.json` | `05/01b` | `05/01b` | Job names and selection of a batch run; read when `RESUME_RUN_STAMP` is set. |
 | `Final/final_annotated_tweets.pkl` (+ `.csv`) | `05/03` | `05/04` | Final annotations on the HITL remainder. |
 | `Full_Inference/full_inference_annotated.pkl` (+ `.csv`) | `05/04` | — | Classifier annotations for the full AI corpus. |
 | `Full_Inference/checkpoint_{n_processed}.pkl` | `05/04` | — | Checkpoints every 100k tweets. |
