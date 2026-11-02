@@ -99,7 +99,34 @@ A/B to do once human labels exist. The ~130 rows to label first: the 13 Argon re
 output and the notebooks' usage code counts visible output only, so the recorded audit cost
 ($2.23) is a floor.
 
-**Run with this version:** none yet.
+**Run with this version: `20261102_1354`** (`01`, `gemini-3.1-flash-lite`, same 2,000 tweets,
+two passes at 0.0 / 0.5, audit on; fingerprints `e4e7586cad52` / `7a9e1e9d8857` confirmed in
+the usage record). 0 parse errors; 0 rows with `none` beside another label. `none`-only
+1,514 (v7: 1,564); `value` 382 (v7: 288); passes agreed on 1,916 rows (v7: 1,901). Against
+v7, `value` was gained on 104 rows and lost on 10 — far outside the run-to-run noise
+measured between v6 and v7 (see version 7), so this is the amendment's effect. Other labels
+moved within that noise (`definition` +11/−28, `hedonism` +6/−22, `achievement` +15/−24).
+Audit: 11 of 500 `none`-only rows relabelled by Argon, $2.41 visible tokens.
+
+Of the 13 tweets Argon relabelled on 10-19, v8 now gives `value` to *"this is what ai voice
+generation is meant to be"*, *"cuz its cute"*, the ChatGPT-stories tweet and the "Book Corner"
+plug; the NFT *"sick free claim"* promo correctly stays `none`; *"The quality produced by
+@PixiaAi"* was already `value` in v7 and stays so.
+
+**It overshot.** A random sample of 25 of the 104 rows that gained `value` (seed 1) shows
+roughly 10–12 that praise or criticise an **AI tool's usefulness or capability**, not an
+artwork: *"chat gpt is too good"*, *"amazing AI will change the whole world's vision"*,
+*"Peter Answers >>> Chat GPT"*, *"CHAT GPT can't take your job if you Skill up!"*, *"Google
+LaMDA demo … amusing … very locked-down"*. The rationales say *"an artistic or functional
+judgment"* — the model read "a specific work" as covering a product. If the sample rate holds,
+about 45 of the 104 are false positives. The intended gains are of the kind *"she deserved so
+much better … only let her sing twice"*, *"these AI voice memes are WILD"*, *"Out of this
+world"* on an AI-art post. Next step: say what the judgment must be *about* (an artwork or
+creative output, or its creator), and that a tool's usefulness, capability or impact is not
+artistic value.
+
+Not recorded by `01`: labelling-pass tokens and the dropped-`none` count (`01` prints both
+but writes neither to its usage record; `01b` writes both).
 
 ### 7 — `none` is exclusive (2026-11-02, `c3473ed`)
 
@@ -118,9 +145,23 @@ followed by a hedging `none` (*"While the tweet critiques music, it focuses on�
 would have trained `02` on contradictory targets. The prompt line alone could not be relied
 on, hence the parser rule; the dropped count is what tells whether the line helped.
 
-**Run with this version:** `01`, 2026-11-02, 2,000 tweets, two passes, audit on — in
-progress at the time of writing; the dropped count is printed at the end of the Labelling
-Loop cell.
+**Run with this version: `20261102_1154`** (`01`, `gemini-3.1-flash-lite`, the same 2,000
+tweets as `20261019_1550`, two passes at 0.0 / 0.5, audit on; fingerprints `cdb1c2c846ba` /
+`96d53ecfad1b` confirmed in the usage record). 0 parse errors; 0 rows with `none` beside
+another label (guaranteed by the parser). `none`-only 1,564 (v6: 1,621); `value` 288,
+`achievement` 123, `definition` 126, `originality` 68, `hedonism` 70, `cognitivism` 57,
+`expressivism` 20, `intentionalism` 20, `anti_intentionalism` 2. Passes agreed on 1,901 rows.
+Audit: 9 of 500 `none`-only rows relabelled by Argon, $2.27 visible tokens. The dropped-`none`
+count was printed in the notebook but is not in any file.
+
+**Run-to-run noise.** v6 and v7 differ only by the `none` sentence, yet **164 of 2,000 rows
+(8.2%) changed label set** between the two runs, although pass 1 runs at temperature 0.
+Per label (gained / lost): `none` 3 / 78, `value` 42 / 23, `definition` 34 / 8,
+`achievement` 22 / 10, `cognitivism` 16 / 5, `hedonism` 15 / 6. Part of the `none` loss is
+the rule itself (18 rows had `none` beside a label in v6), but most of this movement is
+nondeterminism of the API at temperature 0, plus whatever the sentence did. Treat a per-label
+change of a few dozen rows between two runs as noise unless it is one-directional and large;
+a repeat run with an unchanged prompt would measure the noise directly.
 
 ### 6 and 5 — prose only (2026-10-19)
 
