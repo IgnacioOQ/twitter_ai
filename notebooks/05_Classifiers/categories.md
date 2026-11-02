@@ -112,4 +112,4 @@ The taxonomy is designed to grow. When adding category *N+1*:
 1. Add a `### <label>` block inside the fence in `llm_bootstrap_prompt.md` with the same parts — Definition, Example.
 2. Add the label to the [Label set](#label-set) table.
 3. Add the label string to `CATEGORIES` in the Label Set cell of notebook `01`, then run `python3 notebooks/05_Classifiers/sync_prompt.py`. The response schema derives its `enum` from `CATEGORIES`, and the Prompt Builder cell asserts `CATEGORIES` against the fence's category line.
-4. Add it, in the same position, to `CATEGORIES` in the Configuration cell of notebook `02`. Notebooks `03` and `04` read the label set from the trained model's config, so they need no edit — but they need a model retrained by `02` on the new set.
+4. Add it, in the same position, to `CATEGORIES` in the Configuration cell of notebook `02`. Notebook `03` reads the label set from the trained model's config, so it needs no edit — but it needs a model retrained by `02` on the new set.

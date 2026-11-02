@@ -419,7 +419,7 @@ Subfolders: `Partitioned Data/` (§13.4), `Tweet Sheets/` (§13.5), `Sentiment A
 | `hitl_pending_batch_{i + 1}.pkl` | `05/00` | `05/02` (as `hitl_pending_batch_{PENDING_BATCH_TO_PROCESS}.pkl`) | Pending HITL batches, one per round. |
 | `inference_dataset.pkl` | `05/00` | `05/03` | Remainder held out for final inference. |
 | `llm_bootstrap_dataset.pkl` | `05/00` | `05/01`, `05/01b`, `05/03` | Partition sent to the LLM labeller. |
-| `partition_ids.pkl` | `05/00` | `05/04` | Tweet ids per partition. |
+| `partition_ids.pkl` | `05/00` | — | Tweet ids per partition. |
 | `retweets_dataset.pkl` | `05/00` | `05/03` | Retweets split off from the partitions. |
 
 ### 13.5 `Data Sets/Cleaned Data/Tweet Sheets/`
@@ -443,9 +443,7 @@ Subfolders: `Partitioned Data/` (§13.4), `Tweet Sheets/` (§13.5), `Sentiment A
 | `HITL/batch/llm_bootstrap_batch_<stamp>_{pass1,pass2,audit}.jsonl` | `05/01b` | — | Batch API request files, one per job; the record of what was sent. |
 | `HITL/batch/llm_bootstrap_batch_<stamp>_{pass1,pass2,audit}_results.jsonl` | `05/01b` | — | Downloaded batch results; the API deletes its copy after six weeks. |
 | `HITL/batch/llm_bootstrap_batch_state_<stamp>.json` | `05/01b` | `05/01b` | Job names and selection of a batch run; read when `RESUME_RUN_STAMP` is set. |
-| `Final/final_annotated_tweets.pkl` (+ `.csv`) | `05/03` | `05/04` | Final annotations on the HITL remainder. |
-| `Full_Inference/full_inference_annotated.pkl` (+ `.csv`) | `05/04` | — | Classifier annotations for the full AI corpus. |
-| `Full_Inference/checkpoint_{n_processed}.pkl` | `05/04` | — | Checkpoints every 100k tweets. |
+| `Final/final_annotated_tweets.pkl` (+ `.csv`) | `05/03` | — | Final annotations for the whole AI corpus, retweets included (labels inherited from their originals). The former `05/04` mass-inference notebook was deleted 2026-11-02: 03 already covers the pruned corpus, and 04 read the unpruned stage-1 dictionary. |
 
 ### 13.7 `Data Sets/Networks/`
 

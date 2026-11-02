@@ -10,7 +10,6 @@ Changes per notebook
 01  add DATASET_TYPE + partitioned_folder; fix INPUT_PATH (was hitl_folder)
 02  add DATASET_TYPE + partitioned_folder; fix NEXT_BATCH_PATH (was hitl_folder)
 03  add DATASET_TYPE + update partitioned_folder
-04  add DATASET_TYPE + update partitioned_folder + dual FULL_CORPUS_PATH lookup
 """
 import json
 from pathlib import Path
@@ -227,37 +226,6 @@ def patch_03():
     save_nb(path, nb)
 
 
-# ── 04_full_dataset_inference ────────────────────────────────────────────────
-
-def patch_04():
-    path = NB_DIR / '04_full_dataset_inference.ipynb'
-    nb = load_nb(path)
-
-    # 1. Insert DATASET_TYPE block
-    patch_substring(nb, CELL1_MARKER,
-        "RUNNING_LOCALLY = False",
-        "RUNNING_LOCALLY = False" + DATASET_TYPE_BLOCK)
-
-    # 2. Append dataset-type subdirectory to partitioned_folder
-    patch_substring(nb,
-        "partitioned_folder    = cleanedds_folder / 'Partitioned Data'",
-        "partitioned_folder    = cleanedds_folder / 'Partitioned Data'",
-        "partitioned_folder    = cleanedds_folder / 'Partitioned Data' / f'{DATASET_TYPE} Data'")
-
-    # 3. Replace single FULL_CORPUS_PATH line with dataset-type lookup dict
-    old_corpus = "FULL_CORPUS_PATH = datasets_folder / 'AItrust_twits_dict.json'"
-    new_corpus = (
-        "_FULL_CORPUS_PATHS = {\n"
-        "    'AI':  datasets_folder / 'AItrust_twits_dict.json',\n"
-        "    'Art': datasets_folder / 'AItrust_Art_twit_dict.json',  # TODO: confirm Art corpus path\n"
-        "}\n"
-        "FULL_CORPUS_PATH = _FULL_CORPUS_PATHS[DATASET_TYPE]"
-    )
-    patch_substring(nb, old_corpus, old_corpus, new_corpus)
-
-    save_nb(path, nb)
-
-
 # ── main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
@@ -266,5 +234,4 @@ if __name__ == '__main__':
     patch_01()
     patch_02()
     patch_03()
-    patch_04()
     print('Done. Re-run src/scripts/pipeline_graph.py to regenerate docs/pipeline_graph.*')

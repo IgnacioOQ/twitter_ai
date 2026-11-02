@@ -88,7 +88,7 @@ The notebooks are divided into six stages. Every notebook follows the [Setup pat
 | 2 | [02_Processing/](notebooks/02_Processing/) | Convert raw API JSON to tweet/author dictionaries; filter to the AI and AI+Art corpora; build the retweet network and cut its two author backbones (retweeted once, LWCC). |
 | 3 | [03_Analysis_and_Modeling/](notebooks/03_Analysis_and_Modeling/) | Sentiment and emotion classification (Twitter-RoBERTa); example extraction; tweet-level LDA; author-level topics, affect and community comparison per backbone (`04`, which runs `src/author_analysis`); embedding maps. |
 | 4 | [04_Network_Analysis/](notebooks/04_Network_Analysis/) | Community detection with five methods on each backbone, degree distributions and power-law fits; GPU maps of a backbone. |
-| 5 | [05_Classifiers/](notebooks/05_Classifiers/) | Human-in-the-Loop active learning (LightGBM + Twitter-RoBERTa); final inference on the HITL remainder; mass inference on the full ~17M-tweet corpus. See [classification_strategy.md](notebooks/05_Classifiers/classification_strategy.md). |
+| 5 | [05_Classifiers/](notebooks/05_Classifiers/) | Human-in-the-Loop active learning (LightGBM + Twitter-RoBERTa); final inference over the full ~17M-tweet corpus, retweets labelled from their originals. See [classification_strategy.md](notebooks/05_Classifiers/classification_strategy.md). |
 | 6 | [06_Experiments/](notebooks/06_Experiments/) | Isolated probes (e.g. TP-Bigrams) that do not feed downstream stages. |
 
 Notebooks are numbered within each stage (`01_*`, `02_*`, ...) and use snake_case names. The order is not strictly by stage number: the author analysis in stage 3 reads the community partitions of stage 4. After it, command-line stages in `src/` build the figure inputs, the weekly series, figures 1–11 and the author viewer ([docs/blog_analysis/README.md](docs/blog_analysis/README.md)).
@@ -137,11 +137,8 @@ AI Public Trust/                                  (BASE_PATH)
 │       ├── HITL/
 │       │   ├── llm_bootstrap_labels_<stamp>.csv  ← LLM seed labels, one per run
 │       │   └── hitl_review_batch_0{0..4}.csv     ← human-labelled rounds
-│       ├── Final/
-│       │   └── final_annotated_tweets.{pkl,csv}
-│       └── Full_Inference/
-│           ├── checkpoint_*.pkl                  ← every 100k tweets
-│           └── full_inference_annotated.{pkl,csv}
+│       └── Final/
+│           └── final_annotated_tweets.{pkl,csv}  ← every tweet, retweets included
 │
 ├── Literature/                                   ← reference papers, notes
 └── Models/

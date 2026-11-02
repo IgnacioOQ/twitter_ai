@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 One-off patch: fix RAM exhaustion in 00_hitl_data_preparation, preserve `ref_id`
-on retweets so 03/04 can do the orphan lookup without re-extracting the nested
+on retweets so 03 can do the orphan lookup without re-extracting the nested
 `referenced_tweets_dictionary`, and fix two latent bugs in 00:
   - the partition-slicing cell (`llm_bootstrap_df`, `base_df`, ...) was missing
   - the manifest cell was duplicated and the surviving copy dropped `retweets`
@@ -131,7 +131,7 @@ print(df['type'].value_counts().to_string())"""
 
 CELL9_NEW = """RETWEET_TYPE = 'retweeted'
 
-# ref_id is kept on retweets (used for the orphan lookup in 03 and 04) and
+# ref_id is kept on retweets (used for the orphan lookup in 03) and
 # dropped from non-retweets where it would just waste memory.
 retweets_df = df[df['type'] == RETWEET_TYPE].copy().reset_index(drop=True)
 df          = df[df['type'] != RETWEET_TYPE].drop(columns=['ref_id']).reset_index(drop=True)
@@ -295,40 +295,8 @@ def patch_03():
     save_nb(path, nb)
 
 
-# ── notebook 04: same lookup-preference change against new_retweets ──────────
-
-OLD_04 = """if 'referenced_tweets_dictionary' not in new_retweets.columns:
-    print('WARNING: full corpus has no referenced_tweets_dictionary column.')
-    print('         Every retweet will fall through to the no-reference fallback in Pass 3.')
-    new_retweets['ref_id'] = None
-else:
-    new_retweets['ref_id'] = new_retweets['referenced_tweets_dictionary'].apply(_ref_id)"""
-
-NEW_04 = """# Prefer the precomputed `ref_id` column where available (e.g. corpus produced
-# by an updated 02_Processing step). Fall back to extracting from the nested dict.
-if 'ref_id' in new_retweets.columns:
-    new_retweets['ref_id'] = new_retweets['ref_id'].where(new_retweets['ref_id'].notna(), None)
-elif 'referenced_tweets_dictionary' in new_retweets.columns:
-    new_retweets['ref_id'] = new_retweets['referenced_tweets_dictionary'].apply(_ref_id)
-else:
-    print('WARNING: full corpus has no ref_id / referenced_tweets_dictionary column.')
-    print('         Every retweet will fall through to the no-reference fallback in Pass 3.')
-    new_retweets['ref_id'] = None"""
-
-
-def patch_04():
-    path = NB_DIR / '04_full_dataset_inference.ipynb'
-    nb = load_nb(path)
-    i = find_cell_idx(nb, "if 'referenced_tweets_dictionary' not in new_retweets.columns:")
-    s = cell_src(nb['cells'][i])
-    assert OLD_04 in s, f'Old ref_id block not found in 04 cell {i}'
-    nb['cells'][i]['source'] = make_source(s.replace(OLD_04, NEW_04))
-    save_nb(path, nb)
-
-
 if __name__ == '__main__':
     print('Patching 05_Classifiers notebooks (RAM + ref_id + latent bugs)...')
     patch_00()
     patch_03()
-    patch_04()
     print('Done.')

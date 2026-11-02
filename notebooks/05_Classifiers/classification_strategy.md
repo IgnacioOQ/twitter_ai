@@ -34,7 +34,7 @@ Every notebook in this stage exposes a `DATASET_TYPE` constant (default `'AI'`) 
 | `'AI'` | `AItrust_twits_pruned_dict.json` | `Cleaned Data/Partitioned Data/AI Data/` |
 | `'Art'` | `AItrust_Art_pruned_twit_dict.json` | `Cleaned Data/Partitioned Data/Art Data/` |
 
-Each corpus is partitioned, HITL-labelled, and classified end-to-end. Notebook `00` must be run **once per `DATASET_TYPE`** to seed the partition pickles for that corpus; notebooks `01`-`04` are then run per dataset, each with the matching `DATASET_TYPE` set. The trained model artifacts under `Models/Classifiers/` and the HITL labelling CSVs under `Classifiers_Data/HITL/` are **not** dataset-type-aware — the operator is expected to manage those artifacts between runs to avoid clobbering across corpora.
+Each corpus is partitioned, HITL-labelled, and classified end-to-end. Notebook `00` must be run **once per `DATASET_TYPE`** to seed the partition pickles for that corpus; notebooks `01`-`03` are then run per dataset, each with the matching `DATASET_TYPE` set. The trained model artifacts under `Models/Classifiers/` and the HITL labelling CSVs under `Classifiers_Data/HITL/` are **not** dataset-type-aware — the operator is expected to manage those artifacts between runs to avoid clobbering across corpora.
 
 ---
 
@@ -44,7 +44,9 @@ The **pruned tweets dataset** for the active `DATASET_TYPE` (`AItrust_twits_prun
 
 ### Retweets are split out before partitioning
 
-Retweets (`type == 'retweeted'`) are routed to a separate `retweets_dataset.pkl` and **never enter the train/test partitions**. A retweet's `text` is bit-for-bit identical to its referenced original's, so leaving retweets in would (1) leak the same string between training partitions and the held-out Inference partition, inflating measured generalisation, and (2) burn classifier compute predicting labels that are by construction the original's label. At merge time in Step 4, each retweet inherits its original's predicted (or human-confirmed) label via `referenced_tweets_dictionary` — no model call needed.
+Retweets (`type == 'retweeted'`) are routed to a separate `retweets_dataset.pkl` and **never enter the train/test partitions**. A retweet's `text` is bit-for-bit identical to its referenced original's, so leaving retweets in would (1) leak the same string between training partitions and the held-out Inference partition, inflating measured generalisation, and (2) burn classifier compute predicting labels that are by construction the original's label.
+
+**Retweets are out of training, not out of the labelled dataset.** No retweet is sent to the LLM (`01`) or used to train or evaluate a model (`02`). All of them are labelled in Step 4 (`03`), where each retweet inherits its original's predicted (or human-confirmed) label through its `ref_id`, the id of the tweet it retweets (kept by `00` from `referenced_tweets_dictionary`). No model call is needed, except for retweets whose original is missing from the corpus or whose reference cannot be read. The final annotated file therefore covers the whole corpus, retweets included, and its `label_source` column says how each retweet got its label.
 
 `replied_to` and `quoted` carry the user's own commentary text on top of a reference, so their text is genuinely new and they remain in the partitionable corpus alongside originals.
 
@@ -62,7 +64,7 @@ The partitionable corpus (`type ∈ {original, replied_to, quoted}`) is then shu
 
 A `partition_ids.pkl` manifest is written to `Cleaned Data/Partitioned Data/{DATASET_TYPE} Data/`, mapping each partition name to its tweet IDs, with an inline assertion that all partitions are pairwise disjoint. Any downstream notebook can load this manifest to verify which subset a tweet belongs to.
 
-The **remaining ~17 million tweets** in the full corpus are classified separately in notebook 04 using the final trained model.
+Because the Inference partition is the whole remainder, the partitions together with the retweets cover the entire pruned corpus (17,410,035 tweets). Step 4 therefore labels every tweet in it; there is no separate mass-inference step.
 
 ---
 
@@ -207,20 +209,6 @@ Data Sets/Classifiers_Data/Final/final_annotated_tweets.csv
 
 ---
 
-### Step 5 — Full Dataset Mass Inference (~17M tweets)
-
-The final model is then applied to the **entire remaining tweet corpus**. This notebook:
-
-- Loads models from `Models/Classifiers/`
-- Processes tweets in configurable chunks (default 10 000) with `tqdm` progress bars
-- Applies standard text cleaning (remove URLs, @mentions, RT markers)
-- Saves checkpoints every 100 000 tweets to prevent data loss on Colab disconnects
-- Saves final output to `Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.pkl`
-
-This annotated corpus feeds into `03_Analysis_and_Modeling` and `04_Network_Analysis` for the main paper.
-
----
-
 ## Notebooks
 
 All notebooks consume `DATASET_TYPE` (default `'AI'`); set it to `'Art'` to run the same pipeline against the Art corpus.
@@ -231,7 +219,6 @@ All notebooks consume `DATASET_TYPE` (default `'AI'`); set it to `'Art'` to run 
 | `01_llm_bootstrap_labelling.ipynb` | **Once per `DATASET_TYPE`, after `00`** — runs the LLM over the LLM Bootstrap partition to produce `llm_bootstrap_labels_<stamp>.csv`. Its prompt is `llm_bootstrap_prompt.md`, embedded by `sync_prompt.py` (see [Label Taxonomy](#label-taxonomy)); capped at `MAX_LLM_TWEETS` per run |
 | `02_hitl_training_loop.ipynb` | **After each labelling round** — trains all models and exports the next review batch |
 | `03_final_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the HITL remainder and merges with labelled data |
-| `04_full_dataset_inference.ipynb` | **Once per `DATASET_TYPE`** — classifies the entire remaining corpus |
 
 ---
 
@@ -266,13 +253,9 @@ Data Sets/
     │   ├── llm_bootstrap_checkpoint_*.pkl  ← intermediate saves every 1 000 tweets
     │   ├── hitl_review_batch_00.csv        ← optional human-labelled seed (Path B)
     │   └── hitl_review_batch_01.csv        ← ... 04.csv (filled after each loop)
-    ├── Final/
-    │   ├── final_annotated_tweets.pkl
-    │   └── final_annotated_tweets.csv
-    └── Full_Inference/
-        ├── checkpoint_100000.pkl      ← intermediate saves
-        ├── full_inference_annotated.pkl
-        └── full_inference_annotated.csv
+    └── Final/
+        ├── final_annotated_tweets.pkl   ← every tweet of the pruned corpus, retweets included
+        └── final_annotated_tweets.csv
 
 Models/
 └── Classifiers/
@@ -294,4 +277,3 @@ Models/
 - **Why not LLaMA?** Large generative LLMs (7B+ parameters) require dedicated GPU infrastructure and LoRA/PEFT fine-tuning pipelines. RoBERTa (125M parameters) achieves excellent results within standard Colab GPU limits.
 - **Why 5k random + 5k uncertain?** Pure uncertainty sampling can introduce bias by clustering around a narrow slice of the input space. Mixing in a random sample ensures the training set remains diverse.
 - **Why the native LightGBM API (`lgb.train`) instead of the sklearn wrapper?** The native API gives direct control over `lgb.Dataset` construction, the params dict, and `num_boost_rounds`, matching the approach in `Classifiers_Training_Final.ipynb` and enabling finer-grained model inspection.
-- **Why checkpoint saves in notebook 04?** Classifying 17M tweets on Colab can take many hours. Google Colab sessions disconnect unpredictably; saving every 100k tweets means at most ~100k tweets of work is lost.

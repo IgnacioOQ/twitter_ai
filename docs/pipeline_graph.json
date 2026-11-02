@@ -155,13 +155,6 @@
       "bipartite": 0
     },
     {
-      "id": "05_Classifiers/04_full_dataset_inference",
-      "kind": "notebook",
-      "stage": 5,
-      "path": "notebooks/05_Classifiers/04_full_dataset_inference.ipynb",
-      "bipartite": 0
-    },
-    {
       "id": "06_Experiments/01_tp_bigrams_test",
       "kind": "notebook",
       "stage": 6,
@@ -821,30 +814,6 @@
       "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Final/final_annotated_tweets.csv",
       "kind": "artifact",
       "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Final/final_annotated_tweets.csv",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/checkpoint_{n_processed}.pkl",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/checkpoint_{n_processed}.pkl",
-      "glob": false,
-      "templated": true,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.pkl",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.pkl",
-      "glob": false,
-      "templated": false,
-      "bipartite": 1
-    },
-    {
-      "id": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.csv",
-      "kind": "artifact",
-      "drive_path": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.csv",
       "glob": false,
       "templated": false,
       "bipartite": 1
@@ -1856,21 +1825,6 @@
       "direction": "write"
     },
     {
-      "src": "05_Classifiers/04_full_dataset_inference",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/checkpoint_{n_processed}.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "05_Classifiers/04_full_dataset_inference",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.pkl",
-      "direction": "write"
-    },
-    {
-      "src": "05_Classifiers/04_full_dataset_inference",
-      "dst": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Full_Inference/full_inference_annotated.csv",
-      "direction": "write"
-    },
-    {
       "src": "author_analysis: layout",
       "dst": "My Drive/Colab Projects/AI Public Trust/Models/Topic Modeling/LDA/backbone_analysis/networks/{backbone}/layout/matched_nodes.parquet",
       "direction": "write",
@@ -2228,11 +2182,6 @@
       "direction": "read"
     },
     {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/AI Data/partition_ids.pkl",
-      "dst": "05_Classifiers/04_full_dataset_inference",
-      "direction": "read"
-    },
-    {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/HITL/llm_bootstrap_labels_{RUN_STAMP}.csv",
       "dst": "05_Classifiers/02_hitl_training_loop",
       "direction": "read",
@@ -2272,11 +2221,6 @@
     {
       "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Cleaned Data/Partitioned Data/AI Data/hitl_pending_batch_{PENDING_BATCH_TO_PROCESS}.pkl",
       "dst": "05_Classifiers/02_hitl_training_loop",
-      "direction": "read"
-    },
-    {
-      "src": "My Drive/Colab Projects/AI Public Trust/Data Sets/Classifiers_Data/Final/final_annotated_tweets.pkl",
-      "dst": "05_Classifiers/04_full_dataset_inference",
       "direction": "read"
     },
     {
