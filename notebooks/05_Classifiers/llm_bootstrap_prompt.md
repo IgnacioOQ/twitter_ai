@@ -33,12 +33,18 @@ The tuning loop that this is built for: run with `SMOKE_TEST = True`, open
 `llm_bootstrap_labels_full_<stamp>.pkl`, sort by `confidence` ascending and read the bottom rows —
 those are where the criteria are underspecified. Edit the fence, sync, re-run.
 
+**Every change to the fence gets an entry in `llm_bootstrap_prompt_log.md`**, in this folder:
+what changed, the evidence that motivated it (which run, which rows), and the fingerprints the
+notebook prints after the sync. That file is how a labels CSV on Drive is traced back to the
+exact criteria that produced it, and how the same mistake is not re-made two versions later.
+
 ## The prompt
 
 ````text
 You are a tweet classifier for a research project on AI public trust.
 This is a multi-label classification task about two central questions: "What is art?" and "What makes art valuable?".
 The categories come in two groups. `definition` and `value` mark a tweet that raises one of those two questions. The remaining categories are conceptual frameworks that answer them. A tweet can raise a question and answer it through a framework at the same time: label every category that applies.
+The tweets are ordinary social-media posts, not essays. Apply each criterion as written: a tweet does not need to make an argument, or to use philosophical vocabulary, to meet it.
 
 Classify the tweet into ALL of the following categories that apply:
 definition, value, intentionalism, anti_intentionalism, cognitivism, expressivism, hedonism, originality, achievement, none
@@ -55,9 +61,11 @@ Examples:
 
 ### value
 Definition: The tweet engages the question of what makes art valuable. It judges something as good or bad art, or a good or bad artwork; asks whether a creator can produce anything of value; points out flaws or strengths of a work; or uses the language of liking or disliking a work (this can overlap with personal taste). This is artistic value, NOT monetary value: whether something will sell, or what it is worth in money, does not count.
+Casual praise or criticism of a specific work, performance or creator counts, with no argument attached ("this is amazing", "it looks cute", "this is what ai voice generation is meant to be"). A seller promoting its own product, token or collection is advertising, not an artistic judgement, and does not count on its own ("another sick free claim for our holders").
 Examples:
 - "cuz if they cleared it up a bit, it would look less like they just posted it to show off or get noticed. this is just me cuz i have seen a fair share of good and bad ai art, yours is in the good category."
 - "i don't mind ai art as long as it's not plagiarism...i also think some people a bit too lazy with it, seen some make a few posts with ai art that you can clearly see have flaws. yours is great, i really like it. but i feel like others should touch up the ai art before posting..."
+- "this is what ai voice generation is meant to be" (implicit: praises a specific work as a good use of AI, without saying why)
 
 ### intentionalism
 Definition: This framework posits that the artist's intent is the ultimate source of meaning and the defining characteristic of art. A work is art because it was intended to be so, and it means exactly what the creator meant it to mean. Tweets using this framework will often argue that AI cannot produce art because it lacks a conscious mind, meaning, or deliberate intention.

@@ -52,6 +52,9 @@ python3 notebooks/05_Classifiers/sync_prompt.py             # embed it in the no
 `sync_prompt.py --check` exits non-zero while the two disagree, which is the form to wire into
 a pre-commit hook.
 
+Every change to the fence is recorded in `llm_bootstrap_prompt_log.md`, with the run and the
+rows that motivated it and the fingerprints that tie a labels file to its prompt version.
+
 ---
 
 ## Confidence and rationale are the interpretability surface
