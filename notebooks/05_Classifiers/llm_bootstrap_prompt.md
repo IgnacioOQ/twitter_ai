@@ -89,6 +89,7 @@ Example: "This AI collaboration art thing, isn't effort."
 
 ### none
 Definition: No category above applies. This is the residual bucket — it is not a claim that the tweet is unrelated to art or to AI. Only output `none` if NO other category applies.
+`none` is never combined with another category. If you select any other category, do not also output `none`, even when you are unsure; express the doubt through that category's confidence instead.
 
 Confidence.
 0.8-1.0   Explicit: the vocabulary is present and the link to art's worth/definition is stated outright.
@@ -165,3 +166,8 @@ working exactly as written — which is a reason to edit this file, not just tha
 - The same tweet is labelled **more than once**, independently, each pass through a fresh client.
 - **Pass 1 is the operative label** — the one in the CSV. Where passes disagree the row is flagged in `passes_agree` (in the pickle).
 - `confidence` in the pickle is the **highest confidence among pass 1's selected categories**. It is the model's own self-report.
+- **`none` is exclusive, and the parser enforces it.** The fence above says so, but the model
+  has still returned `none` beside another label (18 of 2 000 rows on 2026-10-19, typically a
+  substantive label followed by a hedging `none`). The parser drops `none` from any reply
+  that also carries another category, before `pred_*`, `passes_agree` or the audit see it, and
+  counts how often it did so; `01b` prints that count in its run report.

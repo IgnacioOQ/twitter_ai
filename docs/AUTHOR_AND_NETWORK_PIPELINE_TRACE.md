@@ -439,7 +439,7 @@ Subfolders: `Partitioned Data/` (§13.4), `Tweet Sheets/` (§13.5), `Sentiment A
 | `HITL/llm_bootstrap_labels_full_<stamp>.pkl` | `05/01`, `05/01b` | — | Full bootstrap output with confidence and rationale. |
 | `HITL/llm_bootstrap_seen_ids_AI.json` | `05/01`, `05/01b` | `05/01`, `05/01b` | Ids already sent to the LLM; shared by both notebooks. |
 | `HITL/llm_bootstrap_usage_{timestamp}.json` | `05/01`, `05/01b` | — | API usage and cost per run; `05/01b` adds measured tokens, cost and the batch job names. |
-| `HITL/llm_bootstrap_audit_report_<stamp>.txt` | `05/01b` | — | The printed audit report (second opinion on `none`), saved as text. |
+| `HITL/llm_bootstrap_report_<stamp>.txt` | `05/01b` | — | Run report as text: cost and tokens per batch job (passes and audit) against the pre-flight estimate, then the classification report, label co-occurrence, pass-disagreement study and audit report. Replaces the earlier `llm_bootstrap_audit_report_<stamp>.txt`. |
 | `HITL/batch/llm_bootstrap_batch_<stamp>_{pass1,pass2,audit}.jsonl` | `05/01b` | — | Batch API request files, one per job; the record of what was sent. |
 | `HITL/batch/llm_bootstrap_batch_<stamp>_{pass1,pass2,audit}_results.jsonl` | `05/01b` | — | Downloaded batch results; the API deletes its copy after six weeks. |
 | `HITL/batch/llm_bootstrap_batch_state_<stamp>.json` | `05/01b` | `05/01b` | Job names and selection of a batch run; read when `RESUME_RUN_STAMP` is set. |

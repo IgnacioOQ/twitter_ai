@@ -262,6 +262,7 @@ Data Sets/
     │   ├── llm_bootstrap_prompt.md         ← the repo's prompt file, copied verbatim
     │   ├── llm_bootstrap_seen_ids_AI.json  ← ids the LLM has seen — EXCLUDE from eval
     │   ├── llm_bootstrap_usage_*.json      ← measured token/cost record, one per run
+    │   ├── llm_bootstrap_report_<stamp>.txt  ← 01b run report: cost per job, labels, co-occurrence, disagreement, audit
     │   ├── llm_bootstrap_checkpoint_*.pkl  ← intermediate saves every 1 000 tweets
     │   ├── hitl_review_batch_00.csv        ← optional human-labelled seed (Path B)
     │   └── hitl_review_batch_01.csv        ← ... 04.csv (filled after each loop)

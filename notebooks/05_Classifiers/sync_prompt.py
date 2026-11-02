@@ -15,9 +15,10 @@ the criteria into the notebook" is a manual step performed by a human under time
 which is how the notebook and `categories.md` came to hold two copies of the same text in
 the first place.
 
-Notebook edits preserve the file's own JSON serialization (indent=1, ensure_ascii=True, no
-trailing newline) so the diff is confined to the one cell — see NOTEBOOK_WRITING_SKILL.md
-§8. Colab-flavored ids stay mirrored at `metadata.id` (§1).
+Notebook edits preserve each file's own JSON serialization — detected per file, since a
+notebook saved from Colab comes back as indent=2, ensure_ascii=False where the repo writes
+indent=1, ensure_ascii=True — so the diff is confined to the one cell (KB
+NOTEBOOK_AUTHORING_SKILL.md §8). Colab-flavored ids stay mirrored at `metadata.id` (§1).
 """
 from __future__ import annotations
 
@@ -33,7 +34,18 @@ NOTEBOOKS = [HERE / "01_llm_bootstrap_labelling.ipynb",
              HERE / "01b_llm_bootstrap_labelling.ipynb"]
 CELL_ID = "c-prompt"
 
-INDENT, ENSURE_ASCII = 1, True
+# Candidate serializations, tried in order; the one whose no-op round-trip reproduces the
+# file byte for byte is reused when writing it back.
+SERIALIZATIONS = [(1, True, False), (2, False, False), (1, False, False), (2, True, False),
+                  (1, True, True), (2, False, True), (1, False, True), (2, True, True)]
+
+
+def detect_serialization(raw: str, nb: dict):
+    """(indent, ensure_ascii, trailing_newline) that reproduces `raw`, or None."""
+    for indent, ensure_ascii, nl in SERIALIZATIONS:
+        if json.dumps(nb, indent=indent, ensure_ascii=ensure_ascii) + ("\n" if nl else "") == raw:
+            return indent, ensure_ascii, nl
+    return None
 
 # Sentinels bounding the generated region, so the surrounding cell (imports, helpers,
 # assertions) can be edited by hand without this script clobbering it.
@@ -132,14 +144,15 @@ def main() -> int:
     for NOTEBOOK in NOTEBOOKS:
         raw = NOTEBOOK.read_text(encoding="utf-8")
         nb = json.loads(raw)
-        if json.dumps(nb, indent=INDENT, ensure_ascii=ENSURE_ASCII) != raw:
-            print(f"ERROR: {NOTEBOOK.name} is not serialized as indent={INDENT}, "
-                  f"ensure_ascii={ENSURE_ASCII}; refusing to rewrite it wholesale.",
-                  file=sys.stderr)
+        fmt = detect_serialization(raw, nb)
+        if fmt is None:
+            print(f"ERROR: {NOTEBOOK.name} matches none of the known JSON serializations; "
+                  f"refusing to rewrite it wholesale.", file=sys.stderr)
             drift += 1          # reported per notebook so the others are still checked
             continue
 
-        cell = next((c for c in nb["cells"] if c.get("id") == CELL_ID), None)
+        cell = next((c for c in nb["cells"]
+                     if CELL_ID in (c.get("id"), c.get("metadata", {}).get("id"))), None)
         if cell is None:
             sys.exit(f"ERROR: no cell with id {CELL_ID!r} in {NOTEBOOK.name}")
 
@@ -159,7 +172,8 @@ def main() -> int:
         cell["source"] = wanted_source
         cell.setdefault("metadata", {})["id"] = CELL_ID
 
-        out = json.dumps(nb, indent=INDENT, ensure_ascii=ENSURE_ASCII)
+        indent, ensure_ascii, nl = fmt
+        out = json.dumps(nb, indent=indent, ensure_ascii=ensure_ascii) + ("\n" if nl else "")
         NOTEBOOK.write_text(out, encoding="utf-8")
         json.loads(NOTEBOOK.read_text(encoding="utf-8"))   # round-trip check
 

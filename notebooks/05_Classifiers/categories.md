@@ -28,7 +28,7 @@ The pipeline uses a **multi-label classification** approach: a single tweet can 
 | `achievement` | Art is valuable because it requires human effort, skill, and mastery. |
 | `none` | No category in the current taxonomy applies. |
 
-`none` is a **residual bucket.** It means "no category applied *as of the run that produced it*". 
+`none` is a **residual bucket.** It means "no category applied *as of the run that produced it*". It is therefore **exclusive**: the prompt forbids combining it with another label, and the parser in `01` / `01b` drops `none` from any reply that does so anyway (18 of 2 000 rows on 2026-10-19), counting the replies it changed.
 
 ---
 
